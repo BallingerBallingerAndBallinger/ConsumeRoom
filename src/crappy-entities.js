@@ -65,12 +65,12 @@
     entities = [
       entityBuilder.initialize(canvasElement, logMove),
       entityBuilder.initialize(canvasElement, logMove),
-      bloonBuilder.initialize(canvasElement, () => {})
+      bloonBuilder.initialize(canvasElement, logMove)
     ];
   }
 
   function logMove(entity, x, y) {
-    console.log('Moving: ' + entity.name + ' :(' + x + ', ' + y + ')');
+    console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
   }
 
   function update(timestamp, delta) {

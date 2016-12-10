@@ -156,12 +156,12 @@
 	    entities = [
 	      entityBuilder.initialize(canvasElement, logMove),
 	      entityBuilder.initialize(canvasElement, logMove),
-	      bloonBuilder.initialize(canvasElement, () => {})
+	      bloonBuilder.initialize(canvasElement, logMove)
 	    ];
 	  }
 
 	  function logMove(entity, x, y) {
-	    console.log('Moving: ' + entity.name + ' :(' + x + ', ' + y + ')');
+	    console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
 	  }
 
 	  function update(timestamp, delta) {
@@ -17371,13 +17371,16 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 
-	  function initialize(canvasElement, moveEntity) {
+	  function initialize(canvasElement, moveMethod) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(canvasElement, moveEntity);
-	      entity.render = render;
-	      return entity;
+	      var entity = entityBase.initialize(canvasElement, moveMethod);
+	      var self = { name: 'bloon', x: 1, y: 2 };
+	      var bloon = Object.assign({}, entity);
+	      bloon.update = update;
+	      return bloon;
 
-	      function render(timestamp, delta) {
+	      function update(timestamp, delta) {
+	        moveMethod(self, 10, 10);
 	        console.log('Totally rendering a bloon right meow');
 	      }
 	    };
