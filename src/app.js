@@ -5,11 +5,13 @@
   var config = require('./configuration.js');
   var sprites = require('./crappy-sprites.js');
   var entities = require('./crappy-entities.js');
+  var stats = require('./crappy-stats.js');
 
   var canvasElement;
   window.onload = () => {
     canvasElement = document.getElementById('canvas');
     sprites.initialize(canvasElement);
+    stats.initialize(entities.theRoom);
     requestAnimationFrame(grandLoop);
   };
 
@@ -53,6 +55,7 @@
     sprites.clearClicks();
 
     drawTitle(canvasElement.getContext('2d'));
+    stats.draw(entities.theRoom);
   }
 
   var last;
