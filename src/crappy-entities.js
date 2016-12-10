@@ -1,6 +1,8 @@
 (function() {
   var _ = require('lodash');
-  
+  var sprites = require('./crappy-sprites.js');
+  var stats;
+
   var theGirl =
     { name: 'girl1',
       x: 500,
@@ -53,7 +55,20 @@
       }
     };
 
+  function initialize(canvasElement, incomingStats) {
+    sprites.initialize(canvasElement);
+    stats = incomingStats;
+  }
+
+  function render(timestamp, delta) {
+    sprites.update([{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items));
+    sprites.draw();
+    sprites.clearClicks();
+    stats.draw(entities.theRoom);
+  }
+
   module.exports = {
-    theRoom: theRoom
+    render: render,
+    initialize: initialize
   };
 })();

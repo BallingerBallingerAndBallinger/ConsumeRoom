@@ -2,16 +2,12 @@
 (function() {
   'use strict';
 
-  var config = require('./configuration.js');
-  var sprites = require('./crappy-sprites.js');
   var entities = require('./crappy-entities.js');
   var stats = require('./crappy-stats.js');
 
-  var canvasElement;
   window.onload = () => {
-    canvasElement = document.getElementById('canvas');
-    sprites.initialize(canvasElement);
-    stats.initialize(entities.theRoom);
+    var canvasElement = document.getElementById('canvas');
+    entities.initialize(canvasElement, stats);
     requestAnimationFrame(grandLoop);
   };
 
@@ -24,38 +20,7 @@
     var delta = getDelta(timestamp);
     if (delta < 50) return;
     updateDelta(timestamp);
-
-    var entitiesList = [
-      { name: 'crappy-room', x: 25, y: 10, size: 900 },
-      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 }
-    ];
-
-    entitiesList = entitiesList.concat(entities.theRoom.people);
-    entitiesList = entitiesList.concat(entities.theRoom.items);
-
-    sprites.update(entitiesList);
-    sprites.draw();
-
-    var clickedGirls = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
-    var clickedBears = sprites.getClicks().filter((sprite) => sprite.name === 'bear');
-    var bears = clickedGirls.map((sprite) => {
-      var newSprite = Object.assign({}, sprite);
-      newSprite.name = 'bear';
-      return newSprite;
-    });
-    var girls = clickedBears.map((sprite) => {
-      var newSprite = Object.assign({}, sprite);
-      newSprite.name = 'girl1';
-      return newSprite;
-    });
-    entities.theRoom.remove(clickedBears);
-    entities.theRoom.remove(clickedGirls);
-    entities.theRoom.addItems(bears);
-    entities.theRoom.addPeople(girls);
-    sprites.clearClicks();
-
-    drawTitle(canvasElement.getContext('2d'));
-    stats.draw(entities.theRoom);
+    entities.render(timestamp, delta);
   }
 
   var last;
@@ -70,21 +35,5 @@
 
   function updateDelta(timestamp) {
     last = timestamp;
-  }
-
-  // Taken from a horrific w3c example
-  function drawTitle(ctx) {
-    ctx.font = '32px Verdana';
-    // Create gradient
-    var gradient = ctx.createLinearGradient(0, 0, 500, 0);
-    gradient.addColorStop('0', 'magenta');
-    gradient.addColorStop('0.5', 'blue');
-    gradient.addColorStop('1.0', 'red');
-
-    var oldFill = ctx.fillStyle;
-    ctx.fillStyle = gradient;
-
-    ctx.fillText(config.title, 22, 32);
-    ctx.fillStyle = oldFill;
   }
 })();

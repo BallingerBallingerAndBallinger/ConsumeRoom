@@ -48,16 +48,12 @@
 	(function() {
 	  'use strict';
 
-	  var config = __webpack_require__(1);
-	  var sprites = __webpack_require__(2);
-	  var entities = __webpack_require__(3);
-	  var stats = __webpack_require__(6);
+	  var entities = __webpack_require__(1);
+	  var stats = __webpack_require__(5);
 
-	  var canvasElement;
 	  window.onload = () => {
-	    canvasElement = document.getElementById('canvas');
-	    sprites.initialize(canvasElement);
-	    stats.initialize(entities.theRoom);
+	    var canvasElement = document.getElementById('canvas');
+	    entities.initialize(canvasElement, stats);
 	    requestAnimationFrame(grandLoop);
 	  };
 
@@ -70,38 +66,7 @@
 	    var delta = getDelta(timestamp);
 	    if (delta < 50) return;
 	    updateDelta(timestamp);
-
-	    var entitiesList = [
-	      { name: 'crappy-room', x: 25, y: 10, size: 900 },
-	      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 }
-	    ];
-
-	    entitiesList = entitiesList.concat(entities.theRoom.people);
-	    entitiesList = entitiesList.concat(entities.theRoom.items);
-
-	    sprites.update(entitiesList);
-	    sprites.draw();
-
-	    var clickedGirls = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
-	    var clickedBears = sprites.getClicks().filter((sprite) => sprite.name === 'bear');
-	    var bears = clickedGirls.map((sprite) => {
-	      var newSprite = Object.assign({}, sprite);
-	      newSprite.name = 'bear';
-	      return newSprite;
-	    });
-	    var girls = clickedBears.map((sprite) => {
-	      var newSprite = Object.assign({}, sprite);
-	      newSprite.name = 'girl1';
-	      return newSprite;
-	    });
-	    entities.theRoom.remove(clickedBears);
-	    entities.theRoom.remove(clickedGirls);
-	    entities.theRoom.addItems(bears);
-	    entities.theRoom.addPeople(girls);
-	    sprites.clearClicks();
-
-	    drawTitle(canvasElement.getContext('2d'));
-	    stats.draw(entities.theRoom);
+	    entities.render(timestamp, delta);
 	  }
 
 	  var last;
@@ -117,110 +82,18 @@
 	  function updateDelta(timestamp) {
 	    last = timestamp;
 	  }
-
-	  // Taken from a horrific w3c example
-	  function drawTitle(ctx) {
-	    ctx.font = '32px Verdana';
-	    // Create gradient
-	    var gradient = ctx.createLinearGradient(0, 0, 500, 0);
-	    gradient.addColorStop('0', 'magenta');
-	    gradient.addColorStop('0.5', 'blue');
-	    gradient.addColorStop('1.0', 'red');
-
-	    var oldFill = ctx.fillStyle;
-	    ctx.fillStyle = gradient;
-
-	    ctx.fillText(config.title, 22, 32);
-	    ctx.fillStyle = oldFill;
-	  }
 	})();
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	  title: 'Consume Room'
-	};
-
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	(function() {
-	  var sprites = [];
-	  var clicked = [];
-	  var width;
-	  var height;
-	  var context;
-
-	  function initialize(canvasElement) {
-	    canvasElement.addEventListener('click', clickHappened);
-	    context = canvasElement.getContext('2d');
-	    width = canvasElement.width;
-	    height = canvasElement.height;
-	    sprites = [];
-	  }
-
-	  function draw() {
-	    context.clearRect(0, 0, width, height);
-	    sprites.forEach((sprite) => {
-	      context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
-	    });
-	  }
-
-	  function update(newState) {
-	    sprites = newState;
-	  }
-
-	  function clickHappened(clickEvent) {
-	    var coords = transformCoords(clickEvent);
-	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, coords.x, coords.y)).slice(0);
-	    clicked = clicked.concat(encountered);
-	  }
-
-	  function isInsideSprite(sprite, x, y) {
-	    return sprite.x < x &&
-	           sprite.y < y &&
-	           sprite.x + sprite.size > x &&
-	           sprite.y + sprite.size > y;
-	  }
-
-	  function getClicks() {
-	    return clicked;
-	  }
-
-	  function clearClicks() {
-	    clicked = [];
-	  }
-
-	  function transformCoords(event) {
-	    var rect = event.target.getBoundingClientRect();
-	    return {
-	      x: (event.clientX - rect.left) * (width / rect.width),
-	      y: (event.clientY - rect.top) * (height / rect.height)
-	    };
-	  }
-
-	  module.exports = {
-	    draw: draw,
-	    update: update,
-	    initialize: initialize,
-	    getClicks: getClicks,
-	    clearClicks: clearClicks
-	  };
-	})();
-
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function() {
-	  var _ = __webpack_require__(4);
-	  
+	  var _ = __webpack_require__(2);
+	  var sprites = __webpack_require__(4);
+	  var stats;
+
 	  var theGirl =
 	    { name: 'girl1',
 	      x: 500,
@@ -273,14 +146,27 @@
 	      }
 	    };
 
+	  function initialize(canvasElement, incomingStats) {
+	    sprites.initialize(canvasElement);
+	    stats = incomingStats;
+	  }
+
+	  function render(timestamp, delta) {
+	    sprites.update([{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items));
+	    sprites.draw();
+	    sprites.clearClicks();
+	    stats.draw(entities.theRoom);
+	  }
+
 	  module.exports = {
-	    theRoom: theRoom
+	    render: render,
+	    initialize: initialize
 	  };
 	})();
 
 
 /***/ },
-/* 4 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -297,7 +183,7 @@
 	  var undefined;
 
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.0';
+	  var VERSION = '4.17.2';
 
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3341,7 +3227,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 
 	      var index = 0,
 	          length = path.length;
@@ -3527,12 +3413,9 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      if (!isKey(path, object)) {
-	        path = castPath(path);
-	        object = parent(object, path);
-	        path = last(path);
-	      }
-	      var func = object == null ? object : object[toKey(path)];
+	      path = castPath(path, object);
+	      object = parent(object, path);
+	      var func = object == null ? object : object[toKey(last(path))];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 
@@ -4093,7 +3976,7 @@
 	            value = baseGet(object, path);
 
 	        if (predicate(value, path)) {
-	          baseSet(result, path, value);
+	          baseSet(result, castPath(path, object), value);
 	        }
 	      }
 	      return result;
@@ -4169,17 +4052,8 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          }
-	          else if (!isKey(index, array)) {
-	            var path = castPath(index),
-	                object = parent(array, path);
-
-	            if (object != null) {
-	              delete object[toKey(last(path))];
-	            }
-	          }
-	          else {
-	            delete array[toKey(index)];
+	          } else {
+	            baseUnset(array, index);
 	          }
 	        }
 	      }
@@ -4300,7 +4174,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 
 	      var index = -1,
 	          length = path.length,
@@ -4641,11 +4515,9 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	      object = parent(object, path);
-
-	      var key = toKey(last(path));
-	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
+	      return object == null || delete object[toKey(last(path))];
 	    }
 
 	    /**
@@ -4785,10 +4657,14 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
+	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value) {
-	      return isArray(value) ? value : stringToPath(value);
+	    function castPath(value, object) {
+	      if (isArray(value)) {
+	        return value;
+	      }
+	      return isKey(value, object) ? [value] : stringToPath(toString(value));
 	    }
 
 	    /**
@@ -6413,7 +6289,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 
 	      var index = -1,
 	          length = path.length,
@@ -6890,7 +6766,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 
 	    /**
@@ -7030,8 +6906,6 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
-	      string = toString(string);
-
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9766,12 +9640,10 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
-	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 
 	      baseEach(collection, function(value) {
-	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
-	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
+	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11139,14 +11011,10 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
-	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 
 	        if (array) {
 	          arrayPush(otherArgs, array);
-	        }
-	        if (start != lastIndex) {
-	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13762,9 +13630,16 @@
 	      if (object == null) {
 	        return result;
 	      }
+	      var isDeep = false;
+	      paths = arrayMap(paths, function(path) {
+	        path = castPath(path, object);
+	        isDeep || (isDeep = path.length > 1);
+	        return path;
+	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-
+	      if (isDeep) {
+	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	      }
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13814,7 +13689,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
+	      return object == null ? {} : basePick(object, paths);
 	    });
 
 	    /**
@@ -13836,7 +13711,16 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
+	      if (object == null) {
+	        return {};
+	      }
+	      var props = arrayMap(getAllKeysIn(object), function(prop) {
+	        return [prop];
+	      });
+	      predicate = getIteratee(predicate);
+	      return basePickBy(object, props, function(value, path) {
+	        return predicate(value, path[0]);
+	      });
 	    }
 
 	    /**
@@ -13869,15 +13753,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 
 	      var index = -1,
 	          length = path.length;
 
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        object = undefined;
 	        length = 1;
+	        object = undefined;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16387,7 +16271,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
 	    }
 
 	    /**
@@ -17351,10 +17235,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(5)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(3)(module)))
 
 /***/ },
-/* 5 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -17370,7 +17254,76 @@
 
 
 /***/ },
-/* 6 */
+/* 4 */
+/***/ function(module, exports) {
+
+	(function() {
+	  var sprites = [];
+	  var clicked = [];
+	  var width;
+	  var height;
+	  var context;
+
+	  function initialize(canvasElement) {
+	    canvasElement.addEventListener('click', clickHappened);
+	    context = canvasElement.getContext('2d');
+	    width = canvasElement.width;
+	    height = canvasElement.height;
+	    sprites = [];
+	  }
+
+	  function draw() {
+	    context.clearRect(0, 0, width, height);
+	    sprites.forEach((sprite) => {
+	      context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
+	    });
+	  }
+
+	  function update(newState) {
+	    sprites = newState;
+	  }
+
+	  function clickHappened(clickEvent) {
+	    var coords = transformCoords(clickEvent);
+	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, coords.x, coords.y)).slice(0);
+	    clicked = clicked.concat(encountered);
+	  }
+
+	  function isInsideSprite(sprite, x, y) {
+	    return sprite.x < x &&
+	           sprite.y < y &&
+	           sprite.x + sprite.size > x &&
+	           sprite.y + sprite.size > y;
+	  }
+
+	  function getClicks() {
+	    return clicked;
+	  }
+
+	  function clearClicks() {
+	    clicked = [];
+	  }
+
+	  function transformCoords(event) {
+	    var rect = event.target.getBoundingClientRect();
+	    return {
+	      x: (event.clientX - rect.left) * (width / rect.width),
+	      y: (event.clientY - rect.top) * (height / rect.height)
+	    };
+	  }
+
+	  module.exports = {
+	    draw: draw,
+	    update: update,
+	    initialize: initialize,
+	    getClicks: getClicks,
+	    clearClicks: clearClicks
+	  };
+	})();
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
 	(function() {
