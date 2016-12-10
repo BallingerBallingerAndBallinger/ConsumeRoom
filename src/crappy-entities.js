@@ -1,7 +1,9 @@
 (function() {
   var _ = require('lodash');
   var sprites = require('./crappy-sprites.js');
+  var entityBuilder = require('./crappy-entity.js');
   var stats;
+  var entities = [];
 
   var theGirl =
     { name: 'girl1',
@@ -59,15 +61,15 @@
     sprites.initialize(canvasElement);
     stats = incomingStats;
     stats.initialize(theRoom);
+    entities = [
+      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move A ' + x + ', ' + y)),
+      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move B ' + x + ', ' + y))
+    ];
   }
 
   function render(timestamp, delta) {
-    var state = [{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items);
-
-    sprites.update(state);
-    sprites.draw();
-    sprites.clearClicks();
-    stats.draw(theRoom);
+    entities.forEach(e => e.move(1, 2));
+    entities.forEach(e => e.render(timestamp, delta));
   }
 
   module.exports = {
