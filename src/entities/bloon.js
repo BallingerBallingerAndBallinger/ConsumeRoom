@@ -21,7 +21,7 @@
         var toMove = checkMovement(attemptedX, self.y);
 
         if (toMove === false) {
-          goingLeft === !goingLeft;
+          goingLeft = !goingLeft;
         } else {
           self.x = attemptedX;
         };
