@@ -2,21 +2,15 @@ node_modules
 **/*.swp
 **/#*
 *.un~
-<<<<<<< HEAD
 **/*.iml
 **/*.ipr
 **/*.iws
-
-=======
 *.iml
 *.ipr
->>>>>>> origin/master
 *.iws
 
-*.iws
-
-*.iws
+**/*.map
+*.map
 
 ludem_dare_37.iws
-
 docs/TestPage.html
