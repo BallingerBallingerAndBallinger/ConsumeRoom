@@ -96,7 +96,13 @@
 	  var bloonBuilder = __webpack_require__(6);
 	  var renderLib = __webpack_require__(7);
 	  var stats;
+<<<<<<< HEAD
 	  var renderer;
+=======
+	  var width;
+	  var height;
+	  var clear;
+>>>>>>> dafd1cdc58662d471472802f30f9e1d2782f1f4c
 	  var entities = [];
 
 	  var theGirl =
@@ -152,6 +158,7 @@
 	    };
 
 	  function initialize(canvasElement, incomingStats) {
+<<<<<<< HEAD
 	    renderLib.initialize(canvasElement);
 	    renderer = renderLib;
 	    stats = incomingStats;
@@ -160,6 +167,17 @@
 	      entityBuilder.initialize(renderer, logMove),
 	      entityBuilder.initialize(renderer, logMove),
 	      bloonBuilder.initialize(renderer, logMove)
+=======
+	    width = canvasElement.width;
+	    height = canvasElement.height;
+
+	    clear = () => canvasElement.getContext('2d').clearRect(0, 0, width, height);
+	    sprites.initialize(canvasElement);
+	    stats = incomingStats;
+	    stats.initialize(theRoom);
+	    entities = [
+	      bloonBuilder.initialize(canvasElement, logMove, checkMovement)
+>>>>>>> dafd1cdc58662d471472802f30f9e1d2782f1f4c
 	    ];
 	  }
 
@@ -167,7 +185,20 @@
 	    console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
 	  }
 
+	  function checkMovement(x, y) {
+	    if (x < 0) {
+	      return false;
+	    }
+
+	    if (x > width) {
+	      return false;
+	    }
+
+	    return true;
+	  }
+
 	  function update(timestamp, delta) {
+	    clear();
 	    entities.forEach(e => e.update(timestamp, delta));
 	  }
 
@@ -17288,7 +17319,6 @@
 	  }
 
 	  function draw() {
-	    context.clearRect(0, 0, width, height);
 	    sprites.forEach((sprite) => {
 	      context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
 	    });
@@ -17375,18 +17405,34 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var sprites = __webpack_require__(4);
 
-	  function initialize(canvasElement, moveMethod) {
+	  function initialize(canvasElement, moveMethod, checkMovement) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(canvasElement, moveMethod);
-	      var self = { name: 'bloon', x: 1, y: 2 };
+	      var entity = entityBase.initialize(canvasElement,
+	                                         moveMethod);
+	      sprites.initialize(canvasElement);
+
+	      var goingLeft = false;
+
+	      var self = { name: 'bloon', x: 100, y: 400, size: 100 };
 	      var bloon = Object.assign({}, entity);
+
 	      bloon.update = update;
 	      return bloon;
 
 	      function update(timestamp, delta) {
-	        moveMethod(self, 10, 10);
-	        console.log('Totally rendering a bloon right meow');
+	        var attemptedX = goingLeft ? self.x - 10 : self.x + 10;
+	        var toMove = checkMovement(attemptedX, self.y);
+
+	        if (toMove === false) {
+	          goingLeft === !goingLeft;
+	        } else {
+	          self.x = attemptedX;
+	        };
+
+	        sprites.update([self]);
+	        sprites.draw();
 	      }
 	    };
 
