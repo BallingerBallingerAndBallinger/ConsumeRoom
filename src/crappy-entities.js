@@ -4,6 +4,9 @@
   var entityBuilder = require('./crappy-entity.js');
   var bloonBuilder = require('./entities/bloon.js');
   var stats;
+  var width;
+  var height;
+  var clear;
   var entities = [];
 
   var theGirl =
@@ -59,13 +62,15 @@
     };
 
   function initialize(canvasElement, incomingStats) {
+    width = canvasElement.width;
+    height = canvasElement.height;
+
+    clear = () => canvasElement.getContext('2d').clearRect(0, 0, width, height);
     sprites.initialize(canvasElement);
     stats = incomingStats;
     stats.initialize(theRoom);
     entities = [
-      entityBuilder.initialize(canvasElement, logMove),
-      entityBuilder.initialize(canvasElement, logMove),
-      bloonBuilder.initialize(canvasElement, logMove)
+      bloonBuilder.initialize(canvasElement, logMove, checkMovement)
     ];
   }
 
@@ -73,7 +78,20 @@
     console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
   }
 
+  function checkMovement(x, y) {
+    if (x < 0) {
+      return false;
+    }
+
+    if (x > width) {
+      return false;
+    }
+
+    return true;
+  }
+
   function update(timestamp, delta) {
+    clear();
     entities.forEach(e => e.update(timestamp, delta));
   }
 

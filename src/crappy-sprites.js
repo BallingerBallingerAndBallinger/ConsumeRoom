@@ -14,7 +14,6 @@
   }
 
   function draw() {
-    context.clearRect(0, 0, width, height);
     sprites.forEach((sprite) => {
       context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
     });
