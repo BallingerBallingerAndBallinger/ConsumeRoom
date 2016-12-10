@@ -3,6 +3,7 @@
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
   var goerBuilder = require('./entities/party-goer.js');
+  var doorBuilder = require('./entities/door.js');
   var renderer = require('./rendering.js');
   var stats;
   var width;
@@ -75,12 +76,12 @@
       goerBuilder.initialize(renderer, logMove, checkMovement),
       goerBuilder.initialize(renderer, logMove, checkMovement),
       goerBuilder.initialize(renderer, logMove, checkMovement),
-      goerBuilder.initialize(renderer, logMove, checkMovement)
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      doorBuilder.initialize(renderer)
     ];
 
     entities[1].setX(100);
-    entities[2].setX(300);
-    entities[3].setX(500);
+    entities[1].setY(250);
   }
 
   function logMove(entity, x, y) {

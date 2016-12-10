@@ -6,12 +6,12 @@
       var entity = entityBase.initialize(renderer, moveMethod);
       var render = renderer;
 
-      var room = Object.assign({}, entity);
-      room.update = update;
-      return room;
+      var door = Object.assign({}, entity);
+      door.update = update;
+      return door;
 
       function update(timestamp, delta) {
-        render.image(0, 500, 'floor-closed', 1000, 500);
+        render.image(830, 300, 'door', 55, 400);
       }
     };
 
