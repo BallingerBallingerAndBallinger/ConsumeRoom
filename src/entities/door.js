@@ -8,6 +8,9 @@
 
       var door = Object.assign({}, entity);
       door.update = update;
+      door.getX = getX;
+      door.getY = getY;
+      door.getZ = getZ;
       return door;
 
       function update(timestamp, delta) {

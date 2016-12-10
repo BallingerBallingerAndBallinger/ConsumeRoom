@@ -58,7 +58,12 @@
   function update(timestamp, delta) {
     updateGameState();
     renderer.clear();
+    entities.sort(compareEntities);
     entities.forEach(e => e.update(timestamp, delta));
+  }
+
+  function compareEntities(a, b) {
+    return a.getZ() - b.getZ();
   }
 
   function updateGameState() {

@@ -17,6 +17,9 @@
       bloon.update = update;
       bloon.setX = setX;
       bloon.setY = setY;
+      bloon.getX = getX;
+      bloon.getY = getY;
+      bloon.getZ = getZ;
       return bloon;
 
       function update(timestamp, delta) {

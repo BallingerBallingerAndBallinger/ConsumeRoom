@@ -22,6 +22,9 @@
 
       goer.update = update;
       goer.setX = setX;
+      goer.getX = getX;
+      goer.getY = getY;
+      goer.getZ = getZ;
       return goer;
 
       function update(timestamp, delta) {

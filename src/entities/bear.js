@@ -14,6 +14,9 @@
       var isSquishing;
 
       bear.update = update;
+      bear.getX = getX;
+      bear.getY = getY;
+      bear.getZ = getZ;
       bear.setX = setX;
       bear.setY = setY;
       return bear;

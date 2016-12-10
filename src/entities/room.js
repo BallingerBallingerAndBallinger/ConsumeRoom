@@ -9,6 +9,9 @@
       var self = { name: 'floor-closed', x: 0, y: 500, z: -1 };
       var room = Object.assign({}, entity);
       room.update = update;
+      room.getX = getX;
+      room.getY = getY;
+      room.getZ = getZ;
       return room;
 
       function update(timestamp, delta) {
