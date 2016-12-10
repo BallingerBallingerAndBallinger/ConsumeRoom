@@ -6,11 +6,10 @@
   // ============================================================================
   // PROPERTIES
   //
-  var renderCanvas;
   var renderContext;
 
   function initialize(canvasElement) {
-    setCanvas(canvasElement);
+    renderContext = canvasElement.getContext('2d');
   }
 
 
@@ -64,13 +63,6 @@
   // PRIMITIVES
   //
 
-  // ----------------------------------------------------------------------------
-  // Set the current canvas (element)
-  //
-  function setCanvas(elementName) {
-    renderCanvas = document.getElementById(elementName);
-    renderContext = renderCanvas.getContext('2d');
-  }
 
   // ----------------------------------------------------------------------------
   // Line
