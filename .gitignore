@@ -2,8 +2,13 @@ node_modules
 **/*.swp
 **/#*
 *.un~
+<<<<<<< HEAD
 **/*.iml
 **/*.ipr
 **/*.iws
 
+=======
+*.iml
+*.ipr
+>>>>>>> origin/master
 *.iws
