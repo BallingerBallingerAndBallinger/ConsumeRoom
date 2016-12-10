@@ -81,13 +81,21 @@
 	    sprites.draw();
 
 	    var clickedGirls = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
+	    var clickedBears = sprites.getClicks().filter((sprite) => sprite.name === 'bear');
 	    var bears = clickedGirls.map((sprite) => {
 	      var newSprite = Object.assign({}, sprite);
 	      newSprite.name = 'bear';
 	      return newSprite;
 	    });
+	    var girls = clickedBears.map((sprite) => {
+	      var newSprite = Object.assign({}, sprite);
+	      newSprite.name = 'girl1';
+	      return newSprite;
+	    });
+	    entities.theRoom.remove(clickedBears);
 	    entities.theRoom.remove(clickedGirls);
 	    entities.theRoom.addItems(bears);
+	    entities.theRoom.addPeople(girls);
 	    sprites.clearClicks();
 
 	    drawTitle(canvasElement.getContext('2d'));
@@ -233,6 +241,9 @@
 	      items: [theBloon, theBear],
 	      addItems: (items) => {
 	        theRoom.items = theRoom.items.concat(items);
+	      },
+	      addPeople: (people) => {
+	        theRoom.people = theRoom.people.concat(people);
 	      },
 	      remove: (targets) => {
 	        theRoom.people = _.difference(theRoom.people, targets);

@@ -34,6 +34,9 @@
       addItems: (items) => {
         theRoom.items = theRoom.items.concat(items);
       },
+      addPeople: (people) => {
+        theRoom.people = theRoom.people.concat(people);
+      },
       remove: (targets) => {
         theRoom.people = _.difference(theRoom.people, targets);
         theRoom.items = _.difference(theRoom.items, targets);
