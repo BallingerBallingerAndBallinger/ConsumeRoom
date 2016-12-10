@@ -161,8 +161,14 @@
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
+
+	    entities[0].setX(100);
+	    entities[1].setX(300);
+	    entities[2].setX(500);
 	  }
 
 	  function logMove(entity, x, y) {
@@ -17402,6 +17408,7 @@
 	      var travel = 0;
 
 	      bloon.update = update;
+	      bloon.setX = setX;
 	      return bloon;
 
 	      function update(timestamp, delta) {
@@ -17422,6 +17429,10 @@
 	        };
 
 	        render.circle(self.x, self.y, 50, 'black', 'red');
+	      }
+
+	      function setX(newX) {
+	        self.x = newX;
 	      }
 	    };
 

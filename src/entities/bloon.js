@@ -15,6 +15,7 @@
       var travel = 0;
 
       bloon.update = update;
+      bloon.setX = setX;
       return bloon;
 
       function update(timestamp, delta) {
@@ -35,6 +36,10 @@
         };
 
         render.circle(self.x, self.y, 50, 'black', 'red');
+      }
+
+      function setX(newX) {
+        self.x = newX;
       }
     };
 
