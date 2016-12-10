@@ -2,10 +2,13 @@
   'use strict';
 
   var config = require('./configuration.js');
+  var sprites = require('./crappy-sprites.js');
 
   window.onload = () => {
-    var canvas = document.getElementById('canvas').getContext('2d');
-    canvas.fillText('Hello Ludem Andrew is insulted!', 10, 50);
-    canvas.fillText(config.title, 10, 90);
+    sprites.initialize(document.getElementById('canvas'));
+    sprites.update([
+      { name: 'crappy-room', x: 10, y: 10, size: 200}
+    ]);
+    sprites.draw();
   };
 })();

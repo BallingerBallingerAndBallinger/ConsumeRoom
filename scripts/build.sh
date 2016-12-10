@@ -2,6 +2,6 @@
 (
     rm -rf docs
     mkdir docs
-    cp src/index.html docs/index.html
+    cp assets/* docs/
     node_modules/webpack/bin/webpack.js
 )

@@ -48,11 +48,14 @@
 	  'use strict';
 
 	  var config = __webpack_require__(1);
+	  var sprites = __webpack_require__(2);
 
 	  window.onload = () => {
-	    var canvas = document.getElementById('canvas').getContext('2d');
-	    canvas.fillText('Hello Ludem Andrew is insulted!', 10, 50);
-	    canvas.fillText(config.title, 10, 90);
+	    sprites.initialize(document.getElementById('canvas'));
+	    sprites.update([
+	      { name: 'crappy-room', x: 10, y: 10, size: 200}
+	    ]);
+	    sprites.draw();
 	  };
 	})();
 
@@ -64,6 +67,42 @@
 	module.exports = {
 	  title: 'The Back Room'
 	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	(function() {
+	  var sprites;
+	  var width;
+	  var height;
+	  var context;
+
+	  function initialize(canvasElement) {
+	    context = canvasElement.getContext('2d');
+	    width = canvasElement.width;
+	    height = canvasElement.height;
+	    sprites = [];
+	  }
+
+	  function draw() {
+	    context.clearRect(0, 0, width, height);
+	    sprites.forEach((sprite) => {
+	      context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
+	    });
+	  }
+
+	  function update(newState) {
+	    sprites = newState;
+	  }
+
+	  module.exports = {
+	    draw: draw,
+	    update: update,
+	    initialize: initialize
+	  };
+	})();
 
 
 /***/ }
