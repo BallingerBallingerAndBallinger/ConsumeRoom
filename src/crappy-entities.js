@@ -70,8 +70,6 @@
     stats = incomingStats;
     stats.initialize(theRoom);
     entities = [
-      entityBuilder.initialize(renderer, logMove),
-      entityBuilder.initialize(renderer, logMove),
       bloonBuilder.initialize(renderer, logMove, checkMovement)
     ];
   }
@@ -93,6 +91,7 @@
   }
 
   function update(timestamp, delta) {
+    renderer.clear();
     entities.forEach(e => e.update(timestamp, delta));
   }
 

@@ -34,7 +34,6 @@
           travel += attemptedTravel;
         };
 
-        console.log(self.x);
         render.circle(self.x, self.y, 50, 'black', 'red');
       }
     };

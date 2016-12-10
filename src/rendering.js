@@ -7,9 +7,13 @@
   // PROPERTIES
   //
   var renderContext;
+  var width;
+  var height;
 
   function initialize(canvasElement) {
     renderContext = canvasElement.getContext('2d');
+    width = canvasElement.width;
+    height = canvasElement.height;
   }
 
 
@@ -63,6 +67,9 @@
   // PRIMITIVES
   //
 
+  function clear() {
+    renderContext.clearRect(0, 0, width, height);
+  }
 
   // ----------------------------------------------------------------------------
   // Line
@@ -178,6 +185,7 @@
     stopWorker: stopWorker,
     startAnimation: startAnimation,
     stopAnimation: stopAnimation,
+    clear: clear,
     line: line,
     circle: circle,
     rectangle: rectangle,

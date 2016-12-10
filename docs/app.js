@@ -161,8 +161,6 @@
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
-	      entityBuilder.initialize(renderer, logMove),
-	      entityBuilder.initialize(renderer, logMove),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 	  }
@@ -184,6 +182,7 @@
 	  }
 
 	  function update(timestamp, delta) {
+	    renderer.clear();
 	    entities.forEach(e => e.update(timestamp, delta));
 	  }
 
@@ -17422,7 +17421,6 @@
 	          travel += attemptedTravel;
 	        };
 
-	        console.log(self.x);
 	        render.circle(self.x, self.y, 50, 'black', 'red');
 	      }
 	    };
@@ -17449,9 +17447,13 @@
 	  // PROPERTIES
 	  //
 	  var renderContext;
+	  var width;
+	  var height;
 
 	  function initialize(canvasElement) {
 	    renderContext = canvasElement.getContext('2d');
+	    width = canvasElement.width;
+	    height = canvasElement.height;
 	  }
 
 
@@ -17505,6 +17507,9 @@
 	  // PRIMITIVES
 	  //
 
+	  function clear() {
+	    renderContext.clearRect(0, 0, width, height);
+	  }
 
 	  // ----------------------------------------------------------------------------
 	  // Line
@@ -17620,6 +17625,7 @@
 	    stopWorker: stopWorker,
 	    startAnimation: startAnimation,
 	    stopAnimation: stopAnimation,
+	    clear: clear,
 	    line: line,
 	    circle: circle,
 	    rectangle: rectangle,
