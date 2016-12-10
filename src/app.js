@@ -7,7 +7,7 @@
   window.onload = () => {
     sprites.initialize(document.getElementById('canvas'));
     sprites.update([
-      { name: 'crappy-room', x: 10, y: 10, size: 200}
+      { name: 'crappy-room', x: 25, y: 10, size: 100}
     ]);
     sprites.draw();
   };
