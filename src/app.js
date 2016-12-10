@@ -25,7 +25,6 @@
 
     var entitiesList = [
       { name: 'crappy-room', x: 25, y: 10, size: 900 },
-      { name: 'bear', x: 55, y: 450, size: 150 },
       { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 }
     ];
 

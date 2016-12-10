@@ -71,7 +71,6 @@
 
 	    var entitiesList = [
 	      { name: 'crappy-room', x: 25, y: 10, size: 900 },
-	      { name: 'bear', x: 55, y: 450, size: 150 },
 	      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 }
 	    ];
 
@@ -184,10 +183,18 @@
 	      attractiveness: 40
 	    };
 
+	  var theBear =
+	    { name: 'bear',
+	      x: 55,
+	      y: 450,
+	      size: 150,
+	      attractiveness: 20
+	    };
+
 	  var theRoom =
 	    { happiness: 0,
 	      people: [theGirl],
-	      items: [theBloon],
+	      items: [theBloon, theBear],
 	      attractivenes: () => {
 	        var total = 0;
 	        theRoom.people.forEach((p) => {
