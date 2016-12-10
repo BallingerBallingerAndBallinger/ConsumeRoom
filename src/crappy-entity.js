@@ -3,32 +3,26 @@
   var _ = require('lodash');
 
   function initialize(canvasElement, moveMethod) {
-    var entity = () => {
-      var entity = {};
+    var initializer = () => {
+      var self = {};
       var context = canvasElement.getContext('2d');
       return {
-        render: genericRender(context, entity),
-        move: genericMove(entity, moveMethod)
+        render: render,
+        move: genericMove(moveMethod)
       };
+
+      function genericMove(moveMethod) {
+        return (deltaX, deltaY) => {
+          moveMethod(self, deltaX, deltaY);
+        };
+      }
+
+      function render(timestamp, delta) {
+        context; // Is used somehow.
+        console.log("We're totally rendering an entity right now");
+      }
     };
-
-    return entity();
-  }
-
-  function genericRender(context, entity) {
-    return (timestamp, delta) => {
-      render(context, entity, timestamp, delta);
-    };
-  }
-
-  function genericMove(entity, moveMethod) {
-    return (deltaX, deltaY) => {
-      moveMethod(entity, deltaX, deltaY);
-    };
-  }
-
-  function render(context, entity, deltaX, deltaY) {
-    console.log("We're totally rendering an entity right now");
+    return initializer();
   }
 
   // Exports
