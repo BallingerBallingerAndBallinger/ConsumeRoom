@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(6);
+	  var stats = __webpack_require__(5);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -92,9 +92,7 @@
 	(function() {
 	  var _ = __webpack_require__(2);
 	  var sprites = __webpack_require__(4);
-	  var entityBuilder = __webpack_require__(5);
 	  var stats;
-	  var entities = [];
 
 	  var theGirl =
 	    { name: 'girl1',
@@ -152,15 +150,15 @@
 	    sprites.initialize(canvasElement);
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
-	    entities = [
-	      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move A ' + x + ', ' + y)),
-	      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move B ' + x + ', ' + y))
-	    ];
 	  }
 
 	  function render(timestamp, delta) {
-	    entities.forEach(e => e.move(1, 2));
-	    entities.forEach(e => e.render(timestamp, delta));
+	    var entities = [{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items);
+
+	    sprites.update(entities);
+	    sprites.draw();
+	    sprites.clearClicks();
+	    stats.draw(theRoom);
 	  }
 
 	  module.exports = {
@@ -17329,50 +17327,6 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(function() {
-	  // Includes
-	  var _ = __webpack_require__(2);
-
-	  function initialize(canvasElement, moveMethod) {
-	    var entity = () => {
-	      var entity = {};
-	      var context = canvasElement.getContext('2d');
-	      return {
-	        render: genericRender(context, entity),
-	        move: genericMove(entity, moveMethod)
-	      };
-	    };
-
-	    return entity();
-	  }
-
-	  function genericRender(context, entity) {
-	    return (timestamp, delta) => {
-	      render(context, entity, timestamp, delta);
-	    };
-	  }
-
-	  function genericMove(entity, moveMethod) {
-	    return (deltaX, deltaY) => {
-	      moveMethod(entity, deltaX, deltaY);
-	    };
-	  }
-
-	  function render(context, entity, deltaX, deltaY) {
-	    console.log("We're totally rendering an entity right now");
-	  }
-
-	  // Exports
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 6 */
 /***/ function(module, exports) {
 
 	(function() {
