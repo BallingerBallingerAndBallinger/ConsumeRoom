@@ -3,6 +3,7 @@
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
   var doorBuilder = require('./entities/door.js');
+  var bearBuilder = require('./entities/bear.js');
   var renderer = require('./rendering.js');
   var stats;
   var width;
@@ -67,14 +68,20 @@
     renderer.initialize(canvasElement);
     stats = incomingStats;
     stats.initialize(theRoom);
+    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
+    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
     entities = [
       roomBuilder.initialize(renderer),
-      bloonBuilder.initialize(renderer, logMove, checkMovement),
+      bloon,
+      bear,
       doorBuilder.initialize(renderer)
     ];
 
-    entities[1].setX(100);
-    entities[1].setY(250);
+    bloon.setX(100);
+    bloon.setY(250);
+
+    bear.setX(800);
+    bear.setY(800);
   }
 
   function logMove(entity, x, y) {

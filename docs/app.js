@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(9);
+	  var stats = __webpack_require__(10);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -94,7 +94,8 @@
 	  var bloonBuilder = __webpack_require__(4);
 	  var roomBuilder = __webpack_require__(6);
 	  var doorBuilder = __webpack_require__(7);
-	  var renderer = __webpack_require__(8);
+	  var bearBuilder = __webpack_require__(8);
+	  var renderer = __webpack_require__(9);
 	  var stats;
 	  var width;
 	  var entities = [];
@@ -158,14 +159,20 @@
 	    renderer.initialize(canvasElement);
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
+	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
+	    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
 	    entities = [
 	      roomBuilder.initialize(renderer),
-	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      bloon,
+	      bear,
 	      doorBuilder.initialize(renderer)
 	    ];
 
-	    entities[1].setX(100);
-	    entities[1].setY(250);
+	    bloon.setX(100);
+	    bloon.setY(250);
+
+	    bear.setX(800);
+	    bear.setY(800);
 	  }
 
 	  function logMove(entity, x, y) {
@@ -17441,6 +17448,68 @@
 
 /***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
+	  function initialize(renderer, moveMethod, checkMovement) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
+
+	      var squishVelocity = 0.05;
+
+	      var self = { name: 'bear', x: 100, y: 400, size: 150 };
+	      var bear = Object.assign({}, entity);
+	      var squish = 0;
+	      var isSquishing;
+
+	      bear.update = update;
+	      bear.setX = setX;
+	      bear.setY = setY;
+	      return bear;
+
+	      function update(timestamp, delta) {
+	        if (!isSquishing) {
+	          if (Math.random() < 0.01) {
+	            console.log('Bear Squish!');
+	            isSquishing = true;
+	            squish = 30;
+	          }
+	        }
+
+	        var squished = 0;
+	        if (squish > 0) {
+	          squish = squish - (squishVelocity * delta);
+	          squished = squish;
+	        } else {
+	          isSquishing = false;
+	        }
+
+	        render.image(self.x, self.y + squished, self.name, self.size, self.size - squished);
+	      }
+
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+
+	      function setY(newY) {
+	        self.y = newY;
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -17644,7 +17713,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	(function() {
