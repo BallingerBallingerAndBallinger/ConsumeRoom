@@ -173,7 +173,8 @@
 	  }
 
 	  function clickHappened(clickEvent) {
-	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, clickEvent.x, clickEvent.y)).slice(0);
+	    var coords = transformCoords(clickEvent);
+	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, coords.x, coords.y)).slice(0);
 	    clicked = clicked.concat(encountered);
 	  }
 
@@ -190,6 +191,14 @@
 
 	  function clearClicks() {
 	    clicked = [];
+	  }
+
+	  function transformCoords(event) {
+	    var rect = event.target.getBoundingClientRect();
+	    return {
+	      x: (event.clientX - rect.left) * (width / rect.width),
+	      y: (event.clientY - rect.top) * (height / rect.height)
+	    };
 	  }
 
 	  module.exports = {
