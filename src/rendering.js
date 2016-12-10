@@ -144,9 +144,9 @@
         renderContext.moveTo(x,y);
       else
         renderContext.lineTo(x,y);
-      }
-      if (close == true || (fillColor != null && fillColor != "")) renderContext.closePath();
-      renderPath(borderColor,fillColor);
+    }
+    if (close == true || (fillColor != null && fillColor != "")) renderContext.closePath();
+    renderPath(borderColor,fillColor);
   }
 
   // ----------------------------------------------------------------------------
