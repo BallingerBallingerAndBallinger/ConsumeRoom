@@ -39,6 +39,18 @@
         render.image(self.x, self.y, self.name, self.size, self.size);
       }
 
+      function getX() {
+        return self.x;
+      }
+
+      function getY() {
+        return self.y;
+      }
+
+      function getZ() {
+        return self.z;
+      }
+
       function setX(newX) {
         self.x = newX;
       }

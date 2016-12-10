@@ -8,7 +8,7 @@
 
       var squishVelocity = 0.05;
 
-      var self = { name: 'bear', x: 100, y: 400, size: 150 };
+      var self = { name: 'bear', x: 100, z: 1, y: 400, size: 150 };
       var bear = Object.assign({}, entity);
       var squish = 0;
       var isSquishing;
@@ -36,6 +36,18 @@
         }
 
         render.image(self.x, self.y + squished, self.name, self.size, self.size - squished);
+      }
+
+      function getX() {
+        return self.x;
+      }
+
+      function getY() {
+        return self.y;
+      }
+
+      function getZ() {
+        return self.z;
       }
 
       function setX(newX) {

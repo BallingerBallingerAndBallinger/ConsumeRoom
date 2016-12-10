@@ -226,7 +226,7 @@
 	  var undefined;
 
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3270,7 +3270,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = 0,
 	          length = path.length;
@@ -3456,9 +3456,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 
@@ -4019,7 +4022,7 @@
 	            value = baseGet(object, path);
 
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4095,8 +4098,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4217,7 +4229,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -4558,9 +4570,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 
 	    /**
@@ -4700,14 +4714,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 
 	    /**
@@ -6332,7 +6342,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -6809,7 +6819,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 
 	    /**
@@ -6949,6 +6959,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9683,10 +9695,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11054,10 +11068,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13673,16 +13691,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13732,7 +13743,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 
 	    /**
@@ -13754,16 +13765,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 
 	    /**
@@ -13796,15 +13798,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length;
 
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16314,7 +16316,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 
 	    /**
@@ -17341,6 +17343,18 @@
 	        render.image(self.x, self.y, self.name, self.size, self.size);
 	      }
 
+	      function getX() {
+	        return self.x;
+	      }
+
+	      function getY() {
+	        return self.y;
+	      }
+
+	      function getZ() {
+	        return self.z;
+	      }
+
 	      function setX(newX) {
 	        self.x = newX;
 	      }
@@ -17403,13 +17417,27 @@
 	      var entity = entityBase.initialize(renderer, moveMethod);
 	      var render = renderer;
 
+	      var self = { name: 'floor-closed', x: 0, y: 500, z: -1 };
 	      var room = Object.assign({}, entity);
 	      room.update = update;
 	      return room;
 
 	      function update(timestamp, delta) {
-	        render.image(0, 500, 'floor-closed', 1000, 500);
+	        render.image(self.x, self.y, self.name, 1000, 500);
 	      }
+
+	      function getX() {
+	        return self.x;
+	      }
+
+	      function getY() {
+	        return self.y;
+	      }
+
+	      function getZ() {
+	        return self.z;
+	      }
+
 	    };
 
 	    return constructor();
@@ -17475,6 +17503,22 @@
 	        render.image(renderX, renderY, self.name, '', renderHeight);
 	      }
 
+	      function getX() {
+	        return self.x;
+	      }
+
+	      function getY() {
+	        return self.y;
+	      }
+
+	      function getZ() {
+	        return self.z;
+	      }
+
+	      function setZ(newZ) {
+	        self.z = newZ;
+	      }
+
 	      function setX(newX) {
 	        self.x = newX;
 	      }
@@ -17511,6 +17555,18 @@
 	    };
 
 	    return constructor();
+
+	    function getX() {
+	      return self.x;
+	    }
+
+	    function getY() {
+	      return self.y;
+	    }
+
+	    function getZ() {
+	      return self.z;
+	    }
 	  }
 
 	  module.exports = {
@@ -17533,7 +17589,7 @@
 
 	      var squishVelocity = 0.05;
 
-	      var self = { name: 'bear', x: 100, y: 400, size: 150 };
+	      var self = { name: 'bear', x: 100, z: 1, y: 400, size: 150 };
 	      var bear = Object.assign({}, entity);
 	      var squish = 0;
 	      var isSquishing;
@@ -17561,6 +17617,18 @@
 	        }
 
 	        render.image(self.x, self.y + squished, self.name, self.size, self.size - squished);
+	      }
+
+	      function getX() {
+	        return self.x;
+	      }
+
+	      function getY() {
+	        return self.y;
+	      }
+
+	      function getZ() {
+	        return self.z;
 	      }
 
 	      function setX(newX) {

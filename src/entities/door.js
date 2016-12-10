@@ -16,6 +16,18 @@
     };
 
     return constructor();
+
+    function getX() {
+      return self.x;
+    }
+
+    function getY() {
+      return self.y;
+    }
+
+    function getZ() {
+      return self.z;
+    }
   }
 
   module.exports = {
