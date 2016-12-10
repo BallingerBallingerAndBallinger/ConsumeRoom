@@ -207,11 +207,11 @@
 
 
   function getWidth(){
-    return width;
+    return canvasWidth;
   }
 
   function getHeight(){
-    return height;
+    return canvasHeight;
   }
 
 

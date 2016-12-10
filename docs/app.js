@@ -17662,13 +17662,18 @@
 	  // PROPERTIES
 	  //
 	  var renderContext;
-	  var width;
-	  var height;
+	  var canvasWidth;
+	  var canvasHeight;
 
+
+
+	  // ============================================================================
+	  // CONSTRUCTORS
+	  //
 	  function initialize(canvasElement) {
 	    renderContext = canvasElement.getContext('2d');
-	    width = canvasElement.width;
-	    height = canvasElement.height;
+	    canvasWidth = canvasElement.width;
+	    canvasHeight = canvasElement.height;
 	  }
 
 
@@ -17722,8 +17727,11 @@
 	  // PRIMITIVES
 	  //
 
+	  // ----------------------------------------------------------------------------
+	  // Clear
+	  //
 	  function clear() {
-	    renderContext.clearRect(0, 0, width, height);
+	    renderContext.clearRect(0, 0, canvasWidth, canvasHeight);
 	  }
 
 	  // ----------------------------------------------------------------------------
@@ -17773,6 +17781,27 @@
 	    if (borderColor != null && borderColor !== '') {
 	      renderContext.strokeText(text, x, y);
 	    }
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Path
+	  //
+	  //   points = [[x,y],[x,y]...]
+	  //   bool close = close the path
+	  //   Existence of a fill color, or close==true will cause path to be closed
+	  //
+	  function path(points, borderColor, fillColor, close) {
+
+	    for(i=0; i<points.length; i++) {
+	      var x = points[i][0];
+	      var y = points[i][1];
+	      if (i==0)
+	        renderContext.moveTo(x,y);
+	      else
+	        renderContext.lineTo(x,y);
+	      }
+	      if (close == true || (fillColor != null && fillColor != "")) renderContext.closePath();
+	      renderPath(borderColor,fillColor);
 	  }
 
 	  // ----------------------------------------------------------------------------
@@ -17833,11 +17862,11 @@
 
 
 	  function getWidth(){
-	    return width;
+	    return canvasWidth;
 	  }
 
 	  function getHeight(){
-	    return height;
+	    return canvasHeight;
 	  }
 
 
