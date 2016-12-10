@@ -2,6 +2,7 @@
   var _ = require('lodash');
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
+  var goerBuilder = require('./entities/party-goer.js');
   var doorBuilder = require('./entities/door.js');
   var bearBuilder = require('./entities/bear.js');
   var renderer = require('./rendering.js');
@@ -74,6 +75,10 @@
       roomBuilder.initialize(renderer),
       bloon,
       bear,
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
       doorBuilder.initialize(renderer)
     ];
 

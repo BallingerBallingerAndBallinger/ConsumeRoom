@@ -93,8 +93,13 @@
 	  var _ = __webpack_require__(2);
 	  var bloonBuilder = __webpack_require__(4);
 	  var roomBuilder = __webpack_require__(6);
+<<<<<<< HEAD
 	  var doorBuilder = __webpack_require__(7);
 	  var bearBuilder = __webpack_require__(8);
+=======
+	  var goerBuilder = __webpack_require__(7);
+	  var doorBuilder = __webpack_require__(8);
+>>>>>>> d35610e36b7596ede018dee47efe4b885792de96
 	  var renderer = __webpack_require__(9);
 	  var stats;
 	  var width;
@@ -163,8 +168,18 @@
 	    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
 	    entities = [
 	      roomBuilder.initialize(renderer),
+<<<<<<< HEAD
 	      bloon,
 	      bear,
+=======
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+>>>>>>> d35610e36b7596ede018dee47efe4b885792de96
 	      doorBuilder.initialize(renderer)
 	    ];
 
@@ -221,7 +236,7 @@
 	  var undefined;
 
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3265,7 +3280,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = 0,
 	          length = path.length;
@@ -3451,9 +3466,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 
@@ -4014,7 +4032,7 @@
 	            value = baseGet(object, path);
 
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4090,8 +4108,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4212,7 +4239,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -4553,9 +4580,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 
 	    /**
@@ -4695,14 +4724,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 
 	    /**
@@ -6327,7 +6352,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -6804,7 +6829,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 
 	    /**
@@ -6944,6 +6969,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9678,10 +9705,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11049,10 +11078,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13668,16 +13701,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13727,7 +13753,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 
 	    /**
@@ -13749,16 +13775,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 
 	    /**
@@ -13791,15 +13808,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length;
 
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16309,7 +16326,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 
 	    /**
@@ -17423,6 +17440,73 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 
+	  var velocity = 0.01;
+
+	  function initialize(renderer, moveMethod, checkMovement) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
+
+	      var self = {};
+	      self.name = 'girl1';
+	      self.x = Math.random() * renderer.getWidth();
+	      self.z = Math.random() * 100;
+	      self.y = 0;
+	      self.size = 400;
+	      var goer = Object.assign({}, entity);
+
+	      var goingLeft = false;
+	      var travel = 0;
+
+	      goer.update = update;
+	      goer.setX = setX;
+	      return goer;
+
+	      function update(timestamp, delta) {
+	        var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
+	        var attemptedX = attemptedTravel + self.x;
+	        var toMove = checkMovement(attemptedX, self.y);
+
+	        if (travel > 10 || travel < -10) {
+	          goingLeft = !goingLeft;
+	          travel = 0;
+	        }
+
+	        if (toMove === false) {
+	          goingLeft = !goingLeft;
+	        } else {
+	          self.x = attemptedX;
+	          travel += attemptedTravel;
+	        };
+
+	        var renderX = self.x;
+	        var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
+	        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight())) - renderHeight;
+
+	        render.image(renderX, renderY, self.name, renderHeight, renderHeight);
+	      }
+
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
 	  function initialize(renderer, moveMethod, checkMovement) {
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, moveMethod);
@@ -17447,6 +17531,7 @@
 
 
 /***/ },
+<<<<<<< HEAD
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -17509,6 +17594,8 @@
 
 
 /***/ },
+=======
+>>>>>>> d35610e36b7596ede018dee47efe4b885792de96
 /* 9 */
 /***/ function(module, exports) {
 
@@ -17691,6 +17778,14 @@
 	  }
 
 
+	  function getWidth(){
+	    return width;
+	  }
+
+	  function getHeight(){
+	    return height;
+	  }
+
 
 
 	  module.exports = {
@@ -17705,7 +17800,9 @@
 	    rectangle: rectangle,
 	    text: text,
 	    image: image,
-	    video: video
+	    video: video,
+	    getWidth: getWidth,
+	    getHeight: getHeight
 	  };
 
 
