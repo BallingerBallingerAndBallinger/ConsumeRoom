@@ -2,6 +2,7 @@
   var _ = require('lodash');
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
+  var doorBuilder = require('./entities/door.js');
   var renderer = require('./rendering.js');
   var stats;
   var width;
@@ -68,7 +69,8 @@
     stats.initialize(theRoom);
     entities = [
       roomBuilder.initialize(renderer),
-      bloonBuilder.initialize(renderer, logMove, checkMovement)
+      bloonBuilder.initialize(renderer, logMove, checkMovement),
+      doorBuilder.initialize(renderer)
     ];
 
     entities[1].setX(100);

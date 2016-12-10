@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(8);
+	  var stats = __webpack_require__(9);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -93,7 +93,8 @@
 	  var _ = __webpack_require__(2);
 	  var bloonBuilder = __webpack_require__(4);
 	  var roomBuilder = __webpack_require__(6);
-	  var renderer = __webpack_require__(7);
+	  var doorBuilder = __webpack_require__(7);
+	  var renderer = __webpack_require__(8);
 	  var stats;
 	  var width;
 	  var entities = [];
@@ -159,7 +160,8 @@
 	    stats.initialize(theRoom);
 	    entities = [
 	      roomBuilder.initialize(renderer),
-	      bloonBuilder.initialize(renderer, logMove, checkMovement)
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      doorBuilder.initialize(renderer)
 	    ];
 
 	    entities[1].setX(100);
@@ -17409,6 +17411,36 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
+	  function initialize(renderer, moveMethod, checkMovement) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
+
+	      var door = Object.assign({}, entity);
+	      door.update = update;
+	      return door;
+
+	      function update(timestamp, delta) {
+	        render.image(830, 300, 'door', 55, 400);
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -17612,7 +17644,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	(function() {
