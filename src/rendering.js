@@ -177,6 +177,14 @@
   }
 
 
+  function getWidth(){
+    return width;
+  }
+
+  function getHeight(){
+    return height;
+  }
+
 
 
   module.exports = {
@@ -191,7 +199,9 @@
     rectangle: rectangle,
     text: text,
     image: image,
-    video: video
+    video: video,
+    getWidth: getWidth,
+    getHeight: getHeight
   };
 
 

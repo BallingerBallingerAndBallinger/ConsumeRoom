@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(8);
+	  var stats = __webpack_require__(9);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -93,7 +93,8 @@
 	  var _ = __webpack_require__(2);
 	  var bloonBuilder = __webpack_require__(4);
 	  var roomBuilder = __webpack_require__(6);
-	  var renderer = __webpack_require__(7);
+	  var goerBuilder = __webpack_require__(7);
+	  var renderer = __webpack_require__(8);
 	  var stats;
 	  var width;
 	  var entities = [];
@@ -161,7 +162,11 @@
 	      roomBuilder.initialize(renderer),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
-	      bloonBuilder.initialize(renderer, logMove, checkMovement)
+	      bloonBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement),
+	      goerBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 
 	    entities[1].setX(100);
@@ -17409,6 +17414,74 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
+	  var velocity = 0.01;
+
+	  function initialize(renderer, moveMethod, checkMovement) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
+
+	      var self = {};
+	      self.name = 'girl1';
+	      self.x = Math.random() * renderer.getWidth();
+	      self.z = Math.random() * 100;
+	      self.y = 0;
+	      self.size = 400;
+	      var goer = Object.assign({}, entity);
+
+	      var goingLeft = false;
+	      var travel = 0;
+
+	      goer.update = update;
+	      goer.setX = setX;
+	      return goer;
+
+	      function update(timestamp, delta) {
+	        var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
+	        var attemptedX = attemptedTravel + self.x;
+	        var toMove = checkMovement(attemptedX, self.y);
+
+	        if (travel > 10 || travel < -10) {
+	          goingLeft = !goingLeft;
+	          travel = 0;
+	        }
+
+	        if (toMove === false) {
+	          goingLeft = !goingLeft;
+	        } else {
+	          self.x = attemptedX;
+	          travel += attemptedTravel;
+	        };
+
+	        var renderX = self.x;
+	        var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
+	        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight())) - renderHeight;
+
+	        render.image(renderX, renderY, self.name, renderHeight, renderHeight);
+	        //render.image(renderX, renderY, 'bloon', renderHeight.size, renderHeight.size);
+	      }
+
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -17590,6 +17663,14 @@
 	  }
 
 
+	  function getWidth(){
+	    return width;
+	  }
+
+	  function getHeight(){
+	    return height;
+	  }
+
 
 
 	  module.exports = {
@@ -17604,7 +17685,9 @@
 	    rectangle: rectangle,
 	    text: text,
 	    image: image,
-	    video: video
+	    video: video,
+	    getWidth: getWidth,
+	    getHeight: getHeight
 	  };
 
 
@@ -17612,7 +17695,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	(function() {

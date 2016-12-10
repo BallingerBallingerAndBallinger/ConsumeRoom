@@ -2,6 +2,7 @@
   var _ = require('lodash');
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
+  var goerBuilder = require('./entities/party-goer.js');
   var renderer = require('./rendering.js');
   var stats;
   var width;
@@ -70,7 +71,11 @@
       roomBuilder.initialize(renderer),
       bloonBuilder.initialize(renderer, logMove, checkMovement),
       bloonBuilder.initialize(renderer, logMove, checkMovement),
-      bloonBuilder.initialize(renderer, logMove, checkMovement)
+      bloonBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement),
+      goerBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
     entities[1].setX(100);
