@@ -6,6 +6,10 @@ The back room
 Entice people into the room...
 Spend resource on chocolate cake?
 
+# Requirements
+
+npm
+
 # Building
 
 ```
