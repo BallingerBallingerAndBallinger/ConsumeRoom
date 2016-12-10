@@ -161,18 +161,18 @@
 	    stats.initialize(theRoom);
 	    entities = [
 	      roomBuilder.initialize(renderer),
+	      doorBuilder.initialize(renderer),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      goerBuilder.initialize(renderer, logMove, checkMovement),
 	      goerBuilder.initialize(renderer, logMove, checkMovement),
 	      goerBuilder.initialize(renderer, logMove, checkMovement),
-	      goerBuilder.initialize(renderer, logMove, checkMovement),
-	      doorBuilder.initialize(renderer)
+	      goerBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 
-	    entities[1].setX(100);
-	    entities[1].setY(250);
+	    entities[2].setX(100);
+	    entities[2].setY(250);
 	  }
 
 	  function logMove(entity, x, y) {
