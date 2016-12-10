@@ -72,7 +72,6 @@
     entities = [
       entityBuilder.initialize(renderer, logMove),
       entityBuilder.initialize(renderer, logMove),
-      bloonBuilder.initialize(renderer, logMove)
       bloonBuilder.initialize(renderer, logMove, checkMovement)
     ];
   }
@@ -94,7 +93,6 @@
   }
 
   function update(timestamp, delta) {
-    clear();
     entities.forEach(e => e.update(timestamp, delta));
   }
 
