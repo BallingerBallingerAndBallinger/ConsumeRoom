@@ -7,7 +7,7 @@
     });
   }
 
-  function initialize(room) {
+  function initialize() {
     displays = [
       { element: document.getElementById('room-happiness'),
         value: (room) => { return room.happiness }

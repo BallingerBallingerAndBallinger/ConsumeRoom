@@ -20,6 +20,8 @@
       bloon.getX = getX;
       bloon.getY = getY;
       bloon.getZ = getZ;
+      bloon.getHappiness = () => 100;
+      bloon.isEnticement = true;
       return bloon;
 
       function update(timestamp, delta) {

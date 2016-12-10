@@ -25,6 +25,7 @@
       goer.getX = getX;
       goer.getY = getY;
       goer.getZ = getZ;
+      goer.isPerson = true;
       return goer;
 
       function update(timestamp, delta) {

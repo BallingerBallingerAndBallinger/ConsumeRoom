@@ -108,7 +108,7 @@
 	
 	    renderer.initialize(canvasElement);
 	    stats = incomingStats;
-	    stats.initialize(gameState);
+	    stats.initialize();
 	
 	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
 	    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
@@ -159,16 +159,18 @@
 	
 	  function updateGameState() {
 	    gameState.happiness = entities.map(e => {
-	      return 0;
+	      return e.getHappiness ? e.getHappiness() : 0;
 	    }).reduce((acc, val) => acc + val, 0);
 	
-	    gameState.peopleCount = entities.map(e => {
-	      return 0;
-	    }).reduce((acc, val) => acc + val, 0);
+	    gameState.peopleCount = entities.filter(e => {
+	      return e.isPerson ? true : false;
+	    }).length;
 	
-	    gameState.enticementCount = entities.map(e => {
-	      return 0;
-	    }).reduce((acc, val) => acc + val, 0);
+	    gameState.enticementCount = entities.filter(e => {
+	      return e.isEnticement ? true : false;
+	    }).length;
+	
+	    stats.draw(gameState);
 	  }
 	
 	  module.exports = {
@@ -17294,6 +17296,8 @@
 	      bloon.getX = getX;
 	      bloon.getY = getY;
 	      bloon.getZ = getZ;
+	      bloon.getHappiness = () => 100;
+	      bloon.isEnticement = true;
 	      return bloon;
 	
 	      function update(timestamp, delta) {
@@ -17456,6 +17460,7 @@
 	      goer.getX = getX;
 	      goer.getY = getY;
 	      goer.getZ = getZ;
+	      goer.isPerson = true;
 	      return goer;
 	
 	      function update(timestamp, delta) {
@@ -17582,6 +17587,8 @@
 	      bear.getZ = getZ;
 	      bear.setX = setX;
 	      bear.setY = setY;
+	      bear.getHappiness = () => 33;
+	      bear.isEnticement = true;
 	      return bear;
 	
 	      function update(timestamp, delta) {
@@ -17890,7 +17897,7 @@
 	    });
 	  }
 	
-	  function initialize(room) {
+	  function initialize() {
 	    displays = [
 	      { element: document.getElementById('room-happiness'),
 	        value: (room) => { return room.happiness }

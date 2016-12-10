@@ -19,6 +19,8 @@
       bear.getZ = getZ;
       bear.setX = setX;
       bear.setY = setY;
+      bear.getHappiness = () => 33;
+      bear.isEnticement = true;
       return bear;
 
       function update(timestamp, delta) {
