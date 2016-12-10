@@ -1,7 +1,7 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
 
-  var velocity = 0.01;
+  var velocity = 0.05;
 
   function initialize(renderer, moveMethod, checkMovement) {
     var constructor = () => {
@@ -10,13 +10,14 @@
 
       var self = {};
       self.name = 'girl1';
-      self.x = Math.random() * renderer.getWidth();
+      self.x = 200 + Math.random() * (renderer.getWidth() / 2);
       self.z = Math.random() * 100;
       self.y = 0;
       self.size = 400;
       var goer = Object.assign({}, entity);
 
-      var goingLeft = false;
+      var goingLeft = Math.random() > 0.5;
+      var maxTravel = Math.random() * 100;
       var travel = 0;
 
       goer.update = update;
@@ -28,7 +29,7 @@
         var attemptedX = attemptedTravel + self.x;
         var toMove = checkMovement(attemptedX, self.y);
 
-        if (travel > 10 || travel < -10) {
+        if (travel > maxTravel || travel < -maxTravel) {
           goingLeft = !goingLeft;
           travel = 0;
         }
@@ -44,7 +45,7 @@
         var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
         var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight())) - renderHeight;
 
-        render.image(renderX, renderY, self.name, renderHeight, renderHeight);
+        render.image(renderX, renderY, self.name, '', renderHeight);
       }
 
       function setX(newX) {
