@@ -2,17 +2,17 @@
   // Includes
   var _ = require('lodash');
 
-  function initialize(canvasElement, moveMethod) {
+  function initialize(renderer, moveMethod) {
     var initializer = () => {
       var self = {name: 'generic', x: 1, y: 2};
-      var context = canvasElement.getContext('2d');
+      var render = renderer;
       return {
         update: update
       };
 
       function update(timestamp, delta) {
-        context; // To be used in here
         moveMethod(self, 10, 10);
+        render.circle(self.x, self.y, 20, 'black', 'red');
         console.log("We're totally rendering an entity right now");
       }
     };

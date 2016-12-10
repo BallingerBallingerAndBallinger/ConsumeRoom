@@ -3,6 +3,7 @@
   var sprites = require('./crappy-sprites.js');
   var entityBuilder = require('./crappy-entity.js');
   var bloonBuilder = require('./entities/bloon.js');
+  var renderer = require('./rendering.js');
   var stats;
   var entities = [];
 
@@ -59,13 +60,13 @@
     };
 
   function initialize(canvasElement, incomingStats) {
-    sprites.initialize(canvasElement);
+    renderer.initialize(canvasElement);
     stats = incomingStats;
     stats.initialize(theRoom);
     entities = [
-      entityBuilder.initialize(canvasElement, logMove),
-      entityBuilder.initialize(canvasElement, logMove),
-      bloonBuilder.initialize(canvasElement, logMove)
+      entityBuilder.initialize(renderer, logMove),
+      entityBuilder.initialize(renderer, logMove),
+      bloonBuilder.initialize(renderer, logMove)
     ];
   }
 

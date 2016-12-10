@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(7);
+	  var stats = __webpack_require__(8);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -94,7 +94,9 @@
 	  var sprites = __webpack_require__(4);
 	  var entityBuilder = __webpack_require__(5);
 	  var bloonBuilder = __webpack_require__(6);
+	  var renderLib = __webpack_require__(7);
 	  var stats;
+	  var renderer;
 	  var entities = [];
 
 	  var theGirl =
@@ -150,13 +152,14 @@
 	    };
 
 	  function initialize(canvasElement, incomingStats) {
-	    sprites.initialize(canvasElement);
+	    renderLib.initialize(canvasElement);
+	    renderer = renderLib;
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
-	      entityBuilder.initialize(canvasElement, logMove),
-	      entityBuilder.initialize(canvasElement, logMove),
-	      bloonBuilder.initialize(canvasElement, logMove)
+	      entityBuilder.initialize(renderer, logMove),
+	      entityBuilder.initialize(renderer, logMove),
+	      bloonBuilder.initialize(renderer, logMove)
 	    ];
 	  }
 
@@ -193,7 +196,7 @@
 	  var undefined;
 
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3237,7 +3240,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = 0,
 	          length = path.length;
@@ -3423,9 +3426,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 
@@ -3986,7 +3992,7 @@
 	            value = baseGet(object, path);
 
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4062,8 +4068,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4184,7 +4199,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -4525,9 +4540,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 
 	    /**
@@ -4667,14 +4684,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 
 	    /**
@@ -6299,7 +6312,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length,
@@ -6776,7 +6789,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 
 	    /**
@@ -6916,6 +6929,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9650,10 +9665,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11021,10 +11038,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13640,16 +13661,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13699,7 +13713,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 
 	    /**
@@ -13721,16 +13735,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 
 	    /**
@@ -13763,15 +13768,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 
 	      var index = -1,
 	          length = path.length;
 
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16281,7 +16286,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 
 	    /**
@@ -17340,17 +17345,17 @@
 	  // Includes
 	  var _ = __webpack_require__(2);
 
-	  function initialize(canvasElement, moveMethod) {
+	  function initialize(renderer, moveMethod) {
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 1, y: 2};
-	      var context = canvasElement.getContext('2d');
+	      var render = renderer;
 	      return {
 	        update: update
 	      };
 
 	      function update(timestamp, delta) {
-	        context; // To be used in here
 	        moveMethod(self, 10, 10);
+	        render.circle(self.x, self.y, 20, 'black', 'red');
 	        console.log("We're totally rendering an entity right now");
 	      }
 	    };
@@ -17396,6 +17401,202 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports) {
+
+	// PRIMITIVE RENDERING CALLS
+
+	(function() {
+
+
+	  // ============================================================================
+	  // PROPERTIES
+	  //
+	  var renderContext;
+
+	  function initialize(canvasElement) {
+	    renderContext = canvasElement.getContext('2d');
+	  }
+
+
+	  // ============================================================================
+	  // PROCESSES
+	  //
+
+	  // ----------------------------------------------------------------------------
+	  // Start a worker
+	  //
+	  //  Executes every milliseconds
+	  //  Returns a handle to the worker which can be used to stop it
+	  //
+	  function startWorker(workFunction, milliseconds) {
+	    return window.setInterval(workFunction, milliseconds);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Stop a worker
+	  //
+	  function stopWorker(handle) {
+	    window.clearInterval(handle);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Start an animation
+	  //
+	  //  Returns a handle to the animation timer which can be used to stop it
+	  //
+	  function startAnimation(animationFunction) {
+	    return window.requestAnimationFrame(animationFunction);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Stop animation
+	  //
+	  function stopAnimation(handle) {
+	    window.cancelAnimationFrame(handle);
+	  }
+
+	  function animate(animationFunction) {
+	    animationFunction();
+	    return window.requestAnimationFrame(() => animate(animationFunction));
+	  }
+
+
+
+
+
+	  // ============================================================================
+	  // PRIMITIVES
+	  //
+
+
+	  // ----------------------------------------------------------------------------
+	  // Line
+	  //
+	  function line(x, y, x1, y1, borderColor) {
+	    renderContext.beginPath();
+	    renderContext.moveTo(x, y);
+	    renderContext.lineTo(x1, y1);
+	    renderPath(borderColor, null);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Circle
+	  //
+	  function circle(x, y, radius, borderColor, fillColor) {
+	    renderContext.beginPath();
+	    renderContext.arc(x, y, radius, 0, 2 * Math.PI, false);
+	    renderPath(borderColor, fillColor);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Rectangle
+	  //
+	  function rectangle(x, y, width, height, borderColor, fillColor) {
+	    renderContext.beginPath();
+	    renderContext.rect(x, y, width, height);
+	    renderPath(borderColor, fillColor);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Text
+	  //
+	  //  Defaults to Arial and 14px
+	  //
+	  function text(x, y, text, fontName, fontSize, borderColor, fillColor) {
+
+	    if (fontSize === null || fontSize === '') fontSize = '14px';
+	    if (fontName === null || fontName === '') fontName = 'Arial';
+	    renderContext.font = fontSize + ' ' + fontName;
+
+	    // Draw
+	    if (fillColor != null && fillColor !== '') {
+	      renderContext.fillText(text, x, y);
+	    }
+
+	    if (borderColor != null && borderColor !== '') {
+	      renderContext.strokeText(text, x, y);
+	    }
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Image
+	  //
+	  //  Blank or null width or height preserves aspect ratio of image
+	  //  Source image is stored in DOM
+	  //  Checks for video width and height if image width or height are zero
+	  //
+	  function image(x, y, imageId, width, height) {
+	    var img = document.getElementById(imageId);
+
+	    var sourceHeight = img.height;
+	    if (sourceHeight === 0) sourceHeight = img.videoHeight;
+
+	    var sourceWidth = img.width;
+	    if (sourceWidth === 0) sourceWidth = img.videoHeight;
+
+	    var aspect = sourceWidth / sourceHeight;
+
+	    if (height > 0 && (width === null || width === '')) {
+	      width = height * aspect;
+	    }
+
+	    if (width > 0 && (height === null || height === '')) {
+	      height = width / aspect;
+	    }
+
+	    renderContext.drawImage(img, x, y, width, height);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Video
+	  //
+	  //  Updates an image from a video every 20 milliseconds
+	  //  Returns a handle to the worker which can be used to stop it with stopWorker
+	  //  Source video is stored in DOM
+	  //  Video must be started and stopped independently
+	  //
+	  function video(x, y, videoId, width, height) {
+	    return animate(() => image(x, y, videoId, width, height), 20);
+	  }
+
+	  // ----------------------------------------------------------------------------
+	  // Render the current path
+	  //
+	  function renderPath(borderColor, fillColor) {
+	    if (borderColor !== null && borderColor !== '') {
+	      renderContext.strokeStyle = borderColor;
+	      renderContext.stroke();
+	    }
+
+	    if (fillColor !== null && fillColor !== '') {
+	      renderContext.fillStyle = fillColor;
+	      renderContext.fill();
+	    }
+	  }
+
+
+
+
+	  module.exports = {
+	    initialize: initialize,
+	    startWorker: startWorker,
+	    stopWorker: stopWorker,
+	    startAnimation: startAnimation,
+	    stopAnimation: stopAnimation,
+	    line: line,
+	    circle: circle,
+	    rectangle: rectangle,
+	    text: text,
+	    image: image,
+	    video: video
+	  };
+
+
+	})();
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	(function() {
