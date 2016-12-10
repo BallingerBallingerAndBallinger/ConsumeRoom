@@ -18,6 +18,10 @@ npm run package
 ```
 
 Then view the index.html in the build directory.
+## To Improve 
+Responsiveness, consider framing and how it'll work on various form factors.
+Needs sounds coming in sooner then later.
+Consider how entities will path in and out, are they animated at all?
 
 
 ## Path to implementation
