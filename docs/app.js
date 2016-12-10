@@ -44,14 +44,14 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	(function(){
+	(function() {
 	  'use strict';
 
 	  var config = __webpack_require__(1);
 
 	  window.onload = () => {
 	    var canvas = document.getElementById('canvas').getContext('2d');
-	    canvas.fillText('Hello Ludem Dare!', 10, 50);
+	    canvas.fillText('Hello Ludem Andrew is insulted!', 10, 50);
 	    canvas.fillText(config.title, 10, 90);
 	  };
 	})();
