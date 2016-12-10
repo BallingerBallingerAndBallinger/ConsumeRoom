@@ -62,9 +62,9 @@
   }
 
   function render(timestamp, delta) {
-    var entities = [{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items);
+    var state = [{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items);
 
-    sprites.update(entities);
+    sprites.update(state);
     sprites.draw();
     sprites.clearClicks();
     stats.draw(theRoom);
