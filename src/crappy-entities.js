@@ -68,14 +68,11 @@
     stats.initialize(theRoom);
     entities = [
       roomBuilder.initialize(renderer),
-      bloonBuilder.initialize(renderer, logMove, checkMovement),
-      bloonBuilder.initialize(renderer, logMove, checkMovement),
       bloonBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
     entities[1].setX(100);
-    entities[2].setX(300);
-    entities[3].setX(500);
+    entities[1].setY(250);
   }
 
   function logMove(entity, x, y) {

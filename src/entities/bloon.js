@@ -16,6 +16,7 @@
 
       bloon.update = update;
       bloon.setX = setX;
+      bloon.setY = setY;
       return bloon;
 
       function update(timestamp, delta) {
@@ -40,6 +41,10 @@
 
       function setX(newX) {
         self.x = newX;
+      }
+
+      function setY(newY) {
+        self.y = newY;
       }
     };
 

@@ -11,7 +11,7 @@
       return room;
 
       function update(timestamp, delta) {
-        render.rectangle(0, 0, 1000, 1000, 'black', 'grey');
+        render.image(0, 500, 'floor-closed', 1000, 500);
       }
     };
 
