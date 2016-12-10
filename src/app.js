@@ -20,7 +20,7 @@
     var delta = getDelta(timestamp);
     if (delta < 50) return;
     updateDelta(timestamp);
-    entities.render(timestamp, delta);
+    entities.update(timestamp, delta);
   }
 
   var last;

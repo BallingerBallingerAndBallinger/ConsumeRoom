@@ -49,7 +49,7 @@
 	  'use strict';
 
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(6);
+	  var stats = __webpack_require__(7);
 
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -66,7 +66,7 @@
 	    var delta = getDelta(timestamp);
 	    if (delta < 50) return;
 	    updateDelta(timestamp);
-	    entities.render(timestamp, delta);
+	    entities.update(timestamp, delta);
 	  }
 
 	  var last;
@@ -93,6 +93,7 @@
 	  var _ = __webpack_require__(2);
 	  var sprites = __webpack_require__(4);
 	  var entityBuilder = __webpack_require__(5);
+	  var bloonBuilder = __webpack_require__(6);
 	  var stats;
 	  var entities = [];
 
@@ -153,18 +154,22 @@
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
-	      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move A ' + x + ', ' + y)),
-	      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move B ' + x + ', ' + y))
+	      entityBuilder.initialize(canvasElement, logMove),
+	      entityBuilder.initialize(canvasElement, logMove),
+	      bloonBuilder.initialize(canvasElement, () => {})
 	    ];
 	  }
 
-	  function render(timestamp, delta) {
-	    entities.forEach(e => e.move(1, 2));
-	    entities.forEach(e => e.render(timestamp, delta));
+	  function logMove(entity, x, y) {
+	    console.log('Moving: ' + entity.name + ' :(' + x + ', ' + y + ')');
+	  }
+
+	  function update(timestamp, delta) {
+	    entities.forEach(e => e.update(timestamp, delta));
 	  }
 
 	  module.exports = {
-	    render: render,
+	    update: update,
 	    initialize: initialize
 	  };
 	})();
@@ -17337,21 +17342,15 @@
 
 	  function initialize(canvasElement, moveMethod) {
 	    var initializer = () => {
-	      var self = {};
+	      var self = {name: 'generic', x: 1, y: 2};
 	      var context = canvasElement.getContext('2d');
 	      return {
-	        render: render,
-	        move: genericMove(moveMethod)
+	        update: update
 	      };
 
-	      function genericMove(moveMethod) {
-	        return (deltaX, deltaY) => {
-	          moveMethod(self, deltaX, deltaY);
-	        };
-	      }
-
-	      function render(timestamp, delta) {
-	        context; // Is used somehow.
+	      function update(timestamp, delta) {
+	        context; // To be used in here
+	        moveMethod(self, 10, 10);
 	        console.log("We're totally rendering an entity right now");
 	      }
 	    };
@@ -17367,6 +17366,33 @@
 
 /***/ },
 /* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
+	  function initialize(canvasElement, moveEntity) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(canvasElement, moveEntity);
+	      entity.render = render;
+	      return entity;
+
+	      function render(timestamp, delta) {
+	        console.log('Totally rendering a bloon right meow');
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 7 */
 /***/ function(module, exports) {
 
 	(function() {

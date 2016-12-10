@@ -2,6 +2,7 @@
   var _ = require('lodash');
   var sprites = require('./crappy-sprites.js');
   var entityBuilder = require('./crappy-entity.js');
+  var bloonBuilder = require('./entities/bloon.js');
   var stats;
   var entities = [];
 
@@ -62,18 +63,22 @@
     stats = incomingStats;
     stats.initialize(theRoom);
     entities = [
-      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move A ' + x + ', ' + y)),
-      entityBuilder.initialize(canvasElement, (entity, x, y) => console.log('Move B ' + x + ', ' + y))
+      entityBuilder.initialize(canvasElement, logMove),
+      entityBuilder.initialize(canvasElement, logMove),
+      bloonBuilder.initialize(canvasElement, () => {})
     ];
   }
 
-  function render(timestamp, delta) {
-    entities.forEach(e => e.move(1, 2));
-    entities.forEach(e => e.render(timestamp, delta));
+  function logMove(entity, x, y) {
+    console.log('Moving: ' + entity.name + ' :(' + x + ', ' + y + ')');
+  }
+
+  function update(timestamp, delta) {
+    entities.forEach(e => e.update(timestamp, delta));
   }
 
   module.exports = {
-    render: render,
+    update: update,
     initialize: initialize
   };
 })();

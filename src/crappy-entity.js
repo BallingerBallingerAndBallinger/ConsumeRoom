@@ -4,21 +4,15 @@
 
   function initialize(canvasElement, moveMethod) {
     var initializer = () => {
-      var self = {};
+      var self = {name: 'generic', x: 1, y: 2};
       var context = canvasElement.getContext('2d');
       return {
-        render: render,
-        move: genericMove(moveMethod)
+        update: update
       };
 
-      function genericMove(moveMethod) {
-        return (deltaX, deltaY) => {
-          moveMethod(self, deltaX, deltaY);
-        };
-      }
-
-      function render(timestamp, delta) {
-        context; // Is used somehow.
+      function update(timestamp, delta) {
+        context; // To be used in here
+        moveMethod(self, 10, 10);
         console.log("We're totally rendering an entity right now");
       }
     };
