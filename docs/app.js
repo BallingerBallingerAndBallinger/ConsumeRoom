@@ -71,8 +71,8 @@
 	    sprites.update([
 	      { name: 'crappy-room', x: 25, y: 10, size: 100 },
 	      { name: 'crappy-party-dude', x: Math.random() * 50, y: 45, size: 50 },
-	      { name: 'crappy-party-dude', x: 90, y: 30, size: 40 },
-	      { name: 'crappy-party-dude', x: 25, y: 10, size: 30 }
+	      { name: 'girl1', x: 90, y: 30, size: 40 },
+	      { name: 'bloon', x: 25, y: 10, size: 30 }
 	    ]);
 	    sprites.draw();
 	    drawTitle(canvasElement.getContext('2d'));
@@ -116,7 +116,7 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  title: 'The Back Room'
+	  title: 'Consume Room'
 	};
 
 
