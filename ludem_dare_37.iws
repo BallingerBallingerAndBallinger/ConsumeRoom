@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d1cea44-d9b6-47f6-93cb-a195a2e9c3b8" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/framework.js" afterPath="$PROJECT_DIR$/src/framework.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/crappy-entity.js" afterPath="$PROJECT_DIR$/src/crappy-entity.js" />
     </list>
     <ignored path="ludem_dare_37.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -46,8 +46,8 @@
       <file leaf-file-name="crappy-entity.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/crappy-entity.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+            <state relative-caret-position="330">
+              <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -97,8 +97,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/app.js" />
-        <option value="$PROJECT_DIR$/src/crappy-entity.js" />
         <option value="$PROJECT_DIR$/src/framework.js" />
+        <option value="$PROJECT_DIR$/src/crappy-entity.js" />
       </list>
     </option>
   </component>
@@ -654,8 +654,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/crappy-entity.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+        <state relative-caret-position="330">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
           <folding />
         </state>
       </provider>
