@@ -1,7 +1,7 @@
 #!/bin/bash
 (
-    rm -rf build
-    mkdir build
-    cp src/index.html build/index.html
+    rm -rf docs
+    mkdir docs
+    cp src/index.html docs/index.html
     node_modules/webpack/bin/webpack.js
 )
