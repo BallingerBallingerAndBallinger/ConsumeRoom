@@ -1,4 +1,6 @@
 (function() {
+  var _ = require('lodash');
+  
   var theGirl =
     { name: 'girl1',
       x: 500,
@@ -29,6 +31,16 @@
     { happiness: 0,
       people: [theGirl],
       items: [theBloon, theBear],
+      addItems: (items) => {
+        theRoom.items = theRoom.items.concat(items);
+      },
+      addPeople: (people) => {
+        theRoom.people = theRoom.people.concat(people);
+      },
+      remove: (targets) => {
+        theRoom.people = _.difference(theRoom.people, targets);
+        theRoom.items = _.difference(theRoom.items, targets);
+      },
       attractivenes: () => {
         var total = 0;
         theRoom.people.forEach((p) => {
