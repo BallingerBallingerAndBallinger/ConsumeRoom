@@ -26,7 +26,8 @@
       { name: 'crappy-room', x: 25, y: 10, size: 900 },
       { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 },
       { name: 'girl1', x: 500, y: 300, size: 400 },
-      { name: 'bloon', x: 250, y: 200, size: 200 }
+      { name: 'bloon', x: 250, y: 200, size: 200 },
+      { name: 'bear',  x: 55,  y: 450, size: 150 }
     ]);
     sprites.draw();
     drawTitle(canvasElement.getContext('2d'));
