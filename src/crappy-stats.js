@@ -10,19 +10,13 @@
   function initialize(room) {
     displays = [
       { element: document.getElementById('room-happiness'),
-        value: (room) => {
-          var happiness = 0;
-          room.people.forEach((person) => {
-            happiness += person.happiness;
-          });
-          return happiness;
-        }
+        value: (room) => { return room.happiness }
       },
       { element: document.getElementById('people-count'),
-        value: (room) => { return room.people.length; }
+        value: (room) => { return room.peopleCount; }
       },
       { element: document.getElementById('item-count'),
-        value: (room) => { return room.items.length; }
+        value: (room) => { return room.enticementCount; }
       }
     ];
   }

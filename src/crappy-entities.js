@@ -9,58 +9,7 @@
   var stats;
   var width;
   var entities = [];
-
-  var theGirl =
-    { name: 'girl1',
-      x: 500,
-      y: 300,
-      size: 400,
-      happiness: 100,
-      attractiveness: 40,
-      curiosity: 100
-    };
-
-  var theBloon =
-    { name: 'bloon',
-      x: 250,
-      y: 200,
-      size: 200,
-      attractiveness: 40
-    };
-
-  var theBear =
-    { name: 'bear',
-      x: 55,
-      y: 450,
-      size: 150,
-      attractiveness: 20
-    };
-
-  var theRoom =
-    { happiness: 0,
-      people: [theGirl],
-      items: [theBloon, theBear],
-      addItems: (items) => {
-        theRoom.items = theRoom.items.concat(items);
-      },
-      addPeople: (people) => {
-        theRoom.people = theRoom.people.concat(people);
-      },
-      remove: (targets) => {
-        theRoom.people = _.difference(theRoom.people, targets);
-        theRoom.items = _.difference(theRoom.items, targets);
-      },
-      attractivenes: () => {
-        var total = 0;
-        theRoom.people.forEach((p) => {
-          total += p.attractivenss;
-        });
-        theRoom.items.forEach((i) => {
-          total += i.attractiveness;
-        });
-        return total;
-      }
-    };
+  var gameState = {};
 
   function initialize(canvasElement, incomingStats) {
     width = canvasElement.width;
@@ -68,7 +17,8 @@
 
     renderer.initialize(canvasElement);
     stats = incomingStats;
-    stats.initialize(theRoom);
+    stats.initialize(gameState);
+
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
     var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
     entities = [
@@ -106,8 +56,23 @@
   }
 
   function update(timestamp, delta) {
+    updateGameState();
     renderer.clear();
     entities.forEach(e => e.update(timestamp, delta));
+  }
+
+  function updateGameState() {
+    gameState.happiness = entities.map(e => {
+      return 0;
+    }).reduce((acc, val) => acc + val, 0);
+
+    gameState.peopleCount = entities.map(e => {
+      return 0;
+    }).reduce((acc, val) => acc + val, 0);
+
+    gameState.enticementCount = entities.map(e => {
+      return 0;
+    }).reduce((acc, val) => acc + val, 0);
   }
 
   module.exports = {
