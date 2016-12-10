@@ -1,4 +1,6 @@
 (function() {
+
+
   // ----------------------------------------------------------------------------
   // Globals
   //
@@ -7,17 +9,9 @@
 
   function initialize(canvasElement) {
     setCanvas(canvasElement);
-    circle(200, 200, 100, 'Red', 'Blue');
-    rectangle(300, 300, 200, 100, '', 'Green');
-    text(100, 300, 'Hello', '', '20px', 'Black', 'Yellow');
-    image(0, 0, 'car', 100, '');
-    video(100, 0, 'video1', 200, '');
-    line(300, 300, 600, 600, 'Red');
+
   }
 
-  // ============================================================================
-  // ENTITIES
-  //
 
   // ============================================================================
   // PROCESSES
@@ -60,6 +54,10 @@
     animationFunction();
     return window.requestAnimationFrame(() => animate(animationFunction));
   }
+
+
+
+
 
   // ============================================================================
   // PRIMITIVES
