@@ -17,7 +17,7 @@
 
     renderer.initialize(canvasElement);
     stats = incomingStats;
-    stats.initialize(gameState);
+    stats.initialize();
 
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
     var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
@@ -63,16 +63,18 @@
 
   function updateGameState() {
     gameState.happiness = entities.map(e => {
-      return 0;
+      return e.getHappiness ? e.getHappiness() : 0;
     }).reduce((acc, val) => acc + val, 0);
 
-    gameState.peopleCount = entities.map(e => {
-      return 0;
-    }).reduce((acc, val) => acc + val, 0);
+    gameState.peopleCount = entities.filter(e => {
+      return e.isPerson ? true : false;
+    }).length;
 
-    gameState.enticementCount = entities.map(e => {
-      return 0;
-    }).reduce((acc, val) => acc + val, 0);
+    gameState.enticementCount = entities.filter(e => {
+      return e.isEnticement ? true : false;
+    }).length;
+
+    stats.draw(gameState);
   }
 
   module.exports = {

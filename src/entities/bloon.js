@@ -17,6 +17,8 @@
       bloon.update = update;
       bloon.setX = setX;
       bloon.setY = setY;
+      bloon.getHappiness = () => 100;
+      bloon.isEnticement = true;
       return bloon;
 
       function update(timestamp, delta) {

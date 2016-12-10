@@ -22,6 +22,7 @@
 
       goer.update = update;
       goer.setX = setX;
+      goer.isPerson = true;
       return goer;
 
       function update(timestamp, delta) {
