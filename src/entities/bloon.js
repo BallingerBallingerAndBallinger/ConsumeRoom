@@ -1,12 +1,10 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
-  var sprites = require('../crappy-sprites.js');
 
-  function initialize(canvasElement, moveMethod, checkMovement) {
+  function initialize(renderer, moveMethod, checkMovement) {
     var constructor = () => {
-      var entity = entityBase.initialize(canvasElement,
-                                         moveMethod);
-      sprites.initialize(canvasElement);
+      var entity = entityBase.initialize(renderer, moveMethod);
+      var render = renderer;
 
       var goingLeft = false;
 
@@ -26,8 +24,7 @@
           self.x = attemptedX;
         };
 
-        sprites.update([self]);
-        sprites.draw();
+        render.circle(self.x, self.y, 'black', 'red');
       }
     };
 

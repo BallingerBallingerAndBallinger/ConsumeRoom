@@ -94,15 +94,11 @@
 	  var sprites = __webpack_require__(4);
 	  var entityBuilder = __webpack_require__(5);
 	  var bloonBuilder = __webpack_require__(6);
-	  var renderLib = __webpack_require__(7);
+	  var renderer = __webpack_require__(7);
 	  var stats;
-<<<<<<< HEAD
-	  var renderer;
-=======
 	  var width;
 	  var height;
 	  var clear;
->>>>>>> dafd1cdc58662d471472802f30f9e1d2782f1f4c
 	  var entities = [];
 
 	  var theGirl =
@@ -158,26 +154,16 @@
 	    };
 
 	  function initialize(canvasElement, incomingStats) {
-<<<<<<< HEAD
-	    renderLib.initialize(canvasElement);
-	    renderer = renderLib;
-	    stats = incomingStats;
-	    stats.initialize(theRoom);
-	    entities = [
-	      entityBuilder.initialize(renderer, logMove),
-	      entityBuilder.initialize(renderer, logMove),
-	      bloonBuilder.initialize(renderer, logMove)
-=======
 	    width = canvasElement.width;
 	    height = canvasElement.height;
 
-	    clear = () => canvasElement.getContext('2d').clearRect(0, 0, width, height);
-	    sprites.initialize(canvasElement);
+	    renderer.initialize(canvasElement);
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
-	      bloonBuilder.initialize(canvasElement, logMove, checkMovement)
->>>>>>> dafd1cdc58662d471472802f30f9e1d2782f1f4c
+	      entityBuilder.initialize(renderer, logMove),
+	      entityBuilder.initialize(renderer, logMove),
+	      bloonBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 	  }
 
@@ -198,7 +184,6 @@
 	  }
 
 	  function update(timestamp, delta) {
-	    clear();
 	    entities.forEach(e => e.update(timestamp, delta));
 	  }
 
@@ -17405,13 +17390,11 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var sprites = __webpack_require__(4);
 
-	  function initialize(canvasElement, moveMethod, checkMovement) {
+	  function initialize(renderer, moveMethod, checkMovement) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(canvasElement,
-	                                         moveMethod);
-	      sprites.initialize(canvasElement);
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
 
 	      var goingLeft = false;
 
@@ -17431,8 +17414,7 @@
 	          self.x = attemptedX;
 	        };
 
-	        sprites.update([self]);
-	        sprites.draw();
+	        render.circle(self.x, self.y, 'black', 'red');
 	      }
 	    };
 
