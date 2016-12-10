@@ -18,6 +18,10 @@ npm run package
 ```
 
 Then view the index.html in the build directory.
+## To Improve 
+Responsiveness, consider framing and how it'll work on various form factors.
+Needs sounds coming in sooner then later.
+Consider how entities will path in and out, are they animated at all?
 
 
 ## Path to implementation
@@ -97,7 +101,8 @@ Eat people too soon, people run away.
 
 ![Arranged like](http://www.hardcoregaming101.net/recettear/recettear-5.jpg)
 ![Looks like](https://thumbs.candybanana.com/kRTdVAhRimRGq9HgvDgNB4428Ko=/755x425/https://s.candybanana.com/images/92e0/super_meat_boy_the_game.jpg)
-![Also looks like](http://assets.vg247.com/current//2015/11/the_binding_of_isaac.jpg)
+![Also looks like](http://assets.vg247.com/current//2015/11/the_binding_of_isaac.jpg)!!
+![Good old fashioned giblets](http://stream1.gifsoup.com/view3/3020210/serious-sam-3-pestol-o.gif)
 
 ### How to place enticements?
 Place them, placed automatically?
