@@ -1,13 +1,10 @@
 (function() {
   var _ = require('lodash');
-  var sprites = require('./crappy-sprites.js');
-  var entityBuilder = require('./crappy-entity.js');
   var bloonBuilder = require('./entities/bloon.js');
+  var roomBuilder = require('./entities/room.js');
   var renderer = require('./rendering.js');
   var stats;
   var width;
-  var height;
-  var clear;
   var entities = [];
 
   var theGirl =
@@ -70,14 +67,15 @@
     stats = incomingStats;
     stats.initialize(theRoom);
     entities = [
+      roomBuilder.initialize(renderer),
       bloonBuilder.initialize(renderer, logMove, checkMovement),
       bloonBuilder.initialize(renderer, logMove, checkMovement),
       bloonBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
-    entities[0].setX(100);
-    entities[1].setX(300);
-    entities[2].setX(500);
+    entities[1].setX(100);
+    entities[2].setX(300);
+    entities[3].setX(500);
   }
 
   function logMove(entity, x, y) {

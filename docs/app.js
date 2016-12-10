@@ -91,14 +91,11 @@
 
 	(function() {
 	  var _ = __webpack_require__(2);
-	  var sprites = __webpack_require__(4);
-	  var entityBuilder = __webpack_require__(5);
-	  var bloonBuilder = __webpack_require__(6);
+	  var bloonBuilder = __webpack_require__(4);
+	  var roomBuilder = __webpack_require__(6);
 	  var renderer = __webpack_require__(7);
 	  var stats;
 	  var width;
-	  var height;
-	  var clear;
 	  var entities = [];
 
 	  var theGirl =
@@ -161,14 +158,15 @@
 	    stats = incomingStats;
 	    stats.initialize(theRoom);
 	    entities = [
+	      roomBuilder.initialize(renderer),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement),
 	      bloonBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 
-	    entities[0].setX(100);
-	    entities[1].setX(300);
-	    entities[2].setX(500);
+	    entities[1].setX(100);
+	    entities[2].setX(300);
+	    entities[3].setX(500);
 	  }
 
 	  function logMove(entity, x, y) {
@@ -17289,106 +17287,6 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
-
-	(function() {
-	  var sprites = [];
-	  var clicked = [];
-	  var width;
-	  var height;
-	  var context;
-
-	  function initialize(canvasElement) {
-	    canvasElement.addEventListener('click', clickHappened);
-	    context = canvasElement.getContext('2d');
-	    width = canvasElement.width;
-	    height = canvasElement.height;
-	    sprites = [];
-	  }
-
-	  function draw() {
-	    sprites.forEach((sprite) => {
-	      context.drawImage(document.getElementById(sprite.name), sprite.x, sprite.y, sprite.size, sprite.size);
-	    });
-	  }
-
-	  function update(newState) {
-	    sprites = newState;
-	  }
-
-	  function clickHappened(clickEvent) {
-	    var coords = transformCoords(clickEvent);
-	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, coords.x, coords.y)).slice(0);
-	    clicked = clicked.concat(encountered);
-	  }
-
-	  function isInsideSprite(sprite, x, y) {
-	    return sprite.x < x &&
-	           sprite.y < y &&
-	           sprite.x + sprite.size > x &&
-	           sprite.y + sprite.size > y;
-	  }
-
-	  function getClicks() {
-	    return clicked;
-	  }
-
-	  function clearClicks() {
-	    clicked = [];
-	  }
-
-	  function transformCoords(event) {
-	    var rect = event.target.getBoundingClientRect();
-	    return {
-	      x: (event.clientX - rect.left) * (width / rect.width),
-	      y: (event.clientY - rect.top) * (height / rect.height)
-	    };
-	  }
-
-	  module.exports = {
-	    draw: draw,
-	    update: update,
-	    initialize: initialize,
-	    getClicks: getClicks,
-	    clearClicks: clearClicks
-	  };
-	})();
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(function() {
-	  // Includes
-	  var _ = __webpack_require__(2);
-
-	  function initialize(renderer, moveMethod) {
-	    var initializer = () => {
-	      var self = {name: 'generic', x: 1, y: 2};
-	      var render = renderer;
-	      return {
-	        update: update
-	      };
-
-	      function update(timestamp, delta) {
-	        moveMethod(self, 10, 10);
-	        render.circle(self.x, self.y, 20, 'black', 'red');
-	        console.log("We're totally rendering an entity right now");
-	      }
-	    };
-	    return initializer();
-	  }
-
-	  // Exports
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17433,6 +17331,69 @@
 
 	      function setX(newX) {
 	        self.x = newX;
+	      }
+	    };
+
+	    return constructor();
+	  }
+
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(function() {
+	  // Includes
+	  var _ = __webpack_require__(2);
+
+	  function initialize(renderer, moveMethod) {
+	    var initializer = () => {
+	      var self = {name: 'generic', x: 1, y: 2};
+	      var render = renderer;
+	      return {
+	        update: update
+	      };
+
+	      function update(timestamp, delta) {
+	        moveMethod(self, 10, 10);
+	        render.circle(self.x, self.y, 20, 'black', 'red');
+	        console.log("We're totally rendering an entity right now");
+	      }
+	    };
+	    return initializer();
+	  }
+
+	  // Exports
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+
+	  function initialize(renderer, moveMethod, checkMovement) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var render = renderer;
+
+	      var self = { name: 'room' };
+	      var room = Object.assign({}, entity);
+	      room.update = update;
+	      return room;
+
+	      function update(timestamp, delta) {
+	        render.rectangle(0, 0, 1000, 1000, 'black', 'grey');
 	      }
 	    };
 
