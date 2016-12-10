@@ -63,6 +63,7 @@
 	    requestAnimationFrame(grandLoop);
 	  }
 
+	  var girl = 'girl1';
 	  function drawFrame(timestamp) {
 	    var delta = getDelta(timestamp);
 	    if (delta < 50) return;
@@ -71,11 +72,17 @@
 	    sprites.update([
 	      { name: 'crappy-room', x: 25, y: 10, size: 900 },
 	      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 },
-	      { name: 'girl1', x: 500, y: 300, size: 400 },
-	      { name: 'bloon', x: 250, y: 200, size: 200 },
-	      { name: 'bear',  x: 55,  y: 450, size: 150 }
+	      { name: girl, x: 500, y: 300, size: 400 },
+	      { name: 'bloon', x: 250, y: 200, size: 200 }
 	    ]);
 	    sprites.draw();
+
+	    var girlClicked = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
+	    if (girlClicked.length > 0) {
+	      girl = 'bear';
+	    }
+	    sprites.clearClicks();
+
 	    drawTitle(canvasElement.getContext('2d'));
 	  }
 
@@ -101,7 +108,6 @@
 	    gradient.addColorStop('0', 'magenta');
 	    gradient.addColorStop('0.5', 'blue');
 	    gradient.addColorStop('1.0', 'red');
-	    // Fill with gradient
 
 	    var oldFill = ctx.fillStyle;
 	    ctx.fillStyle = gradient;
@@ -126,12 +132,14 @@
 /***/ function(module, exports) {
 
 	(function() {
-	  var sprites;
+	  var sprites = [];
+	  var clicked = [];
 	  var width;
 	  var height;
 	  var context;
 
 	  function initialize(canvasElement) {
+	    canvasElement.addEventListener('click', clickHappened);
 	    context = canvasElement.getContext('2d');
 	    width = canvasElement.width;
 	    height = canvasElement.height;
@@ -149,10 +157,32 @@
 	    sprites = newState;
 	  }
 
+	  function clickHappened(clickEvent) {
+	    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, clickEvent.x, clickEvent.y)).slice(0);
+	    clicked = clicked.concat(encountered);
+	  }
+
+	  function isInsideSprite(sprite, x, y) {
+	    return sprite.x < x &&
+	           sprite.y < y &&
+	           sprite.x + sprite.size > x &&
+	           sprite.y + sprite.size > y;
+	  }
+
+	  function getClicks() {
+	    return clicked;
+	  }
+
+	  function clearClicks() {
+	    clicked = [];
+	  }
+
 	  module.exports = {
 	    draw: draw,
 	    update: update,
-	    initialize: initialize
+	    initialize: initialize,
+	    getClicks: getClicks,
+	    clearClicks: clearClicks
 	  };
 	})();
 

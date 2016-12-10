@@ -1,10 +1,12 @@
 (function() {
-  var sprites;
+  var sprites = [];
+  var clicked = [];
   var width;
   var height;
   var context;
 
   function initialize(canvasElement) {
+    canvasElement.addEventListener('click', clickHappened);
     context = canvasElement.getContext('2d');
     width = canvasElement.width;
     height = canvasElement.height;
@@ -22,9 +24,31 @@
     sprites = newState;
   }
 
+  function clickHappened(clickEvent) {
+    var encountered = sprites.filter((sprite) => isInsideSprite(sprite, clickEvent.x, clickEvent.y)).slice(0);
+    clicked = clicked.concat(encountered);
+  }
+
+  function isInsideSprite(sprite, x, y) {
+    return sprite.x < x &&
+           sprite.y < y &&
+           sprite.x + sprite.size > x &&
+           sprite.y + sprite.size > y;
+  }
+
+  function getClicks() {
+    return clicked;
+  }
+
+  function clearClicks() {
+    clicked = [];
+  }
+
   module.exports = {
     draw: draw,
     update: update,
-    initialize: initialize
+    initialize: initialize,
+    getClicks: getClicks,
+    clearClicks: clearClicks
   };
 })();
