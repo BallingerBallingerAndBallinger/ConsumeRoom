@@ -10,7 +10,7 @@
 
       var goingLeft = false;
 
-      var self = { name: 'bloon', x: 100, y: 400, size: 100 };
+      var self = { name: 'bloon', x: 100, y: 400, size: 300 };
       var bloon = Object.assign({}, entity);
       var travel = 0;
 
@@ -35,7 +35,7 @@
           travel += attemptedTravel;
         };
 
-        render.circle(self.x, self.y, 50, 'black', 'red');
+        render.image(self.x, self.y, self.name, self.size, self.size);
       }
 
       function setX(newX) {
