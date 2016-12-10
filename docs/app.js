@@ -51,11 +51,13 @@
 	  var config = __webpack_require__(1);
 	  var sprites = __webpack_require__(2);
 	  var entities = __webpack_require__(3);
+	  var stats = __webpack_require__(4);
 
 	  var canvasElement;
 	  window.onload = () => {
 	    canvasElement = document.getElementById('canvas');
 	    sprites.initialize(canvasElement);
+	    stats.initialize(entities.theRoom);
 	    requestAnimationFrame(grandLoop);
 	  };
 
@@ -80,6 +82,7 @@
 	    sprites.update(entitiesList);
 	    sprites.draw();
 	    drawTitle(canvasElement.getContext('2d'));
+	    stats.draw(entities.theRoom);
 	  }
 
 	  var last;
@@ -209,6 +212,46 @@
 
 	  module.exports = {
 	    theRoom: theRoom
+	  };
+	})();
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	(function() {
+	  var displays;
+
+	  function draw(room) {
+	    displays.forEach((display) => {
+	      display.element.innerHTML = display.value(room);
+	    });
+	  }
+
+	  function initialize(room) {
+	    displays = [
+	      { element: document.getElementById('room-happiness'),
+	        value: (room) => {
+	          var happiness = 0;
+	          room.people.forEach((person) => {
+	            happiness += person.happiness;
+	          });
+	          return happiness;
+	        }
+	      },
+	      { element: document.getElementById('people-count'),
+	        value: (room) => { return room.people.length; }
+	      },
+	      { element: document.getElementById('item-count'),
+	        value: (room) => { return room.items.length; }
+	      }
+	    ];
+	  }
+
+	  module.exports = {
+	    initialize: initialize,
+	    draw: draw
 	  };
 	})();
 
