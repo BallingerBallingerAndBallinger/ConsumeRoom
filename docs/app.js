@@ -149,13 +149,16 @@
 	  function initialize(canvasElement, incomingStats) {
 	    sprites.initialize(canvasElement);
 	    stats = incomingStats;
+	    stats.initialize(theRoom);
 	  }
 
 	  function render(timestamp, delta) {
-	    sprites.update([{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items));
+	    var entities = [{ name: 'crappy-room', x: 25, y: 10, size: 900 }].concat(theRoom.people).concat(theRoom.items);
+
+	    sprites.update(entities);
 	    sprites.draw();
 	    sprites.clearClicks();
-	    stats.draw(entities.theRoom);
+	    stats.draw(theRoom);
 	  }
 
 	  module.exports = {
