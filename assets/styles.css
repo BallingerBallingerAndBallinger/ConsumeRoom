@@ -4,20 +4,13 @@
     user-select: none;
 }
 
-
-body {
-    width: 1000;
-    height: 1000;
-}
-
 canvas {
     position: relative;
-    width: 1000;
-    height: 1000;
+    width: 600px;
+    height: 600px;
 }
 
 stats {
-    width: 200;
     background-color: rgb(225, 225, 225);
     padding: 5px;
 }
@@ -38,7 +31,6 @@ stats {
     margin-right: 0;
     margin-top: 10px;
     margin-bottom: 10px;
-
 }
 
 .stat-label {
