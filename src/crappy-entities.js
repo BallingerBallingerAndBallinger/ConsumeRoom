@@ -75,11 +75,11 @@
       roomBuilder.initialize(renderer),
       bloon,
       bear,
+      doorBuilder.initialize(renderer),
       goerBuilder.initialize(renderer, logMove, checkMovement),
       goerBuilder.initialize(renderer, logMove, checkMovement),
       goerBuilder.initialize(renderer, logMove, checkMovement),
-      goerBuilder.initialize(renderer, logMove, checkMovement),
-      doorBuilder.initialize(renderer)
+      goerBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
     bloon.setX(100);
