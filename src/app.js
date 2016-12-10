@@ -4,6 +4,7 @@
 
   var config = require('./configuration.js');
   var sprites = require('./crappy-sprites.js');
+  var entities = require('./crappy-entities.js');
 
   var canvasElement;
   window.onload = () => {
@@ -17,24 +18,30 @@
     requestAnimationFrame(grandLoop);
   }
 
-  var girl = 'girl1';
   function drawFrame(timestamp) {
     var delta = getDelta(timestamp);
     if (delta < 50) return;
     updateDelta(timestamp);
 
-    sprites.update([
+    var entitiesList = [
       { name: 'crappy-room', x: 25, y: 10, size: 900 },
-      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 },
-      { name: girl, x: 500, y: 300, size: 400 },
-      { name: 'bloon', x: 250, y: 200, size: 200 }
-    ]);
+      { name: 'crappy-party-dude', x: Math.random() * 50, y: 750, size: 600 }
+    ];
+
+    entitiesList = entitiesList.concat(entities.theRoom.people);
+    entitiesList = entitiesList.concat(entities.theRoom.items);
+
+    sprites.update(entitiesList);
     sprites.draw();
 
-    var girlClicked = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
-    if (girlClicked.length > 0) {
-      girl = 'bear';
-    }
+    var clickedGirls = sprites.getClicks().filter((sprite) => sprite.name === 'girl1');
+    var bears = clickedGirls.map((sprite) => {
+      var newSprite = Object.assign({}, sprite);
+      newSprite.name = 'bear';
+      return newSprite;
+    });
+    entities.theRoom.remove(clickedGirls);
+    entities.theRoom.addItems(bears);
     sprites.clearClicks();
 
     drawTitle(canvasElement.getContext('2d'));

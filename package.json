@@ -19,6 +19,7 @@
   "homepage": "https://github.com/AndrewBallinger/ludem_dare_37#readme",
   "devDependencies": {
     "jasmine": "^2.5.2",
+    "lodash": "^4.17.2",
     "webpack": "^1.14.0"
   }
 }
