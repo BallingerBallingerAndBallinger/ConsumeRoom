@@ -6,6 +6,16 @@ The back room
 Entice people into the room...
 Spend resource on chocolate cake?
 
+# Building
+
+```
+npm install
+npm run package
+```
+
+Then view the index.html in the build directory.
+
+
 ## Path to implementation
 
 One, Single click, resource comes and goes.

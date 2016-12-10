@@ -1,0 +1,23 @@
+{
+  "name": "ludem_dare_37",
+  "version": "1.0.0",
+  "description": "Working titles: The back room",
+  "main": "app.js",
+  "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "package": "scripts/build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndrewBallinger/ludem_dare_37.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndrewBallinger/ludem_dare_37/issues"
+  },
+  "homepage": "https://github.com/AndrewBallinger/ludem_dare_37#readme",
+  "devDependencies": {
+    "webpack": "^1.14.0"
+  }
+}

@@ -5,7 +5,7 @@
 
   window.onload = () => {
     var canvas = document.getElementById('canvas').getContext('2d');
-    canvas.fillText('Hello World', 10, 50);
-    canvas.fillText(config.title, 80, 50);
+    canvas.fillText('Hello Ludem Dare!', 10, 50);
+    canvas.fillText(config.title, 10, 90);
   };
 })();
