@@ -71,6 +71,7 @@ stats {
 
     align-items: flex-end;
     height:100%;
+    background: black;
 }
 .ui-area{
     display: flex;
