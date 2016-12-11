@@ -14,6 +14,7 @@
       var goer = Object.assign({}, entity);
       goer.update = update;
       goer.setX = setX;
+      goer.setY = setY;
       goer.getX = getX;
       goer.getY = getY;
       goer.isPerson = true;
@@ -34,6 +35,10 @@
 
       function setX(newX) {
         self.x = newX;
+      }
+
+      function setY(newY) {
+        self.y = newY;
       }
     };
 

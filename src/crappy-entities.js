@@ -29,14 +29,8 @@
       roomBuilder.initialize(renderer),
       bloon,
       bear,
-      doorBuilder.initialize(renderer),
-      goerBuilder.initialize(renderer, logMove, checkMovement),
-      goerBuilder.initialize(renderer, logMove, checkMovement)
+      doorBuilder.initialize(renderer)
     ];
-
-    for (var i = 0; i < 100; i++) {
-      entities.push(goerBuilder.initialize(renderer, logMove, checkMovement));
-    }
   }
 
   function logMove(entity, x, y) {
@@ -64,6 +58,9 @@
   }
 
   function update(timestamp, delta) {
+    if (Math.random() < 0.01) {
+      introducePartygoer();
+    }
     updateGameState();
     renderer.clear();
     entities.sort(compareEntities);
@@ -85,6 +82,13 @@
   function updateGameState() {
     gameState.fondleEntities(entities);
     stats.draw(gameState);
+  }
+
+  function introducePartygoer() {
+    var goer = goerBuilder.initialize(renderer, logMove, checkMovement);
+    goer.setX(1);
+    goer.setY(0);
+    entities.push(goer);
   }
 
   module.exports = {
