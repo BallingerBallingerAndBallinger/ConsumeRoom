@@ -191,6 +191,16 @@
   }
 
   // ----------------------------------------------------------------------------
+  // Audio
+  //
+  //  Plays some sound
+
+  function audio(audioId) {
+    var sound = document.getElementById(audioId);
+    sound.play();
+  }
+
+  // ----------------------------------------------------------------------------
   // Render the current path
   //
   function renderPath(borderColor, fillColor) {
@@ -229,6 +239,7 @@
     text: text,
     image: image,
     video: video,
+    audio: audio,
     getWidth: getWidth,
     getHeight: getHeight
   };

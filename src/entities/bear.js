@@ -29,6 +29,7 @@
             console.log('Bear Squish!');
             isSquishing = true;
             squish = 30;
+            render.audio('squeak');
           }
         }
 
