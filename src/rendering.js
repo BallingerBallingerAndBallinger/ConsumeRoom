@@ -221,16 +221,21 @@
     }
   }
 
-
-  function getWidth(){
+  function getWidth() {
     return canvasWidth;
   }
 
-  function getHeight(){
+  function getHeight() {
     return canvasHeight;
   }
 
-
+  function transformEventToCoords(event) {
+    var rect = event.target.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * (getWidth() / rect.width),
+      y: (event.clientY - rect.top) * (getHeight() / rect.height)
+    };
+  }
 
   module.exports = {
     initialize: initialize,
@@ -248,8 +253,8 @@
     audio: audio,
     stopAudio: stopAudio,
     getWidth: getWidth,
-    getHeight: getHeight
+    getHeight: getHeight,
+    transformEventToCoords: transformEventToCoords
   };
-
 
 })();

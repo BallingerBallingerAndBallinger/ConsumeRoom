@@ -6,6 +6,7 @@
       var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
       var steps = 0;
+      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
       var goalCallback;
 
       var self = entity.getSelf();
@@ -17,6 +18,7 @@
       goer.draw = draw;
       goer.setGoal = setGoal;
       goer.isPerson = true;
+      goer.setStepsGenerator = setStepsGenerator;
       return goer;
 
       function update(timestamp, delta) {
@@ -51,7 +53,7 @@
         }
 
         // Set steps
-        steps = Math.round(20 + Math.random() * 30);
+        steps = stepsGenerator();
 
         // Set speed
         // var speed = distance / steps;
@@ -59,13 +61,20 @@
         self.vy = (self.gy - self.y) / steps;
       }
 
+      function setStepsGenerator(newGenerator) {
+        stepsGenerator = newGenerator;
+      }
+
       function moveTowardGoal() {
         if (steps <= 0) {
           if (goalCallback) {
-            goalCallback();
+            // Now the callback can set a new goal
+            var cb = goalCallback;
             goalCallback = undefined;
+            cb();
+          } else {
+            setGoal();
           }
-          setGoal();
         }
 
         var newx = self.x + self.vx;

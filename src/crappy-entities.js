@@ -3,6 +3,7 @@
   var bloonBuilder = require('./entities/items/bloon.js');
   var roomBuilder = require('./entities/room.js');
   var doorBuilder = require('./entities/door.js');
+  var windowBuilder = require('./entities/window.js');
   var bearBuilder = require('./entities/items/bear.js');
   var dude1Builder = require('./entities/goers/dude1.js');
   var girl1Builder = require('./entities/goers/girl1.js');
@@ -23,8 +24,11 @@
     click.register((e) => { clickEvent = e; });
 
     var bloon = bloonBuilder.initialize(renderer, movementHandler);
+    var window = windowBuilder.initialize(renderer);
+
     room = roomBuilder.initialize(renderer);
     entities = [
+      window,
       room,
       bloon
     ];
@@ -46,7 +50,7 @@
     renderer.clear();
     entities.sort(compareEntities);
     if (clickEvent) {
-      var coords = transformCoords(clickEvent);
+      var coords = renderer.transformEventToCoords(clickEvent);
       for (var i = entities.length - 1; i >= 0; i--) {
         var entity = entities[i];
         if (entity.handleClick) {
@@ -89,18 +93,11 @@
     }, config.eatSoundTime);
   }
 
-  function transformCoords(event) {
-    var rect = event.target.getBoundingClientRect();
-    return {
-      x: (event.clientX - rect.left) * (renderer.getWidth() / rect.width),
-      y: (event.clientY - rect.top) * (renderer.getHeight() / rect.height)
-    };
-  }
-
   function addBear() {
     var bear = bearBuilder.initialize(renderer, movementHandler);
     bear.setY(Math.random());
     entities.push(bear);
+    gameState.bankHappiness(-1);
   }
 
   function introducePartygoer() {

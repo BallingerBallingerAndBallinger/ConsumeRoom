@@ -5,6 +5,9 @@
   function initialize(renderer, movementHandler) {
     var initializer = () => {
       var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
+      var steps = 0;
+      var goalCallback;
+
       return {
         update: update,
         // Getters and setters
@@ -20,6 +23,7 @@
       };
 
       function update(timestamp, delta) {
+
       }
 
       function getSelf() {
