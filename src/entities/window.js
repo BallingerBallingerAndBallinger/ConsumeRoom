@@ -42,7 +42,9 @@
 
       function startPacing(pacer) {
         var goingLeft = (Math.random() > 0.5);
+        var distance = goingLeft ? pacer.getX() : 1 - pacer.getX();
         reverseGoal();
+        pacer.setSteps(pacer.getSteps() * distance);
 
         function reverseGoal() {
           goingLeft = !goingLeft;

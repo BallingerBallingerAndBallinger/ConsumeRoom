@@ -20,6 +20,7 @@
       goer.isPerson = true;
       goer.setStepsGenerator = setStepsGenerator;
       goer.setSteps = setSteps;
+      goer.getSteps = getSteps;
       return goer;
 
       function update(timestamp, delta) {
@@ -34,8 +35,14 @@
 
       function setSteps(newSteps) {
         steps = newSteps;
+        self.vx = (self.gx - self.x) / steps;
+        self.vy = (self.gy - self.y) / steps;
       }
-      
+
+      function getSteps() {
+        return steps;
+      }
+
       function setGoal(x, y, callback) {
         goalCallback = callback;
         if (x !== undefined && y !== undefined) {
