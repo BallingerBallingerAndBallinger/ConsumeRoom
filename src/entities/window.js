@@ -14,7 +14,7 @@
 
         pacer.setX(Math.random());
         pacer.setY(-0.03);
-        pacer.setStepsGenerator(() => 60 + Math.random() * 10);
+        pacer.setStepsGenerator(() => 60 + Math.random() * 60);
 
         startPacing(pacer);
         pacers.push(pacer);
