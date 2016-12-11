@@ -10,6 +10,10 @@
     entities.consumeAll();
   }
 
+  function addBear(){
+    entities.addBear();
+  }
+
   function setPause(pauseFn) {
     pause = (paused) => {
       pauseFn(paused);
@@ -31,6 +35,8 @@
             .addEventListener('click', (e) => consumeAll(e));
     document.getElementById('pause-game-button')
             .addEventListener('click', (e) => pause());
+    document.getElementById('purchase-enticement-button')
+            .addEventListener('click', (e) => addBear(e));
 
     pausedView = document.getElementById('paused-view');
     gameOverView = document.getElementById('game-over');

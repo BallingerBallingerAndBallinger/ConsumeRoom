@@ -75,6 +75,12 @@
     }, config.eatSoundTime);
   }
 
+  function addBear() {
+    var bear = bearBuilder.initialize(renderer, movementHandler);
+    bear.setY(Math.random());
+    entities.push(bear);
+  }
+
   function introducePartygoer() {
     var goer;
     if (Math.random() < 0.5) {
@@ -103,6 +109,7 @@
 
   module.exports = {
     consumeAll: consumeAll,
+    addBear: addBear,
     update: update,
     initialize: initialize
   };
