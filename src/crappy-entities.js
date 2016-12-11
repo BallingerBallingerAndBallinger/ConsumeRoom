@@ -27,8 +27,6 @@
       bear,
       doorBuilder.initialize(renderer),
       goerBuilder.initialize(renderer, logMove, checkMovement),
-      goerBuilder.initialize(renderer, logMove, checkMovement),
-      goerBuilder.initialize(renderer, logMove, checkMovement),
       goerBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
@@ -46,7 +44,15 @@
       return false;
     }
 
-    if (x > width) {
+    if (x > 1) {
+      return false;
+    }
+
+    if (y < 0) {
+      return false;
+    }
+
+    if (y > 1) {
       return false;
     }
 

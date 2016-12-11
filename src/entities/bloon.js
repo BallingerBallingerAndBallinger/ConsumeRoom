@@ -1,7 +1,7 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
 
-  var velocity = 0.01;
+  var velocity = 0.001;
 
   function initialize(renderer, moveMethod, checkMovement) {
     var constructor = () => {
@@ -12,7 +12,7 @@
 
       var self = entity.getSelf();
       self.name = 'bloon';
-      self.x = Math.random() * (renderer.getWidth() / 2);
+      self.x = Math.random();
       self.y = Math.random();
       self.size = 400;
       var bloon = Object.assign({}, entity);
@@ -33,7 +33,7 @@
         var attemptedX = attemptedTravel + self.x;
         var toMove = checkMovement(attemptedX, self.y);
 
-        if (travel > 10 || travel < -10) {
+        if (travel > 0.10 || travel < -0.10) {
           goingLeft = !goingLeft;
           travel = 0;
         }
