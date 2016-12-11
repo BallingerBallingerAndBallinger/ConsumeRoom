@@ -17638,6 +17638,7 @@
 	      var pacers = [];
 	      for (var i = 0; i < 30; i++) {
 	        var pacer = partyGoer.initialize(renderer, { check: () => true });
+	
 	        pacer.setX(Math.random());
 	        pacer.setY(-0.03);
 	        pacer.setStepsGenerator(() => 60 + Math.random() * 10);
@@ -17756,6 +17757,7 @@
 	      goer.setGoal = setGoal;
 	      goer.isPerson = true;
 	      goer.setStepsGenerator = setStepsGenerator;
+	      goer.setSteps = setSteps;
 	      return goer;
 	
 	      function update(timestamp, delta) {
@@ -17768,6 +17770,10 @@
 	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
+	      function setSteps(newSteps) {
+	        steps = newSteps;
+	      }
+	      
 	      function setGoal(x, y, callback) {
 	        goalCallback = callback;
 	        if (x !== undefined && y !== undefined) {
