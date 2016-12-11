@@ -104,7 +104,7 @@
 
   function introducePartygoer() {
     var goer;
-    if (Math.random > 0.5) {
+    if (Math.random() < 0.5) {
       goer = goerBuilder.initialize(renderer, logMove, checkMovement);
     } else {
       goer = girl1Builder.initialize(renderer, logMove, checkMovement);

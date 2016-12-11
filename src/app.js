@@ -42,6 +42,7 @@
 
   function pause() {
     paused = !paused;
+    gui.showPaused(paused);
   }
 
   var last;

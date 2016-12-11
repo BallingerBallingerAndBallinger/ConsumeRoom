@@ -34,6 +34,18 @@ stats {
     font-style: sans-serif;
 }
 
+.paused-view {
+  position: fixed;
+  right: 140px;
+  top: 100px;
+
+  font-size: 45px;
+}
+
+.hidden {
+  display: none;
+}
+
 /*Chris' stupid inefficient css section
 -------------------------------------------------------*/
 
