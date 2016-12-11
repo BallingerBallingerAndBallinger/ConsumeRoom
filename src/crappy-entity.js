@@ -4,17 +4,20 @@
 
   function initialize(renderer, moveMethod) {
     var initializer = () => {
-      var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0};
+      var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
       var render = renderer;
       var steps;
       return {
-        update: update
+        update: update,
+        setGoal: setGoal,
+        getSelf: getSelf,
+        getRenderX: getRenderX,
+        getRenderY: getRenderY,
+        getRenderHeight: getRenderHeight
       };
 
       function update(timestamp, delta) {
-        moveMethod(self, 10, 10);
-        render.circle(self.x, self.y, 20, 'black', 'red');
-        console.log("We're totally rendering an entity right now");
+        moveTowardsGoal();
       }
 
       function setGoal() {
@@ -35,6 +38,26 @@
         self.vx = (self.x - self.gx) * speed;
         self.vy = (self.y - self.gy) * speed;
 
+      }
+
+      function getSelf() {
+        return self;
+      }
+
+      function getRenderX(renderer) {
+        return self.x;
+      }
+
+      function getRenderHeight(renderer) {
+        return renderHeight = ((self.y / 2) + 0.5) * self.size;
+      }
+
+      function getRenderY(renderer) {
+        var renderHeight = getRenderHeight(renderer);
+        var renderY = (self.y * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+        renderY = renderY - renderHeight;
+        renderY = renderY + (renderHeight / 10);
+        return renderY;
       }
 
       function moveTowardGoal() {

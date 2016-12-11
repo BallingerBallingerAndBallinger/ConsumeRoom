@@ -8,11 +8,10 @@
       var entity = entityBase.initialize(renderer, moveMethod);
       var render = renderer;
 
-      var self = {};
+      var self = entity.getSelf();
       self.name = 'girl1';
       self.x = 200 + Math.random() * (renderer.getWidth() / 2);
-      self.z = Math.random();
-      self.y = 0;
+      self.y = Math.random();
       self.size = 400;
       var goer = Object.assign({}, entity);
 
@@ -45,13 +44,7 @@
           travel += attemptedTravel;
         };
 
-        var renderX = self.x;
-        var renderHeight = ((self.z / 2) + 0.5) * self.size;
-        var renderY = (self.z * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
-        renderY = renderY - renderHeight;
-        renderY = renderY + (renderHeight / 10);
-
-        render.image(renderX, renderY, self.name, '', renderHeight);
+        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 
       function getX() {
