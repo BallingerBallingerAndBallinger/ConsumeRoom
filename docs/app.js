@@ -17290,7 +17290,7 @@
 	
 	      var goingLeft = false;
 	
-	      var self = { name: 'bloon', x: 100, y: 400, size: 300 };
+	      var self = { name: 'bloon', z: 0, x: 100, y: 400, size: 300 };
 	      var bloon = Object.assign({}, entity);
 	      var travel = 0;
 	
@@ -17450,7 +17450,7 @@
 	      var self = {};
 	      self.name = 'girl1';
 	      self.x = 200 + Math.random() * (renderer.getWidth() / 2);
-	      self.z = Math.random() * 100;
+	      self.z = Math.random();
 	      self.y = 0;
 	      self.size = 400;
 	      var goer = Object.assign({}, entity);
@@ -17485,8 +17485,8 @@
 	        };
 	
 	        var renderX = self.x;
-	        var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
-	        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+	        var renderHeight = ((self.z / 2) + 0.5) * self.size;
+	        var renderY = (self.z * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
 	        renderY = renderY - renderHeight;
 	        renderY = renderY + (renderHeight / 10);
 	
