@@ -17523,11 +17523,12 @@
 	      }
 	
 	      function getScreenBoundingRect() {
-	        return { left: getRenderX(),
-	                 right: getRenderX() + getRenderHeight(),
-	                 top: getRenderY(),
-	                 bottom: getRenderY() + getRenderHeight()
-	               }
+	        return {
+	          left: getRenderX(),
+	          right: getRenderX() + getRenderHeight(),
+	          top: getRenderY(),
+	          bottom: getRenderY() + getRenderHeight()
+	        };
 	      }
 	    };
 	    return initializer();
@@ -17788,28 +17789,27 @@
 	      return bear;
 	
 	      function handleClick(x, y) {
-	        console.log('Bear sees a click ' + x + ':' + y);
 	        var bounds = entity.getScreenBoundingRect();
-	        console.log('Bear bounds ' + JSON.stringify(bounds));
-	
 	        if (bounds.left < x &&
 	            bounds.right > x &&
 	            bounds.top < y &&
 	            bounds.bottom > y) {
-	          isSquishing = true;
-	          squish = 30;
+	          squeak();
 	          return true;
 	        }
 	        return false;
 	      }
 	
+	      function squeak() {
+	        isSquishing = true;
+	        squish = 30;
+	        render.audio('squeak');
+	      }
+	
 	      function update(timestamp, delta) {
 	        if (!isSquishing) {
 	          if (Math.random() < 0.01) {
-	            console.log('Bear Squish!');
-	            isSquishing = true;
-	            squish = 30;
-	            render.audio('squeak');
+	            squeak();
 	          }
 	        }
 	

@@ -91,7 +91,6 @@
 
   function transformCoords(event) {
     var rect = event.target.getBoundingClientRect();
-    console.log(JSON.stringify(rect));
     return {
       x: (event.clientX - rect.left) * (renderer.getWidth() / rect.width),
       y: (event.clientY - rect.top) * (renderer.getHeight() / rect.height)
