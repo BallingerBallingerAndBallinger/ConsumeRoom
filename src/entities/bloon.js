@@ -10,7 +10,7 @@
 
       var goingLeft = false;
 
-      var self = { name: 'bloon', x: 100, y: 400, size: 300 };
+      var self = { name: 'bloon', z: 0, x: 100, y: 400, size: 300 };
       var bloon = Object.assign({}, entity);
       var travel = 0;
 
