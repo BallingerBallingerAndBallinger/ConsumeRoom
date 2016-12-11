@@ -5,7 +5,7 @@
     var constructor = () => {
       var entity = entityBase.initialize(renderer, moveMethod);
       var render = renderer;
-      var self = { name: door, z: -1, y: 300, x: 830 };
+      var self = { name: door, y: -1 };
 
       var door = Object.assign({}, entity);
       door.update = update;

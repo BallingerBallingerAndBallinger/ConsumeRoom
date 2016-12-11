@@ -10,7 +10,11 @@
 
       var goingLeft = false;
 
-      var self = { name: 'bloon', z: 0, x: 100, y: 400, size: 300 };
+      var self = entity.getSelf();
+      self.name = 'bloon';
+      self.x = Math.random() * (renderer.getWidth() / 2);
+      self.y = Math.random();
+      self.size = 400;
       var bloon = Object.assign({}, entity);
       var travel = 0;
 
@@ -41,7 +45,7 @@
           travel += attemptedTravel;
         };
 
-        render.image(self.x, self.y, self.name, self.size, self.size);
+        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 
       function getX() {

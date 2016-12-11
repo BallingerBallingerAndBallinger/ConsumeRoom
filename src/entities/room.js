@@ -6,7 +6,7 @@
       var entity = entityBase.initialize(renderer, moveMethod);
       var render = renderer;
 
-      var self = { name: 'floor-closed', x: 0, y: 500, z: -1 };
+      var self = { name: 'floor-closed', x: 0, y: -1 };
       var room = Object.assign({}, entity);
       room.update = update;
       room.getX = getX;
@@ -15,7 +15,7 @@
       return room;
 
       function update(timestamp, delta) {
-        render.image(self.x, self.y, self.name, 1000, 500);
+        render.image(self.x, 500, self.name, 1000, 500);
       }
 
       function getX() {
@@ -29,7 +29,6 @@
       function getZ() {
         return self.z;
       }
-
     };
 
     return constructor();

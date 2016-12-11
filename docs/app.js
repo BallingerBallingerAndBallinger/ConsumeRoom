@@ -126,12 +126,6 @@
 	    for (var i = 0; i < 100; i++) {
 	      entities.push(goerBuilder.initialize(renderer, logMove, checkMovement));
 	    }
-	
-	    bloon.setX(100);
-	    bloon.setY(250);
-	
-	    bear.setX(800);
-	    bear.setY(800);
 	  }
 	
 	  function logMove(entity, x, y) {
@@ -158,7 +152,7 @@
 	  }
 	
 	  function compareEntities(a, b) {
-	    return a.getZ() - b.getZ();
+	    return a.getY() - b.getY();
 	  }
 	
 	  function updateGameState() {
@@ -17288,7 +17282,11 @@
 	
 	      var goingLeft = false;
 	
-	      var self = { name: 'bloon', z: 0, x: 100, y: 400, size: 300 };
+	      var self = entity.getSelf();
+	      self.name = 'bloon';
+	      self.x = Math.random() * (renderer.getWidth() / 2);
+	      self.y = Math.random();
+	      self.size = 400;
 	      var bloon = Object.assign({}, entity);
 	      var travel = 0;
 	
@@ -17319,7 +17317,7 @@
 	          travel += attemptedTravel;
 	        };
 	
-	        render.image(self.x, self.y, self.name, self.size, self.size);
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
 	      function getX() {
@@ -17362,17 +17360,78 @@
 	
 	  function initialize(renderer, moveMethod) {
 	    var initializer = () => {
-	      var self = {name: 'generic', x: 1, y: 2};
+	      var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
 	      var render = renderer;
+	      var steps;
 	      return {
-	        update: update
+	        update: update,
+	        setGoal: setGoal,
+	        getSelf: getSelf,
+	        getRenderX: getRenderX,
+	        getRenderY: getRenderY,
+	        getRenderHeight: getRenderHeight
 	      };
 	
 	      function update(timestamp, delta) {
-	        moveMethod(self, 10, 10);
-	        render.circle(self.x, self.y, 20, 'black', 'red');
-	        console.log("We're totally rendering an entity right now");
+	        moveTowardsGoal();
 	      }
+	
+	      function setGoal() {
+	
+	        // Set distance
+	        var distance = 10 + Math.Random() * 100;
+	
+	        // Set a goal
+	        var angle = Math.Random() * Math.PI * 2;
+	        self.gx = Math.sin(angle) * distance;
+	        self.gy = Math.cos(angle) * distance;
+	
+	        // Set steps
+	        steps = 2 + Math.Random() * 100;
+	
+	        // Set speed
+	        var speed = distance / steps;
+	        self.vx = (self.x - self.gx) * speed;
+	        self.vy = (self.y - self.gy) * speed;
+	
+	      }
+	
+	      function getSelf() {
+	        return self;
+	      }
+	
+	      function getRenderX(renderer) {
+	        return self.x;
+	      }
+	
+	      function getRenderHeight(renderer) {
+	        return renderHeight = ((self.y / 2) + 0.5) * self.size;
+	      }
+	
+	      function getRenderY(renderer) {
+	        var renderHeight = getRenderHeight(renderer);
+	        var renderY = (self.y * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+	        renderY = renderY - renderHeight;
+	        renderY = renderY + (renderHeight / 10);
+	        return renderY;
+	      }
+	
+	      function moveTowardGoal() {
+	
+	        if (steps == 0) setGoal();
+	
+	        var newx = self.x+self.vx;
+	        var newy = self.y+self.vy;
+	        var toMove = checkMovement(newx, newy);
+	        if (toMove == true) {
+	          self.x = newx;
+	          self.y = newy;
+	          steps--;
+	        }
+	
+	      }
+	
+	
 	    };
 	    return initializer();
 	  }
@@ -17396,7 +17455,7 @@
 	      var entity = entityBase.initialize(renderer, moveMethod);
 	      var render = renderer;
 	
-	      var self = { name: 'floor-closed', x: 0, y: 500, z: -1 };
+	      var self = { name: 'floor-closed', x: 0, y: -1 };
 	      var room = Object.assign({}, entity);
 	      room.update = update;
 	      room.getX = getX;
@@ -17405,7 +17464,7 @@
 	      return room;
 	
 	      function update(timestamp, delta) {
-	        render.image(self.x, self.y, self.name, 1000, 500);
+	        render.image(self.x, 500, self.name, 1000, 500);
 	      }
 	
 	      function getX() {
@@ -17419,7 +17478,6 @@
 	      function getZ() {
 	        return self.z;
 	      }
-	
 	    };
 	
 	    return constructor();
@@ -17445,11 +17503,10 @@
 	      var entity = entityBase.initialize(renderer, moveMethod);
 	      var render = renderer;
 	
-	      var self = {};
+	      var self = entity.getSelf();
 	      self.name = 'girl1';
 	      self.x = 200 + Math.random() * (renderer.getWidth() / 2);
-	      self.z = Math.random();
-	      self.y = 0;
+	      self.y = Math.random();
 	      self.size = 400;
 	      var goer = Object.assign({}, entity);
 	
@@ -17482,13 +17539,7 @@
 	          travel += attemptedTravel;
 	        };
 	
-	        var renderX = self.x;
-	        var renderHeight = ((self.z / 2) + 0.5) * self.size;
-	        var renderY = (self.z * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
-	        renderY = renderY - renderHeight;
-	        renderY = renderY + (renderHeight / 10);
-	
-	        render.image(renderX, renderY, self.name, '', renderHeight);
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
 	      function getX() {
@@ -17532,7 +17583,7 @@
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, moveMethod);
 	      var render = renderer;
-	      var self = { name: door, z: -1, y: 300, x: 830 };
+	      var self = { name: door, y: -1 };
 	
 	      var door = Object.assign({}, entity);
 	      door.update = update;
@@ -17581,7 +17632,11 @@
 	
 	      var squishVelocity = 0.05;
 	
-	      var self = { name: 'bear', x: 100, z: 1, y: 400, size: 150 };
+	      var self = entity.getSelf();
+	      self.name = 'bear';
+	      self.x = Math.random() * (renderer.getWidth() / 2);
+	      self.y = 1;
+	      self.size = 150;
 	      var bear = Object.assign({}, entity);
 	      var squish = 0;
 	      var isSquishing;
@@ -17614,7 +17669,7 @@
 	          isSquishing = false;
 	        }
 	
-	        render.image(self.x, self.y + squished, self.name, self.size, self.size - squished);
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
 	      }
 	
 	      function getX() {

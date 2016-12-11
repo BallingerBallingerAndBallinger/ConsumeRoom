@@ -8,7 +8,11 @@
 
       var squishVelocity = 0.05;
 
-      var self = { name: 'bear', x: 100, z: 1, y: 400, size: 150 };
+      var self = entity.getSelf();
+      self.name = 'bear';
+      self.x = Math.random() * (renderer.getWidth() / 2);
+      self.y = 1;
+      self.size = 150;
       var bear = Object.assign({}, entity);
       var squish = 0;
       var isSquishing;
@@ -41,7 +45,7 @@
           isSquishing = false;
         }
 
-        render.image(self.x, self.y + squished, self.name, self.size, self.size - squished);
+        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
       }
 
       function getX() {

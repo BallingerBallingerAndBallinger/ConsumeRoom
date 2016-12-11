@@ -35,12 +35,6 @@
     for (var i = 0; i < 100; i++) {
       entities.push(goerBuilder.initialize(renderer, logMove, checkMovement));
     }
-
-    bloon.setX(100);
-    bloon.setY(250);
-
-    bear.setX(800);
-    bear.setY(800);
   }
 
   function logMove(entity, x, y) {
@@ -67,7 +61,7 @@
   }
 
   function compareEntities(a, b) {
-    return a.getZ() - b.getZ();
+    return a.getY() - b.getY();
   }
 
   function updateGameState() {
