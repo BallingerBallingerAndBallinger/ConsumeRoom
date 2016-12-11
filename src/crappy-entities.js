@@ -54,6 +54,11 @@
     if (Math.random() < config.basePartyGoerProbability) {
       introducePartygoer();
     }
+
+    if (Math.random() < config.basePartyGoerLeavesProbability) {
+      partyGoerWantsToLeave();
+    }
+
     gameState.fondleEntities(entities);
 
     renderer.clear();
@@ -78,6 +83,16 @@
     goer.setX(1);
     goer.setY(0);
     entities.push(goer);
+    console.log(goer.getSelf().name + ' has arrived!');
+  }
+
+  function partyGoerWantsToLeave() {
+    var people = entities.filter((e) => e.isPerson) || [];
+    var leaver = people[Math.floor(Math.random() * people.length)];
+    if (leaver === undefined) return;
+
+    console.log(leaver.getSelf().name + ' is leaving!');
+    leaver.setGoal(1, 0, () => { entities = entities.filter(e => e !== leaver); });
   }
 
   module.exports = {
