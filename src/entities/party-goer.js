@@ -21,6 +21,7 @@
 
       function update(timestamp, delta) {
         entity.update(timestamp, delta);
+        moveTowardGoal();
         draw(timestamp, delta);
       }
 
