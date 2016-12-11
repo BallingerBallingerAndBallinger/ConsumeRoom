@@ -19,6 +19,7 @@
       goer.setGoal = setGoal;
       goer.isPerson = true;
       goer.setStepsGenerator = setStepsGenerator;
+      goer.setSteps = setSteps;
       return goer;
 
       function update(timestamp, delta) {
@@ -31,6 +32,10 @@
         render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 
+      function setSteps(newSteps) {
+        steps = newSteps;
+      }
+      
       function setGoal(x, y, callback) {
         goalCallback = callback;
         if (x !== undefined && y !== undefined) {
