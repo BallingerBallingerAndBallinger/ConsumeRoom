@@ -7,13 +7,14 @@
   <body>
     <div class="main-page">
     <div class="ui-area">
-      <div class="ui-column-container">
+      <div class="ui-column-container bottom-spacer">
 
-        <h2 id="happiness-label">Stored Happiness</h2>
-        <h1 id="room-happiness">##</h1>
+        <div class="container-padding">
+          <h2 id="happiness-label">Stored Happiness</h2>
+          <h1 id="room-happiness">##</h1>
+        </div>
 
-
-        <div class="stat-all-container">
+        <div class="stat-all-container container-padding">
          <div class="stat-container"> 
             <div class ="stat-text-container">People in Room</div>
             <div id="people-count" class="stat-text-container">##</div></div>
@@ -27,32 +28,38 @@
             <div class ="stat-text-container">##</div></div></div>
 
 
-        <div class="info-text-title">What you need to know</div>
+        <div class="info-text-title container-padding">What you need to know</div>
 
-        <ul class="remove-ul-padding">
-          <li class="info-text-item"><span class="cmb-bold">Clicking</span> a person consumes them</li>
-          <li class="info-text-item">Running out of stored happiness is bad</li>
-          <li class="info-text-item">Enticements attract peoples</li>
-        </ul>
+        <div class="container-padding">
+          <ul class="remove-ul-padding">
+            <li class="info-text-item"><span class="cmb-bold">Clicking</span> a person consumes them</li>
+            <li class="info-text-item">Running out of stored happiness is bad</li>
+            <li class="info-text-item">Enticements attract peoples</li>
+          </ul>
+        </div>
+        <div class="height-spacer"></div>
 
       </div>
 
      
-      <div class="ui-column-container">
+      <div class="ui-column-container fill-space">
 
-        <div class="section-text-title">actions</div>
+        <div class="container-padding"><div class="section-text-title">actions</div></div>
 
-        <div id="consume-all-button" class="action-button-wrapper">
-          <img src ="images/consume-icon.png" class="action-button-icon"></img>
-          <div class="action-button">Consume All People</div></div>
+        <div class="button-container">
+          <div id="consume-all-button" class="action-button-wrapper button-padding">
+            <img src ="images/consume-icon.png" class="action-button-icon"></img>
+            <div class="action-button">Consume All People</div></div>
 
-        <div id="purchase-enticement-button" class="action-button-wrapper">
-          <img src ="images/bear.png" class="action-button-icon"></img>
-          <div class="action-button">Purchase Enticements</div></div>
+          <div id="purchase-enticement-button" class="action-button-wrapper button-padding">
+            <img src ="images/bear.png" class="action-button-icon"></img>
+            <div class="action-button">Purchase Enticements</div></div>
 
-        <div id="pause-game-button" class="action-button-wrapper">
-          <img src ="images/pause-icon.png" class="action-button-icon"></img>
-          <div class="action-button">Pause Game</div></div>
+          <div id="pause-game-button" class="action-button-wrapper button-padding">
+            <img src ="images/pause-icon.png" class="action-button-icon"></img>
+            <div class="action-button">Pause Game</div></div>
+
+        </div>
 
       </div>
 

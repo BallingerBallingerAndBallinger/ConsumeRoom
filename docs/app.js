@@ -153,6 +153,11 @@
 	    if (Math.random() < config.basePartyGoerProbability) {
 	      introducePartygoer();
 	    }
+	
+	    if (Math.random() < config.basePartyGoerLeavesProbability) {
+	      partyGoerWantsToLeave();
+	    }
+	    
 	    gameState.fondleEntities(entities);
 	
 	    renderer.clear();
@@ -177,6 +182,12 @@
 	    goer.setX(1);
 	    goer.setY(0);
 	    entities.push(goer);
+	  }
+	
+	  function partyGoerWantsToLeave() {
+	    var people = entities.filter((e) => e.isPerson);
+	    var leaver = entities[Math.floor(Math.random() * people.length())];
+	    leaver.addGoal(0, 0, () => { entities = entities.filter(e => e !== leaver); });
 	  }
 	
 	  module.exports = {
