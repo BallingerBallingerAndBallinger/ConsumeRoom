@@ -2,11 +2,11 @@
   // Includes
   var _ = require('lodash');
 
-  function initialize(renderer, moveMethod) {
+  function initialize(renderer, moveMethod, checkMovement) {
     var initializer = () => {
       var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
       var render = renderer;
-      var steps;
+      var steps = 0;
       return {
         update: update,
         setGoal: setGoal,
@@ -17,27 +17,44 @@
       };
 
       function update(timestamp, delta) {
-        moveTowardsGoal();
+        moveTowardGoal();
       }
 
       function setGoal() {
+        while (true) {
+          // Set distance
+          var distance = Math.random() / 3;
+          // Set a goal
+          var angle = Math.random() * Math.PI * 2;
 
-        // Set distance
-        var distance = 10 + Math.Random() * 100;
+          self.gx = self.x + Math.sin(angle) * distance;
+          self.gy = self.y + Math.cos(angle) * distance;
 
-        // Set a goal
-        var angle = Math.Random() * Math.PI * 2;
-        self.gx = Math.sin(angle) * distance;
-        self.gy = Math.cos(angle) * distance;
+          if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
+            break;
+          }
+        }
 
         // Set steps
-        steps = 2 + Math.Random() * 100;
+        steps = Math.round(20 + Math.random() * 30);
 
         // Set speed
-        var speed = distance / steps;
-        self.vx = (self.x - self.gx) * speed;
-        self.vy = (self.y - self.gy) * speed;
+        // var speed = distance / steps;
+        self.vx = (self.gx - self.x) / steps;
+        self.vy = (self.gy - self.y) / steps;
+      }
 
+      function moveTowardGoal() {
+        if (steps <= 0) setGoal();
+
+        var newx = self.x + self.vx;
+        var newy = self.y + self.vy;
+        var toMove = checkMovement(newx, newy);
+        if (toMove === true) {
+          self.x = newx;
+          self.y = newy;
+        }
+        steps--;
       }
 
       function getSelf() {
@@ -45,11 +62,11 @@
       }
 
       function getRenderX(renderer) {
-        return self.x;
+        return self.x * renderer.getWidth();
       }
 
       function getRenderHeight(renderer) {
-        return renderHeight = ((self.y / 2) + 0.5) * self.size;
+        return ((self.y / 2) + 0.5) * self.size;
       }
 
       function getRenderY(renderer) {
@@ -59,23 +76,6 @@
         renderY = renderY + (renderHeight / 10);
         return renderY;
       }
-
-      function moveTowardGoal() {
-
-        if (steps == 0) setGoal();
-
-        var newx = self.x+self.vx;
-        var newy = self.y+self.vy;
-        var toMove = checkMovement(newx, newy);
-        if (toMove == true) {
-          self.x = newx;
-          self.y = newy;
-          steps--;
-        }
-
-      }
-
-
     };
     return initializer();
   }
