@@ -175,6 +175,7 @@
 	      return e.isPerson ? false : true;
 	    });
 	    gameState.bankHappiness(originalCount - entities.length);
+	    renderer.audio('eat');
 	  }
 	
 	  function introducePartygoer() {
