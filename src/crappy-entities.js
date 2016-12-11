@@ -2,10 +2,10 @@
   var _ = require('lodash');
   var bloonBuilder = require('./entities/items/bloon.js');
   var roomBuilder = require('./entities/room.js');
-  var girl1Builder = require('./entities/goers/girl1.js');
-  var goerBuilder = require('./entities/party-goer.js');
   var doorBuilder = require('./entities/door.js');
   var bearBuilder = require('./entities/items/bear.js');
+  var dude1Builder = require('./entities/goers/dude1.js');
+  var girl1Builder = require('./entities/goers/girl1.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
@@ -104,12 +104,13 @@
   }
 
   function introducePartygoer() {
-    var goer;
-    if (Math.random() < 0.5) {
-      goer = goerBuilder.initialize(renderer, movementHandler);
-    } else {
-      goer = girl1Builder.initialize(renderer, movementHandler);
-    }
+    var goerBuilders = [
+      () => { return dude1Builder.initialize(renderer, movementHandler); },
+      () => { return girl1Builder.initialize(renderer, movementHandler); }
+    ];
+
+    var selection = Math.floor(Math.random() * goerBuilders.length);
+    var goer = goerBuilders[selection]();
 
     goer.setX(0.9);
     goer.setY(0);
