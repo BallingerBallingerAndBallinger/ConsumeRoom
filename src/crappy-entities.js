@@ -12,6 +12,7 @@
   var gameState = require('./crappy-state.js');
   var entities = [];
   var eating;
+  var room;
 
   function initialize(canvasElement) {
     renderer.initialize(canvasElement);
@@ -19,8 +20,9 @@
 
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
     var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
+    room = roomBuilder.initialize(renderer);
     entities = [
-      roomBuilder.initialize(renderer),
+      room,
       bloon,
       bear,
       doorBuilder.initialize(renderer)
@@ -62,6 +64,7 @@
       }
     }
 
+    room.setEating(eating);
     gameState.fondleEntities(entities);
     renderer.clear();
     entities.sort(compareEntities);
@@ -73,6 +76,7 @@
   }
 
   function consumeAll() {
+    if (eating) return;
     eating = true;
     renderer.stopAudio('sound');
     renderer.audio('eat');
@@ -82,7 +86,13 @@
       return e.isPerson ? true : false;
     });
 
-    people.forEach(p => p.setGoal(0.5, 0.5));
+    people.forEach(p => p.setGoal(0.5, 0.5, () => {
+      if (p.eaten) {
+        p.eaten();
+      } else {
+        entities = _.difference(entities, [p]);
+      }
+    }));
 
     setTimeout(() => {
       entities = _.difference(entities, people);

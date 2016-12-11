@@ -12,6 +12,7 @@
       room.getX = getX;
       room.getY = getY;
       room.getZ = getZ;
+      room.setEating = setEating;
       return room;
 
       function update(timestamp, delta) {
@@ -28,6 +29,10 @@
 
       function getZ() {
         return self.z;
+      }
+
+      function setEating(eating) {
+        self.name = eating ? 'floor-open' : 'floor-closed';
       }
     };
 
