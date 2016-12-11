@@ -214,6 +214,7 @@
 	    var bear = bearBuilder.initialize(renderer, movementHandler);
 	    bear.setY(Math.random());
 	    entities.push(bear);
+	    gameState.bankHappiness(-1);
 	  }
 	
 	  function introducePartygoer() {
