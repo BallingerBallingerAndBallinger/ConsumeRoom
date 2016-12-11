@@ -18358,22 +18358,25 @@
 	(function() {
 	  var displays;
 	
-	  function draw(room) {
+	  function draw(gameState) {
 	    displays.forEach((display) => {
-	      display.element.innerHTML = display.value(room);
+	      display.element.innerHTML = display.value(gameState);
 	    });
 	  }
 	
 	  function initialize() {
 	    displays = [
 	      { element: document.getElementById('room-happiness'),
-	        value: (room) => { return room.getHappiness(); }
+	        value: (gameState) => { return gameState.getHappiness(); }
+	      },
+	      { element: document.getElementById('room-enticingness'),
+	        value: (gameState) => { return gameState.getEnticingness(); }
 	      },
 	      { element: document.getElementById('people-count'),
-	        value: (room) => { return room.getPeopleCount(); }
+	        value: (gameState) => { return gameState.getPeopleCount(); }
 	      },
 	      { element: document.getElementById('item-count'),
-	        value: (room) => { return room.getEnticementCount(); }
+	        value: (gameState) => { return gameState.getEnticementCount(); }
 	      }
 	    ];
 	  }
