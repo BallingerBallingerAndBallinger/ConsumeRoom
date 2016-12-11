@@ -32,6 +32,10 @@
       goerBuilder.initialize(renderer, logMove, checkMovement)
     ];
 
+    for (var i = 0; i < 100; i++) {
+      entities.push(goerBuilder.initialize(renderer, logMove, checkMovement));
+    }
+
     bloon.setX(100);
     bloon.setY(250);
 

@@ -47,7 +47,9 @@
 
         var renderX = self.x;
         var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
-        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight())) - renderHeight;
+        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+        renderY = renderY - renderHeight;
+        renderY = renderY + (renderHeight / 10);
 
         render.image(renderX, renderY, self.name, '', renderHeight);
       }

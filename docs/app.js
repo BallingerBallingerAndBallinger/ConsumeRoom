@@ -123,6 +123,10 @@
 	      goerBuilder.initialize(renderer, logMove, checkMovement)
 	    ];
 	
+	    for (var i = 0; i < 100; i++) {
+	      entities.push(goerBuilder.initialize(renderer, logMove, checkMovement));
+	    }
+	
 	    bloon.setX(100);
 	    bloon.setY(250);
 	
@@ -17482,7 +17486,9 @@
 	
 	        var renderX = self.x;
 	        var renderHeight = (((self.z / 100) / 2) + 0.5) * self.size;
-	        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight())) - renderHeight;
+	        var renderY = ((self.z / 100) * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+	        renderY = renderY - renderHeight;
+	        renderY = renderY + (renderHeight / 10);
 	
 	        render.image(renderX, renderY, self.name, '', renderHeight);
 	      }
@@ -17528,6 +17534,7 @@
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, moveMethod);
 	      var render = renderer;
+	      var self = { name: door, z: -1, y: 300, x: 830 };
 	
 	      var door = Object.assign({}, entity);
 	      door.update = update;
@@ -17539,21 +17546,21 @@
 	      function update(timestamp, delta) {
 	        render.image(830, 300, 'door', 55, 400);
 	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function getZ() {
+	        return self.z;
+	      }
 	    };
 	
 	    return constructor();
-	
-	    function getX() {
-	      return self.x;
-	    }
-	
-	    function getY() {
-	      return self.y;
-	    }
-	
-	    function getZ() {
-	      return self.z;
-	    }
 	  }
 	
 	  module.exports = {

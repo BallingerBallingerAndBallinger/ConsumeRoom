@@ -5,6 +5,7 @@
     var constructor = () => {
       var entity = entityBase.initialize(renderer, moveMethod);
       var render = renderer;
+      var self = { name: door, z: -1, y: 300, x: 830 };
 
       var door = Object.assign({}, entity);
       door.update = update;
@@ -16,21 +17,21 @@
       function update(timestamp, delta) {
         render.image(830, 300, 'door', 55, 400);
       }
+
+      function getX() {
+        return self.x;
+      }
+
+      function getY() {
+        return self.y;
+      }
+
+      function getZ() {
+        return self.z;
+      }
     };
 
     return constructor();
-
-    function getX() {
-      return self.x;
-    }
-
-    function getY() {
-      return self.y;
-    }
-
-    function getZ() {
-      return self.z;
-    }
   }
 
   module.exports = {
