@@ -49,7 +49,7 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(15);
+	  var stats = __webpack_require__(16);
 	  var gui = __webpack_require__(13);
 	  var gameState = __webpack_require__(14);
 	  var config = __webpack_require__(11);
@@ -123,44 +123,22 @@
 	  var renderer = __webpack_require__(12);
 	  var gui = __webpack_require__(13);
 	  var gameState = __webpack_require__(14);
+	  var movementHandler = __webpack_require__(15);
 	  var entities = [];
 	  var eating;
 	  var room;
 	
 	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
+	    movementHandler.initialize();
 	    gui.setConsumeAll(consumeAll);
 	
-	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
+	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
 	    room = roomBuilder.initialize(renderer);
 	    entities = [
 	      room,
 	      bloon
 	    ];
-	  }
-	
-	  function logMove(entity, x, y) {
-	    console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
-	  }
-	
-	  function checkMovement(x, y) {
-	    if (x < 0) {
-	      return false;
-	    }
-	
-	    if (x > 1) {
-	      return false;
-	    }
-	
-	    if (y < 0) {
-	      return false;
-	    }
-	
-	    if (y > 1) {
-	      return false;
-	    }
-	
-	    return true;
 	  }
 	
 	  function update(timestamp, delta) {
@@ -215,9 +193,9 @@
 	  function introducePartygoer() {
 	    var goer;
 	    if (Math.random() < 0.5) {
-	      goer = goerBuilder.initialize(renderer, logMove, checkMovement);
+	      goer = goerBuilder.initialize(renderer, movementHandler);
 	    } else {
-	      goer = girl1Builder.initialize(renderer, logMove, checkMovement);
+	      goer = girl1Builder.initialize(renderer, movementHandler);
 	    }
 	
 	    goer.setX(0.9);
@@ -17342,9 +17320,9 @@
 	
 	  var velocity = 0.00001;
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
 	      var goingLeft = false;
@@ -17370,7 +17348,7 @@
 	      function update(timestamp, delta) {
 	        var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
 	        var attemptedX = attemptedTravel + self.x;
-	        var toMove = checkMovement(attemptedX, self.y);
+	        var toMove = movementHandler.check(attemptedX, self.y);
 	
 	        if (travel > 0.01 || travel < -0.01) {
 	          goingLeft = !goingLeft;
@@ -17425,7 +17403,7 @@
 	  // Includes
 	  var _ = __webpack_require__(2);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
 	      var render = renderer;
@@ -17459,7 +17437,7 @@
 	            self.gx = self.x + Math.sin(angle) * distance;
 	            self.gy = self.y + Math.cos(angle) * distance;
 	
-	            if (checkMovement(self.gx, self.gy)) {
+	            if (movementHandler.check(self.gx, self.gy)) {
 	              break;
 	            }
 	          }
@@ -17485,7 +17463,7 @@
 	
 	        var newx = self.x + self.vx;
 	        var newy = self.y + self.vy;
-	        var toMove = checkMovement(newx, newy);
+	        var toMove = movementHandler.check(newx, newy);
 	        if (toMove === true) {
 	          self.x = newx;
 	          self.y = newy;
@@ -17532,9 +17510,9 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
 	      var self = { name: 'floor-closed', x: 0, y: -1 };
@@ -17597,9 +17575,9 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod, checkMovement);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
 	      var self = entity.getSelf();
@@ -17654,9 +17632,9 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod, checkMovement);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
 	      var self = entity.getSelf();
@@ -17710,9 +17688,9 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	      var self = { name: door, y: -1 };
 	
@@ -17756,9 +17734,9 @@
 	(() => {
 	  var entityBase = __webpack_require__(5);
 	
-	  function initialize(renderer, moveMethod, checkMovement) {
+	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, moveMethod);
+	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
 	      var squishVelocity = 0.05;
@@ -18209,6 +18187,38 @@
 
 /***/ },
 /* 15 */
+/***/ function(module, exports) {
+
+	(() => {
+	  function checkMovement(x, y) {
+	    if (x < 0) {
+	      return false;
+	    }
+	
+	    if (x > 1) {
+	      return false;
+	    }
+	
+	    if (y < 0) {
+	      return false;
+	    }
+	
+	    if (y > 1) {
+	      return false;
+	    }
+	
+	    return true;
+	  }
+	
+	  module.exports = {
+	    initialize: () => {},
+	    check: checkMovement
+	  };
+	})();
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports) {
 
 	(function() {

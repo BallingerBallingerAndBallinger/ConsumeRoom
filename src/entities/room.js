@@ -1,9 +1,9 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
 
-  function initialize(renderer, moveMethod, checkMovement) {
+  function initialize(renderer, movementHandler) {
     var constructor = () => {
-      var entity = entityBase.initialize(renderer, moveMethod);
+      var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
 
       var self = { name: 'floor-closed', x: 0, y: -1 };

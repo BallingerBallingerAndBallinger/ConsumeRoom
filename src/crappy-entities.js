@@ -10,44 +10,22 @@
   var renderer = require('./rendering.js');
   var gui = require('./crappy-gui.js');
   var gameState = require('./crappy-state.js');
+  var movementHandler = require('./crappy-movement-handler.js');
   var entities = [];
   var eating;
   var room;
 
   function initialize(canvasElement) {
     renderer.initialize(canvasElement);
+    movementHandler.initialize();
     gui.setConsumeAll(consumeAll);
 
-    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
+    var bloon = bloonBuilder.initialize(renderer, movementHandler);
     room = roomBuilder.initialize(renderer);
     entities = [
       room,
       bloon
     ];
-  }
-
-  function logMove(entity, x, y) {
-    console.log('Moving: ' + entity.name + ': (' + x + ', ' + y + ')');
-  }
-
-  function checkMovement(x, y) {
-    if (x < 0) {
-      return false;
-    }
-
-    if (x > 1) {
-      return false;
-    }
-
-    if (y < 0) {
-      return false;
-    }
-
-    if (y > 1) {
-      return false;
-    }
-
-    return true;
   }
 
   function update(timestamp, delta) {
@@ -102,9 +80,9 @@
   function introducePartygoer() {
     var goer;
     if (Math.random() < 0.5) {
-      goer = goerBuilder.initialize(renderer, logMove, checkMovement);
+      goer = goerBuilder.initialize(renderer, movementHandler);
     } else {
-      goer = girl1Builder.initialize(renderer, logMove, checkMovement);
+      goer = girl1Builder.initialize(renderer, movementHandler);
     }
 
     goer.setX(0.9);

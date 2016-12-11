@@ -3,9 +3,9 @@
 
   var velocity = 0.00001;
 
-  function initialize(renderer, moveMethod, checkMovement) {
+  function initialize(renderer, movementHandler) {
     var constructor = () => {
-      var entity = entityBase.initialize(renderer, moveMethod);
+      var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
 
       var goingLeft = false;
@@ -31,7 +31,7 @@
       function update(timestamp, delta) {
         var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
         var attemptedX = attemptedTravel + self.x;
-        var toMove = checkMovement(attemptedX, self.y);
+        var toMove = movementHandler.check(attemptedX, self.y);
 
         if (travel > 0.01 || travel < -0.01) {
           goingLeft = !goingLeft;

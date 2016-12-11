@@ -2,7 +2,7 @@
   // Includes
   var _ = require('lodash');
 
-  function initialize(renderer, moveMethod, checkMovement) {
+  function initialize(renderer, movementHandler) {
     var initializer = () => {
       var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
       var render = renderer;
@@ -36,7 +36,7 @@
             self.gx = self.x + Math.sin(angle) * distance;
             self.gy = self.y + Math.cos(angle) * distance;
 
-            if (checkMovement(self.gx, self.gy)) {
+            if (movementHandler.check(self.gx, self.gy)) {
               break;
             }
           }
@@ -62,7 +62,7 @@
 
         var newx = self.x + self.vx;
         var newy = self.y + self.vy;
-        var toMove = checkMovement(newx, newy);
+        var toMove = movementHandler.check(newx, newy);
         if (toMove === true) {
           self.x = newx;
           self.y = newy;
