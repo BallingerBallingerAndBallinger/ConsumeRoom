@@ -49,7 +49,7 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(12);
+	  var stats = __webpack_require__(13);
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -98,10 +98,10 @@
 	  var bearBuilder = __webpack_require__(9);
 	  var renderer = __webpack_require__(10);
 	  var gui = __webpack_require__(11);
+	  var gameState = __webpack_require__(12);
 	  var stats;
 	  var width;
 	  var entities = [];
-	  var gameState = {};
 	
 	  function initialize(canvasElement, incomingStats) {
 	    width = canvasElement.width;
@@ -160,24 +160,15 @@
 	  }
 	
 	  function consumeAll() {
+	    var originalCount = entities.length;
 	    entities = entities.filter(e => {
 	      return e.isPerson ? false : true;
 	    });
+	    gameState.bankHappiness(originalCount - entities.length);
 	  }
 	
 	  function updateGameState() {
-	    gameState.happiness = entities.map(e => {
-	      return e.getHappiness ? e.getHappiness() : 0;
-	    }).reduce((acc, val) => acc + val, 0);
-	
-	    gameState.peopleCount = entities.filter(e => {
-	      return e.isPerson ? true : false;
-	    }).length;
-	
-	    gameState.enticementCount = entities.filter(e => {
-	      return e.isEnticement ? true : false;
-	    }).length;
-	
+	    gameState.fondleEntities(entities);
 	    stats.draw(gameState);
 	  }
 	
@@ -17993,6 +17984,45 @@
 /* 12 */
 /***/ function(module, exports) {
 
+	(() => {
+	  var happiness = 0;
+	  var peopleCount = 0;
+	  var enticementCount = 0;
+	
+	  var banked = 0;
+	
+	  function fondleEntities(entities) {
+	    happiness = entities.map(e => {
+	      return e.getHappiness ? e.getHappiness() : 0;
+	    }).reduce((acc, val) => acc + val, 0) + banked;
+	
+	    peopleCount = entities.filter(e => {
+	      return e.isPerson ? true : false;
+	    }).length;
+	
+	    enticementCount = entities.filter(e => {
+	      return e.isEnticement ? true : false;
+	    }).length;
+	  }
+	
+	  function bankHappiness(hopesAndDreams) {
+	    banked += hopesAndDreams;
+	  }
+	
+	  module.exports = {
+	    getHappiness: () => happiness,
+	    getPeopleCount: () => peopleCount,
+	    getEnticementCount: () => enticementCount,
+	    fondleEntities: fondleEntities,
+	    bankHappiness: bankHappiness
+	  };
+	})();
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
 	(function() {
 	  var displays;
 	
@@ -18005,13 +18035,13 @@
 	  function initialize() {
 	    displays = [
 	      { element: document.getElementById('room-happiness'),
-	        value: (room) => { return room.happiness }
+	        value: (room) => { return room.getHappiness(); }
 	      },
 	      { element: document.getElementById('people-count'),
-	        value: (room) => { return room.peopleCount; }
+	        value: (room) => { return room.getPeopleCount(); }
 	      },
 	      { element: document.getElementById('item-count'),
-	        value: (room) => { return room.enticementCount; }
+	        value: (room) => { return room.getEnticementCount(); }
 	      }
 	    ];
 	  }

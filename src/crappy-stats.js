@@ -10,13 +10,13 @@
   function initialize() {
     displays = [
       { element: document.getElementById('room-happiness'),
-        value: (room) => { return room.happiness }
+        value: (room) => { return room.getHappiness(); }
       },
       { element: document.getElementById('people-count'),
-        value: (room) => { return room.peopleCount; }
+        value: (room) => { return room.getPeopleCount(); }
       },
       { element: document.getElementById('item-count'),
-        value: (room) => { return room.enticementCount; }
+        value: (room) => { return room.getEnticementCount(); }
       }
     ];
   }

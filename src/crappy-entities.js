@@ -7,10 +7,10 @@
   var bearBuilder = require('./entities/bear.js');
   var renderer = require('./rendering.js');
   var gui = require('./crappy-gui.js');
+  var gameState = require('./crappy-state.js');
   var stats;
   var width;
   var entities = [];
-  var gameState = {};
 
   function initialize(canvasElement, incomingStats) {
     width = canvasElement.width;
@@ -69,24 +69,15 @@
   }
 
   function consumeAll() {
+    var originalCount = entities.length;
     entities = entities.filter(e => {
       return e.isPerson ? false : true;
     });
+    gameState.bankHappiness(originalCount - entities.length);
   }
 
   function updateGameState() {
-    gameState.happiness = entities.map(e => {
-      return e.getHappiness ? e.getHappiness() : 0;
-    }).reduce((acc, val) => acc + val, 0);
-
-    gameState.peopleCount = entities.filter(e => {
-      return e.isPerson ? true : false;
-    }).length;
-
-    gameState.enticementCount = entities.filter(e => {
-      return e.isEnticement ? true : false;
-    }).length;
-
+    gameState.fondleEntities(entities);
     stats.draw(gameState);
   }
 

@@ -1,0 +1,33 @@
+(() => {
+  var happiness = 0;
+  var peopleCount = 0;
+  var enticementCount = 0;
+
+  var banked = 0;
+
+  function fondleEntities(entities) {
+    happiness = entities.map(e => {
+      return e.getHappiness ? e.getHappiness() : 0;
+    }).reduce((acc, val) => acc + val, 0) + banked;
+
+    peopleCount = entities.filter(e => {
+      return e.isPerson ? true : false;
+    }).length;
+
+    enticementCount = entities.filter(e => {
+      return e.isEnticement ? true : false;
+    }).length;
+  }
+
+  function bankHappiness(hopesAndDreams) {
+    banked += hopesAndDreams;
+  }
+
+  module.exports = {
+    getHappiness: () => happiness,
+    getPeopleCount: () => peopleCount,
+    getEnticementCount: () => enticementCount,
+    fondleEntities: fondleEntities,
+    bankHappiness: bankHappiness
+  };
+})();
