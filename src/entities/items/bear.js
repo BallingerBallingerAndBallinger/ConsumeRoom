@@ -48,7 +48,7 @@
 
       function update(timestamp, delta) {
         if (!isSquishing) {
-          if (Math.random() < 0.01) {
+          if (Math.random() < 0.0001) {
             squeak();
           }
         }
