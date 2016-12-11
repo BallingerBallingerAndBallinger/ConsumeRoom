@@ -1,11 +1,11 @@
 (function() {
   var _ = require('lodash');
-  var bloonBuilder = require('./entities/bloon.js');
+  var bloonBuilder = require('./entities/items/bloon.js');
   var roomBuilder = require('./entities/room.js');
-  var girl1Builder = require('./entities/girl1.js');
+  var girl1Builder = require('./entities/goers/girl1.js');
   var goerBuilder = require('./entities/party-goer.js');
   var doorBuilder = require('./entities/door.js');
-  var bearBuilder = require('./entities/bear.js');
+  var bearBuilder = require('./entities/items/bear.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');

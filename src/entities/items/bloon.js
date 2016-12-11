@@ -1,5 +1,5 @@
 (() => {
-  var entityBase = require('../crappy-entity.js');
+  var entityBase = require('../../crappy-entity.js');
 
   var velocity = 0.00001;
 
