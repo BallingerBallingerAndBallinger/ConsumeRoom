@@ -19,13 +19,10 @@
     gui.setConsumeAll(consumeAll);
 
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
-    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
     room = roomBuilder.initialize(renderer);
     entities = [
       room,
-      bloon,
-      bear,
-      doorBuilder.initialize(renderer)
+      bloon
     ];
   }
 
@@ -110,7 +107,7 @@
       goer = girl1Builder.initialize(renderer, logMove, checkMovement);
     }
 
-    goer.setX(1);
+    goer.setX(0.9);
     goer.setY(0);
     entities.push(goer);
     console.log(goer.getSelf().name + ' has arrived!');
@@ -122,7 +119,7 @@
     if (leaver === undefined) return;
 
     console.log(leaver.getSelf().name + ' is leaving!');
-    leaver.setGoal(1, 0, () => {
+    leaver.setGoal(0.9, 0, () => {
       if (eating) return;
       entities = entities.filter(e => e !== leaver);
     });

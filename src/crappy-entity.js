@@ -36,7 +36,7 @@
             self.gx = self.x + Math.sin(angle) * distance;
             self.gy = self.y + Math.cos(angle) * distance;
 
-            if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
+            if (checkMovement(self.gx, self.gy)) {
               break;
             }
           }
@@ -81,7 +81,7 @@
       }
 
       function getRenderHeight(renderer) {
-        return ((self.y / 2) + 0.5) * self.size;
+        return ((self.y * 0.6666) + 0.3333) * self.size;
       }
 
       function getRenderY(renderer) {

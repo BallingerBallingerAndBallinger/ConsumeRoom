@@ -24,6 +24,7 @@
             chew = !chew;
           }
         }
+        render.image(self.x, 200, 'room-base', 1000, '');
 
         if (eating && chew) {
           render.image(self.x, 500, 'floor-open', 1000, 500);

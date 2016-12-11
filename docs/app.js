@@ -132,13 +132,10 @@
 	    gui.setConsumeAll(consumeAll);
 	
 	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
-	    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
 	    room = roomBuilder.initialize(renderer);
 	    entities = [
 	      room,
-	      bloon,
-	      bear,
-	      doorBuilder.initialize(renderer)
+	      bloon
 	    ];
 	  }
 	
@@ -217,13 +214,13 @@
 	
 	  function introducePartygoer() {
 	    var goer;
-	    if (Math.random > 0.5) {
+	    if (Math.random() < 0.5) {
 	      goer = goerBuilder.initialize(renderer, logMove, checkMovement);
 	    } else {
 	      goer = girl1Builder.initialize(renderer, logMove, checkMovement);
 	    }
 	
-	    goer.setX(1);
+	    goer.setX(0.9);
 	    goer.setY(0);
 	    entities.push(goer);
 	    console.log(goer.getSelf().name + ' has arrived!');
@@ -235,7 +232,7 @@
 	    if (leaver === undefined) return;
 	
 	    console.log(leaver.getSelf().name + ' is leaving!');
-	    leaver.setGoal(1, 0, () => {
+	    leaver.setGoal(0.9, 0, () => {
 	      if (eating) return;
 	      entities = entities.filter(e => e !== leaver);
 	    });
@@ -17462,7 +17459,7 @@
 	            self.gx = self.x + Math.sin(angle) * distance;
 	            self.gy = self.y + Math.cos(angle) * distance;
 	
-	            if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
+	            if (checkMovement(self.gx, self.gy)) {
 	              break;
 	            }
 	          }
@@ -17507,7 +17504,7 @@
 	      }
 	
 	      function getRenderHeight(renderer) {
-	        return ((self.y / 2) + 0.5) * self.size;
+	        return ((self.y * 0.6666) + 0.3333) * self.size;
 	      }
 	
 	      function getRenderY(renderer) {
@@ -17558,6 +17555,7 @@
 	            chew = !chew;
 	          }
 	        }
+	        render.image(self.x, 200, 'room-base', 1000, '');
 	
 	        if (eating && chew) {
 	          render.image(self.x, 500, 'floor-open', 1000, 500);
