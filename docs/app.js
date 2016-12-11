@@ -49,10 +49,10 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(16);
-	  var gui = __webpack_require__(17);
-	  var gameState = __webpack_require__(13);
-	  var config = __webpack_require__(11);
+	  var stats = __webpack_require__(17);
+	  var gui = __webpack_require__(18);
+	  var gameState = __webpack_require__(14);
+	  var config = __webpack_require__(12);
 	
 	  var paused = false;
 	
@@ -118,12 +118,13 @@
 	  var girl1Builder = __webpack_require__(7);
 	  var goerBuilder = __webpack_require__(8);
 	  var doorBuilder = __webpack_require__(9);
-	  var bearBuilder = __webpack_require__(10);
-	  var config = __webpack_require__(11);
-	  var renderer = __webpack_require__(12);
-	  var gameState = __webpack_require__(13);
-	  var click = __webpack_require__(14);
-	  var movementHandler = __webpack_require__(15);
+	  var windowBuilder = __webpack_require__(10);
+	  var bearBuilder = __webpack_require__(11);
+	  var config = __webpack_require__(12);
+	  var renderer = __webpack_require__(13);
+	  var gameState = __webpack_require__(14);
+	  var click = __webpack_require__(15);
+	  var movementHandler = __webpack_require__(16);
 	  var entities = [];
 	  var eating;
 	  var room;
@@ -136,8 +137,11 @@
 	    click.register((e) => { clickEvent = e; });
 	
 	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
+	    var window = windowBuilder.initialize(renderer);
+	
 	    room = roomBuilder.initialize(renderer);
 	    entities = [
+	      window,
 	      room,
 	      bloon
 	    ];
@@ -159,7 +163,7 @@
 	    renderer.clear();
 	    entities.sort(compareEntities);
 	    if (clickEvent) {
-	      var coords = transformCoords(clickEvent);
+	      var coords = renderer.transformEventToCoords(clickEvent);
 	      for (var i = entities.length - 1; i >= 0; i--) {
 	        var entity = entities[i];
 	        if (entity.handleClick) {
@@ -200,14 +204,6 @@
 	      renderer.audio('sound');
 	      eating = false;
 	    }, config.eatSoundTime);
-	  }
-	
-	  function transformCoords(event) {
-	    var rect = event.target.getBoundingClientRect();
-	    return {
-	      x: (event.clientX - rect.left) * (renderer.getWidth() / rect.width),
-	      y: (event.clientY - rect.top) * (renderer.getHeight() / rect.height)
-	    };
 	  }
 	
 	  function addBear() {
@@ -17436,6 +17432,7 @@
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
 	      var steps = 0;
+	      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
 	      var goalCallback;
 	      return {
 	        update: update,
@@ -17444,7 +17441,8 @@
 	        getRenderX: getRenderX,
 	        getRenderY: getRenderY,
 	        getRenderHeight: getRenderHeight,
-	        getScreenBoundingRect: getScreenBoundingRect
+	        getScreenBoundingRect: getScreenBoundingRect,
+	        setStepsGenerator: setStepsGenerator
 	      };
 	
 	      function update(timestamp, delta) {
@@ -17473,7 +17471,8 @@
 	        }
 	
 	        // Set steps
-	        steps = Math.round(20 + Math.random() * 30);
+	        steps = stepsGenerator();
+	        console.log("Moving in " + steps + "steps");
 	
 	        // Set speed
 	        // var speed = distance / steps;
@@ -17481,13 +17480,19 @@
 	        self.vy = (self.gy - self.y) / steps;
 	      }
 	
+	      function setStepsGenerator(newGenerator) {
+	        stepsGenerator = newGenerator;
+	      }
+	
 	      function moveTowardGoal() {
 	        if (steps <= 0) {
 	          if (goalCallback) {
-	            goalCallback();
+	            var cb = goalCallback;
 	            goalCallback = undefined;
+	            cb();
+	          } else {
+	            setGoal();
 	          }
-	          setGoal();
 	        }
 	
 	        var newx = self.x + self.vx;
@@ -17760,6 +17765,75 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var partyGoer = __webpack_require__(7);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	
+	      var self = { name: 'window', x: 0, y: -2 };
+	
+	      var pacers = [];
+	      for (var i = 0; i < 30; i++) {
+	        var pacer = partyGoer.initialize(renderer, { check: () => true });
+	        pacer.setX(Math.random());
+	        pacer.setY(-0.03);
+	        pacer.setStepsGenerator(() => 60 + Math.random() * 10);
+	
+	        startPacing(pacer);
+	        pacers.push(pacer);
+	      }
+	
+	      var room = Object.assign({}, entity);
+	      room.update = update;
+	      room.getX = getX;
+	      room.getY = getY;
+	      return room;
+	
+	      function update(timestamp, delta) {
+	        pacers.forEach((pacer) => {
+	          pacer.update(timestamp, delta);
+	        });
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function startPacing(pacer) {
+	        var goingLeft = (Math.random() > 0.5);
+	        reverseGoal();
+	
+	        function reverseGoal() {
+	          goingLeft = !goingLeft;
+	          if (goingLeft) {
+	            pacer.setGoal(1, -0.03, reverseGoal);
+	          } else {
+	            pacer.setGoal(0, -0.03, reverseGoal);
+	          }
+	        }
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17855,7 +17929,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -17869,7 +17943,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18095,16 +18169,21 @@
 	    }
 	  }
 	
-	
-	  function getWidth(){
+	  function getWidth() {
 	    return canvasWidth;
 	  }
 	
-	  function getHeight(){
+	  function getHeight() {
 	    return canvasHeight;
 	  }
 	
-	
+	  function transformEventToCoords(event) {
+	    var rect = event.target.getBoundingClientRect();
+	    return {
+	      x: (event.clientX - rect.left) * (getWidth() / rect.width),
+	      y: (event.clientY - rect.top) * (getHeight() / rect.height)
+	    };
+	  }
 	
 	  module.exports = {
 	    initialize: initialize,
@@ -18122,15 +18201,15 @@
 	    audio: audio,
 	    stopAudio: stopAudio,
 	    getWidth: getWidth,
-	    getHeight: getHeight
+	    getHeight: getHeight,
+	    transformEventToCoords: transformEventToCoords
 	  };
-	
 	
 	})();
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18170,7 +18249,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18197,7 +18276,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18229,7 +18308,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18263,7 +18342,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	(function() {

@@ -6,6 +6,7 @@
     var initializer = () => {
       var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
       var steps = 0;
+      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
       var goalCallback;
       return {
         update: update,
@@ -14,7 +15,8 @@
         getRenderX: getRenderX,
         getRenderY: getRenderY,
         getRenderHeight: getRenderHeight,
-        getScreenBoundingRect: getScreenBoundingRect
+        getScreenBoundingRect: getScreenBoundingRect,
+        setStepsGenerator: setStepsGenerator
       };
 
       function update(timestamp, delta) {
@@ -43,7 +45,7 @@
         }
 
         // Set steps
-        steps = Math.round(20 + Math.random() * 30);
+        steps = stepsGenerator();
 
         // Set speed
         // var speed = distance / steps;
@@ -51,13 +53,19 @@
         self.vy = (self.gy - self.y) / steps;
       }
 
+      function setStepsGenerator(newGenerator) {
+        stepsGenerator = newGenerator;
+      }
+
       function moveTowardGoal() {
         if (steps <= 0) {
           if (goalCallback) {
-            goalCallback();
+            var cb = goalCallback;
             goalCallback = undefined;
+            cb();
+          } else {
+            setGoal();
           }
-          setGoal();
         }
 
         var newx = self.x + self.vx;
