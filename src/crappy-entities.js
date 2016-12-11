@@ -5,6 +5,7 @@
   var goerBuilder = require('./entities/party-goer.js');
   var doorBuilder = require('./entities/door.js');
   var bearBuilder = require('./entities/bear.js');
+  var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gui = require('./crappy-gui.js');
   var gameState = require('./crappy-state.js');
@@ -50,7 +51,7 @@
   }
 
   function update(timestamp, delta) {
-    if (Math.random() < 0.01) {
+    if (Math.random() < config.basePartyGoerProbability) {
       introducePartygoer();
     }
     gameState.fondleEntities(entities);

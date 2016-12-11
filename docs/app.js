@@ -49,8 +49,9 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(13);
-	  var gameState = __webpack_require__(12);
+	  var stats = __webpack_require__(14);
+	  var gameState = __webpack_require__(13);
+	  var config = __webpack_require__(10);
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -66,10 +67,9 @@
 	
 	  function drawFrame(timestamp) {
 	    var delta = getDelta(timestamp);
-	    if (delta < 50) return;
+	    if (delta < config.frameMs) return;
 	
-	
-	    if (Math.random() < 0.001) {
+	    if (Math.random() < config.baseHungerProbability) {
 	      gameState.bankHappiness(-1);
 	    }
 	    updateDelta(timestamp);
@@ -104,9 +104,10 @@
 	  var goerBuilder = __webpack_require__(7);
 	  var doorBuilder = __webpack_require__(8);
 	  var bearBuilder = __webpack_require__(9);
-	  var renderer = __webpack_require__(10);
-	  var gui = __webpack_require__(11);
-	  var gameState = __webpack_require__(12);
+	  var config = __webpack_require__(10);
+	  var renderer = __webpack_require__(11);
+	  var gui = __webpack_require__(12);
+	  var gameState = __webpack_require__(13);
 	  var entities = [];
 	
 	  function initialize(canvasElement) {
@@ -149,7 +150,7 @@
 	  }
 	
 	  function update(timestamp, delta) {
-	    if (Math.random() < 0.01) {
+	    if (Math.random() < config.basePartyGoerProbability) {
 	      introducePartygoer();
 	    }
 	    gameState.fondleEntities(entities);
@@ -17687,6 +17688,18 @@
 /* 10 */
 /***/ function(module, exports) {
 
+	module.exports = {
+	  title: 'Consume Room',
+	  frameMs: 50,
+	  baseHungerProbability: 0.005,
+	  basePartyGoerProbability: 0.01
+	};
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
 	// PRIMITIVE RENDERING CALLS
 	
 	(function() {
@@ -17938,7 +17951,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -17961,7 +17974,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18001,7 +18014,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	(function() {

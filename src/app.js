@@ -5,6 +5,7 @@
   var entities = require('./crappy-entities.js');
   var stats = require('./crappy-stats.js');
   var gameState = require('./crappy-state.js');
+  var config = require('./configuration.js');
 
   window.onload = () => {
     var canvasElement = document.getElementById('canvas');
@@ -20,10 +21,9 @@
 
   function drawFrame(timestamp) {
     var delta = getDelta(timestamp);
-    if (delta < 50) return;
+    if (delta < config.frameMs) return;
 
-
-    if (Math.random() < 0.001) {
+    if (Math.random() < config.baseHungerProbability) {
       gameState.bankHappiness(-1);
     }
     updateDelta(timestamp);
