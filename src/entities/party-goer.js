@@ -12,6 +12,7 @@
 
       var goer = Object.assign({}, entity);
       goer.update = update;
+      goer.draw = draw;
       goer.setX = setX;
       goer.setY = setY;
       goer.getX = getX;
@@ -21,6 +22,10 @@
 
       function update(timestamp, delta) {
         entity.update(timestamp, delta);
+        draw(timestamp, delta);
+      }
+
+      function draw(timestamp, delta) {
         render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 

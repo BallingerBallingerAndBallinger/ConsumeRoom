@@ -17581,7 +17581,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(5);
+	  var entityBase = __webpack_require__(8);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17590,37 +17590,21 @@
 	
 	      var self = entity.getSelf();
 	      self.name = 'girl1';
-	      self.x = Math.random();
-	      self.y = Math.random();
+	      if (Math.random() < 0.5) {
+	        self.name = 'girl2';
+	      }
 	      self.size = 400;
+	
 	      var goer = Object.assign({}, entity);
 	      goer.update = update;
-	      goer.setX = setX;
-	      goer.setY = setY;
-	      goer.getX = getX;
-	      goer.getY = getY;
-	      goer.isPerson = true;
 	      return goer;
 	
 	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
 	        entity.update(timestamp, delta);
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function setX(newX) {
-	        self.x = newX;
-	      }
-	
-	      function setY(newY) {
-	        self.y = newY;
+	      function draw(timestamp, delta) {
 	      }
 	    };
 	
@@ -17651,6 +17635,7 @@
 	
 	      var goer = Object.assign({}, entity);
 	      goer.update = update;
+	      goer.draw = draw;
 	      goer.setX = setX;
 	      goer.setY = setY;
 	      goer.getX = getX;
@@ -17660,6 +17645,10 @@
 	
 	      function update(timestamp, delta) {
 	        entity.update(timestamp, delta);
+	        draw(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
 	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
