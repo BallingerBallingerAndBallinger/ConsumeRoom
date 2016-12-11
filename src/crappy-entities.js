@@ -13,7 +13,6 @@
 
   function initialize(canvasElement) {
     renderer.initialize(canvasElement);
-    gui.initialize(canvasElement);
     gui.setConsumeAll(consumeAll);
 
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);

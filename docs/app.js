@@ -50,13 +50,18 @@
 	
 	  var entities = __webpack_require__(1);
 	  var stats = __webpack_require__(14);
+	  var gui = __webpack_require__(12);
 	  var gameState = __webpack_require__(13);
 	  var config = __webpack_require__(10);
+	
+	  var paused = false;
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
 	    entities.initialize(canvasElement);
 	    stats.initialize();
+	    gui.initialize();
+	    gui.setPause(pause);
 	    requestAnimationFrame(grandLoop);
 	  };
 	
@@ -68,13 +73,21 @@
 	  function drawFrame(timestamp) {
 	    var delta = getDelta(timestamp);
 	    if (delta < config.frameMs) return;
+	    updateDelta(timestamp);
+	
+	    if (paused) {
+	      return;
+	    }
 	
 	    if (Math.random() < config.baseHungerProbability) {
 	      gameState.bankHappiness(-1);
 	    }
-	    updateDelta(timestamp);
 	    entities.update(timestamp, delta);
 	    stats.draw(gameState);
+	  }
+	
+	  function pause() {
+	    paused = !paused;
 	  }
 	
 	  var last;
@@ -112,7 +125,6 @@
 	
 	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
-	    gui.initialize(canvasElement);
 	    gui.setConsumeAll(consumeAll);
 	
 	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
@@ -175,7 +187,7 @@
 	      return e.isPerson ? false : true;
 	    });
 	    gameState.bankHappiness(originalCount - entities.length);
-	    renderer.audio('eat');
+	    renderer.audio('eat')
 	  }
 	
 	  function introducePartygoer() {
@@ -17986,19 +17998,27 @@
 
 	(function() {
 	  var consumeAll = () => { console.log('No consume function registered'); };
+	  var pause = () => { console.log('No pause function registered'); };
 	
 	  function setConsumeAll(consumeFn) {
 	    consumeAll = consumeFn;
 	  }
 	
+	  function setPause(pauseFn) {
+	    pause = pauseFn;
+	  }
+	
 	  function initialize() {
 	    document.getElementById('consume-all-button')
 	            .addEventListener('click', (e) => consumeAll(e));
+	    document.getElementById('pause-game-button')
+	            .addEventListener('click', (e) => pause());
 	  }
 	
 	  module.exports = {
 	    initialize: initialize,
-	    setConsumeAll: setConsumeAll
+	    setConsumeAll: setConsumeAll,
+	    setPause: setPause
 	  };
 	})();
 
