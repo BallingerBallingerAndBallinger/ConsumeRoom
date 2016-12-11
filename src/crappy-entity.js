@@ -4,9 +4,10 @@
 
   function initialize(renderer, moveMethod, checkMovement) {
     var initializer = () => {
-      var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
+      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
       var render = renderer;
       var steps = 0;
+      var goalCallback;
       return {
         update: update,
         setGoal: setGoal,
@@ -20,18 +21,24 @@
         moveTowardGoal();
       }
 
-      function setGoal() {
-        while (true) {
-          // Set distance
-          var distance = Math.random() / 3;
-          // Set a goal
-          var angle = Math.random() * Math.PI * 2;
+      function setGoal(x, y, callback) {
+        goalCallback = callback;
+        if (x !== undefined && y !== undefined) {
+          self.gx = x;
+          self.gy = y;
+        } else {
+          while (true) {
+            // Set distance
+            var distance = Math.random() / 3;
+            // Set a goal
+            var angle = Math.random() * Math.PI * 2;
 
-          self.gx = self.x + Math.sin(angle) * distance;
-          self.gy = self.y + Math.cos(angle) * distance;
+            self.gx = self.x + Math.sin(angle) * distance;
+            self.gy = self.y + Math.cos(angle) * distance;
 
-          if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
-            break;
+            if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
+              break;
+            }
           }
         }
 
@@ -45,7 +52,13 @@
       }
 
       function moveTowardGoal() {
-        if (steps <= 0) setGoal();
+        if (steps <= 0) {
+          if (goalCallback) {
+            goalCallback();
+            goalCallback = undefined;
+          }
+          setGoal();
+        }
 
         var newx = self.x + self.vx;
         var newy = self.y + self.vy;

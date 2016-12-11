@@ -153,6 +153,14 @@
 	    if (Math.random() < config.basePartyGoerProbability) {
 	      introducePartygoer();
 	    }
+<<<<<<< HEAD
+=======
+	
+	    if (Math.random() < config.basePartyGoerLeavesProbability) {
+	      partyGoerWantsToLeave();
+	    }
+	
+>>>>>>> 090ff83e9966269f2e22592c4c00a12f53f4628b
 	    gameState.fondleEntities(entities);
 	
 	    renderer.clear();
@@ -170,6 +178,7 @@
 	      return e.isPerson ? false : true;
 	    });
 	    gameState.bankHappiness(originalCount - entities.length);
+	    renderer.audio('eat');
 	  }
 	
 	  function introducePartygoer() {
@@ -177,8 +186,21 @@
 	    goer.setX(1);
 	    goer.setY(0);
 	    entities.push(goer);
+	    console.log(goer.getSelf().name + ' has arrived!');
 	  }
 	
+<<<<<<< HEAD
+=======
+	  function partyGoerWantsToLeave() {
+	    var people = entities.filter((e) => e.isPerson) || [];
+	    var leaver = people[Math.floor(Math.random() * people.length)];
+	    if (leaver === undefined) return;
+	
+	    console.log(leaver.getSelf().name + ' is leaving!');
+	    leaver.setGoal(1, 0, () => { entities = entities.filter(e => e !== leaver); });
+	  }
+	
+>>>>>>> 090ff83e9966269f2e22592c4c00a12f53f4628b
 	  module.exports = {
 	    update: update,
 	    initialize: initialize
@@ -17370,9 +17392,10 @@
 	
 	  function initialize(renderer, moveMethod, checkMovement) {
 	    var initializer = () => {
-	      var self = {name: 'generic', x: 1, y: 2, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
+	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
 	      var render = renderer;
 	      var steps = 0;
+	      var goalCallback;
 	      return {
 	        update: update,
 	        setGoal: setGoal,
@@ -17386,18 +17409,24 @@
 	        moveTowardGoal();
 	      }
 	
-	      function setGoal() {
-	        while (true) {
-	          // Set distance
-	          var distance = Math.random() / 3;
-	          // Set a goal
-	          var angle = Math.random() * Math.PI * 2;
+	      function setGoal(x, y, callback) {
+	        goalCallback = callback;
+	        if (x !== undefined && y !== undefined) {
+	          self.gx = x;
+	          self.gy = y;
+	        } else {
+	          while (true) {
+	            // Set distance
+	            var distance = Math.random() / 3;
+	            // Set a goal
+	            var angle = Math.random() * Math.PI * 2;
 	
-	          self.gx = self.x + Math.sin(angle) * distance;
-	          self.gy = self.y + Math.cos(angle) * distance;
+	            self.gx = self.x + Math.sin(angle) * distance;
+	            self.gy = self.y + Math.cos(angle) * distance;
 	
-	          if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
-	            break;
+	            if (self.gx <= 1 && self.gy <= 1 && self.gx >= 0 && self.gy >= 0) {
+	              break;
+	            }
 	          }
 	        }
 	
@@ -17411,7 +17440,13 @@
 	      }
 	
 	      function moveTowardGoal() {
-	        if (steps <= 0) setGoal();
+	        if (steps <= 0) {
+	          if (goalCallback) {
+	            goalCallback();
+	            goalCallback = undefined;
+	          }
+	          setGoal();
+	        }
 	
 	        var newx = self.x + self.vx;
 	        var newy = self.y + self.vy;
@@ -17696,7 +17731,12 @@
 	  title: 'Consume Room',
 	  frameMs: 50,
 	  baseHungerProbability: 0.005,
+<<<<<<< HEAD
 	  basePartyGoerProbability: 0.001
+=======
+	  basePartyGoerProbability: 0.01,
+	  basePartyGoerLeavesProbability: 0.01
+>>>>>>> 090ff83e9966269f2e22592c4c00a12f53f4628b
 	};
 
 
