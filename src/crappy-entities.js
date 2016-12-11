@@ -9,14 +9,18 @@
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
+  var click = require('./crappy-click-handler.js');
   var movementHandler = require('./crappy-movement-handler.js');
   var entities = [];
   var eating;
   var room;
+  var clickEvent;
 
   function initialize(canvasElement) {
     renderer.initialize(canvasElement);
     movementHandler.initialize();
+    click.initialize(canvasElement);
+    click.register((e) => { clickEvent = e; });
 
     var bloon = bloonBuilder.initialize(renderer, movementHandler);
     room = roomBuilder.initialize(renderer);
@@ -41,6 +45,16 @@
     gameState.fondleEntities(entities);
     renderer.clear();
     entities.sort(compareEntities);
+    if (clickEvent) {
+      var coords = transformCoords(clickEvent);
+      for (var i = entities.length - 1; i >= 0; i--) {
+        var entity = entities[i];
+        if (entity.handleClick) {
+          if (entity.handleClick(coords.x, coords.y)) break;
+        }
+      }
+      clickEvent = undefined;
+    }
     entities.forEach(e => e.update(timestamp, delta));
   }
 
@@ -73,6 +87,15 @@
       renderer.audio('sound');
       eating = false;
     }, config.eatSoundTime);
+  }
+
+  function transformCoords(event) {
+    var rect = event.target.getBoundingClientRect();
+    console.log(JSON.stringify(rect));
+    return {
+      x: (event.clientX - rect.left) * (renderer.getWidth() / rect.width),
+      y: (event.clientY - rect.top) * (renderer.getHeight() / rect.height)
+    };
   }
 
   function addBear() {

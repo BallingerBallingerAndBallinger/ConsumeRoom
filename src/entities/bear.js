@@ -23,9 +23,26 @@
       bear.getZ = getZ;
       bear.setX = setX;
       bear.setY = setY;
+      bear.handleClick = handleClick;
       bear.getHappiness = () => 33;
       bear.isEnticement = true;
       return bear;
+
+      function handleClick(x, y) {
+        console.log('Bear sees a click ' + x + ':' + y);
+        var bounds = entity.getScreenBoundingRect();
+        console.log('Bear bounds ' + JSON.stringify(bounds));
+
+        if (bounds.left < x &&
+            bounds.right > x &&
+            bounds.top < y &&
+            bounds.bottom > y) {
+          isSquishing = true;
+          squish = 30;
+          return true;
+        }
+        return false;
+      }
 
       function update(timestamp, delta) {
         if (!isSquishing) {

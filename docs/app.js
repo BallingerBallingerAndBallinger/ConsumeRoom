@@ -49,8 +49,8 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(15);
-	  var gui = __webpack_require__(16);
+	  var stats = __webpack_require__(16);
+	  var gui = __webpack_require__(17);
 	  var gameState = __webpack_require__(13);
 	  var config = __webpack_require__(11);
 	
@@ -122,14 +122,18 @@
 	  var config = __webpack_require__(11);
 	  var renderer = __webpack_require__(12);
 	  var gameState = __webpack_require__(13);
-	  var movementHandler = __webpack_require__(14);
+	  var click = __webpack_require__(14);
+	  var movementHandler = __webpack_require__(15);
 	  var entities = [];
 	  var eating;
 	  var room;
+	  var clickEvent;
 	
 	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
 	    movementHandler.initialize();
+	    click.initialize(canvasElement);
+	    click.register((e) => { clickEvent = e; });
 	
 	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
 	    room = roomBuilder.initialize(renderer);
@@ -154,6 +158,16 @@
 	    gameState.fondleEntities(entities);
 	    renderer.clear();
 	    entities.sort(compareEntities);
+	    if (clickEvent) {
+	      var coords = transformCoords(clickEvent);
+	      for (var i = entities.length - 1; i >= 0; i--) {
+	        var entity = entities[i];
+	        if (entity.handleClick) {
+	          if (entity.handleClick(coords.x, coords.y)) break;
+	        }
+	      }
+	      clickEvent = undefined;
+	    }
 	    entities.forEach(e => e.update(timestamp, delta));
 	  }
 	
@@ -186,6 +200,15 @@
 	      renderer.audio('sound');
 	      eating = false;
 	    }, config.eatSoundTime);
+	  }
+	
+	  function transformCoords(event) {
+	    var rect = event.target.getBoundingClientRect();
+	    console.log(JSON.stringify(rect));
+	    return {
+	      x: (event.clientX - rect.left) * (renderer.getWidth() / rect.width),
+	      y: (event.clientY - rect.top) * (renderer.getHeight() / rect.height)
+	    };
 	  }
 	
 	  function addBear() {
@@ -247,7 +270,7 @@
 	  var undefined;
 	
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.0';
+	  var VERSION = '4.17.2';
 	
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3291,7 +3314,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	
 	      var index = 0,
 	          length = path.length;
@@ -3477,12 +3500,9 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      if (!isKey(path, object)) {
-	        path = castPath(path);
-	        object = parent(object, path);
-	        path = last(path);
-	      }
-	      var func = object == null ? object : object[toKey(path)];
+	      path = castPath(path, object);
+	      object = parent(object, path);
+	      var func = object == null ? object : object[toKey(last(path))];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 	
@@ -4043,7 +4063,7 @@
 	            value = baseGet(object, path);
 	
 	        if (predicate(value, path)) {
-	          baseSet(result, path, value);
+	          baseSet(result, castPath(path, object), value);
 	        }
 	      }
 	      return result;
@@ -4119,17 +4139,8 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          }
-	          else if (!isKey(index, array)) {
-	            var path = castPath(index),
-	                object = parent(array, path);
-	
-	            if (object != null) {
-	              delete object[toKey(last(path))];
-	            }
-	          }
-	          else {
-	            delete array[toKey(index)];
+	          } else {
+	            baseUnset(array, index);
 	          }
 	        }
 	      }
@@ -4250,7 +4261,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	
 	      var index = -1,
 	          length = path.length,
@@ -4591,11 +4602,9 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	      object = parent(object, path);
-	
-	      var key = toKey(last(path));
-	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
+	      return object == null || delete object[toKey(last(path))];
 	    }
 	
 	    /**
@@ -4735,10 +4744,14 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
+	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value) {
-	      return isArray(value) ? value : stringToPath(value);
+	    function castPath(value, object) {
+	      if (isArray(value)) {
+	        return value;
+	      }
+	      return isKey(value, object) ? [value] : stringToPath(toString(value));
 	    }
 	
 	    /**
@@ -6363,7 +6376,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	
 	      var index = -1,
 	          length = path.length,
@@ -6840,7 +6853,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 	
 	    /**
@@ -6980,8 +6993,6 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
-	      string = toString(string);
-	
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9716,12 +9727,10 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
-	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 	
 	      baseEach(collection, function(value) {
-	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
-	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
+	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11089,14 +11098,10 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
-	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 	
 	        if (array) {
 	          arrayPush(otherArgs, array);
-	        }
-	        if (start != lastIndex) {
-	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13712,9 +13717,16 @@
 	      if (object == null) {
 	        return result;
 	      }
+	      var isDeep = false;
+	      paths = arrayMap(paths, function(path) {
+	        path = castPath(path, object);
+	        isDeep || (isDeep = path.length > 1);
+	        return path;
+	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	
+	      if (isDeep) {
+	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	      }
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13764,7 +13776,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
+	      return object == null ? {} : basePick(object, paths);
 	    });
 	
 	    /**
@@ -13786,7 +13798,16 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
+	      if (object == null) {
+	        return {};
+	      }
+	      var props = arrayMap(getAllKeysIn(object), function(prop) {
+	        return [prop];
+	      });
+	      predicate = getIteratee(predicate);
+	      return basePickBy(object, props, function(value, path) {
+	        return predicate(value, path[0]);
+	      });
 	    }
 	
 	    /**
@@ -13819,15 +13840,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = isKey(path, object) ? [path] : castPath(path);
+	      path = castPath(path, object);
 	
 	      var index = -1,
 	          length = path.length;
 	
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        object = undefined;
 	        length = 1;
+	        object = undefined;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16337,7 +16358,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
 	    }
 	
 	    /**
@@ -17414,7 +17435,6 @@
 	  function initialize(renderer, movementHandler) {
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
-	      var render = renderer;
 	      var steps = 0;
 	      var goalCallback;
 	      return {
@@ -17423,7 +17443,8 @@
 	        getSelf: getSelf,
 	        getRenderX: getRenderX,
 	        getRenderY: getRenderY,
-	        getRenderHeight: getRenderHeight
+	        getRenderHeight: getRenderHeight,
+	        getScreenBoundingRect: getScreenBoundingRect
 	      };
 	
 	      function update(timestamp, delta) {
@@ -17483,22 +17504,30 @@
 	        return self;
 	      }
 	
-	      function getRenderX(renderer) {
+	      function getRenderX() {
 	        var squeezeFactor = (self.y / 2 + 0.5);
 	        var squeezed = (self.x - 0.5) * squeezeFactor + 0.5;
 	        return squeezed * renderer.getWidth() - 40;
 	      }
 	
-	      function getRenderHeight(renderer) {
+	      function getRenderHeight() {
 	        return ((self.y * 0.6666) + 0.3333) * self.size;
 	      }
 	
-	      function getRenderY(renderer) {
-	        var renderHeight = getRenderHeight(renderer);
+	      function getRenderY() {
+	        var renderHeight = getRenderHeight();
 	        var renderY = (self.y * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
 	        renderY = renderY - renderHeight;
 	        renderY = renderY + (renderHeight / 10);
 	        return renderY;
+	      }
+	
+	      function getScreenBoundingRect() {
+	        return { left: getRenderX(),
+	                 right: getRenderX() + getRenderHeight(),
+	                 top: getRenderY(),
+	                 bottom: getRenderY() + getRenderHeight()
+	               }
 	      }
 	    };
 	    return initializer();
@@ -17764,9 +17793,26 @@
 	      bear.getZ = getZ;
 	      bear.setX = setX;
 	      bear.setY = setY;
+	      bear.handleClick = handleClick;
 	      bear.getHappiness = () => 33;
 	      bear.isEnticement = true;
 	      return bear;
+	
+	      function handleClick(x, y) {
+	        console.log('Bear sees a click ' + x + ':' + y);
+	        var bounds = entity.getScreenBoundingRect();
+	        console.log('Bear bounds ' + JSON.stringify(bounds));
+	
+	        if (bounds.left < x &&
+	            bounds.right > x &&
+	            bounds.top < y &&
+	            bounds.bottom > y) {
+	          isSquishing = true;
+	          squish = 30;
+	          return true;
+	        }
+	        return false;
+	      }
 	
 	      function update(timestamp, delta) {
 	        if (!isSquishing) {
@@ -18139,6 +18185,33 @@
 /***/ function(module, exports) {
 
 	(() => {
+	  var registered = [];
+	
+	  function initialize(canvasElement) {
+	    canvasElement.addEventListener('click', (e) => registered.forEach(h => h(e)));
+	  }
+	
+	  function register(handler) {
+	    registered.push(handler);
+	  }
+	
+	  function unregister(handler) {
+	    registered = registered.filter((h) => h === handler);
+	  }
+	
+	  module.exports = {
+	    initialize: initialize,
+	    register: register,
+	    unregister: unregister
+	  };
+	})();
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	(() => {
 	  function checkMovement(x, y) {
 	    if (x < 0) {
 	      return false;
@@ -18167,7 +18240,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18201,7 +18274,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(function() {
