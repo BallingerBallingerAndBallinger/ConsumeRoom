@@ -1,7 +1,7 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
 
-  var velocity = 0.001;
+  var velocity = 0.00001;
 
   function initialize(renderer, moveMethod, checkMovement) {
     var constructor = () => {
@@ -33,7 +33,7 @@
         var attemptedX = attemptedTravel + self.x;
         var toMove = checkMovement(attemptedX, self.y);
 
-        if (travel > 0.10 || travel < -0.10) {
+        if (travel > 0.01 || travel < -0.01) {
           goingLeft = !goingLeft;
           travel = 0;
         }
