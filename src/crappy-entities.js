@@ -8,7 +8,6 @@
   var bearBuilder = require('./entities/bear.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
-  var gui = require('./crappy-gui.js');
   var gameState = require('./crappy-state.js');
   var movementHandler = require('./crappy-movement-handler.js');
   var entities = [];
@@ -18,7 +17,6 @@
   function initialize(canvasElement) {
     renderer.initialize(canvasElement);
     movementHandler.initialize();
-    gui.setConsumeAll(consumeAll);
 
     var bloon = bloonBuilder.initialize(renderer, movementHandler);
     room = roomBuilder.initialize(renderer);
@@ -104,6 +102,7 @@
   }
 
   module.exports = {
+    consumeAll: consumeAll,
     update: update,
     initialize: initialize
   };

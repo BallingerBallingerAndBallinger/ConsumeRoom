@@ -1,13 +1,15 @@
 (function() {
-  var consumeAll = () => { console.log('No consume function registered'); };
   var pause = () => { console.log('No pause function registered'); };
 
-  var pausedView;
+  var entities;
 
-  function setConsumeAll(consumeFn) {
-    consumeAll = consumeFn;
+  var pausedView;
+  var gameOverView;
+
+  function consumeAll() {
+    entities.consumeAll();
   }
-  
+
   function setPause(pauseFn) {
     pause = (paused) => {
       pauseFn(paused);
@@ -22,13 +24,16 @@
     }
   }
 
-  function initialize() {
+  function initialize(ents) {
+    entities = ents;
+
     document.getElementById('consume-all-button')
             .addEventListener('click', (e) => consumeAll(e));
     document.getElementById('pause-game-button')
             .addEventListener('click', (e) => pause());
 
     pausedView = document.getElementById('paused-view');
+    gameOverView = document.getElementById('game-over');
   }
 
   function addClass(element, klass) {
@@ -46,7 +51,6 @@
 
   module.exports = {
     initialize: initialize,
-    setConsumeAll: setConsumeAll,
     setPause: setPause,
     showPaused: showPaused
   };

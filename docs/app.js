@@ -49,9 +49,9 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(16);
-	  var gui = __webpack_require__(13);
-	  var gameState = __webpack_require__(14);
+	  var stats = __webpack_require__(15);
+	  var gui = __webpack_require__(16);
+	  var gameState = __webpack_require__(13);
 	  var config = __webpack_require__(11);
 	
 	  var paused = false;
@@ -60,7 +60,7 @@
 	    var canvasElement = document.getElementById('canvas');
 	    entities.initialize(canvasElement);
 	    stats.initialize();
-	    gui.initialize();
+	    gui.initialize(entities);
 	    gui.setPause(pause);
 	    requestAnimationFrame(grandLoop);
 	  };
@@ -121,9 +121,8 @@
 	  var bearBuilder = __webpack_require__(10);
 	  var config = __webpack_require__(11);
 	  var renderer = __webpack_require__(12);
-	  var gui = __webpack_require__(13);
-	  var gameState = __webpack_require__(14);
-	  var movementHandler = __webpack_require__(15);
+	  var gameState = __webpack_require__(13);
+	  var movementHandler = __webpack_require__(14);
 	  var entities = [];
 	  var eating;
 	  var room;
@@ -131,7 +130,6 @@
 	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
 	    movementHandler.initialize();
-	    gui.setConsumeAll(consumeAll);
 	
 	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
 	    room = roomBuilder.initialize(renderer);
@@ -217,6 +215,7 @@
 	  }
 	
 	  module.exports = {
+	    consumeAll: consumeAll,
 	    update: update,
 	    initialize: initialize
 	  };
@@ -18090,65 +18089,6 @@
 /* 13 */
 /***/ function(module, exports) {
 
-	(function() {
-	  var consumeAll = () => { console.log('No consume function registered'); };
-	  var pause = () => { console.log('No pause function registered'); };
-	
-	  var pausedView;
-	
-	  function setConsumeAll(consumeFn) {
-	    consumeAll = consumeFn;
-	  }
-	  
-	  function setPause(pauseFn) {
-	    pause = (paused) => {
-	      pauseFn(paused);
-	    };
-	  }
-	
-	  function showPaused(show) {
-	    if (show) {
-	      removeClass(pausedView, 'hidden');
-	    } else {
-	      addClass(pausedView, 'hidden');
-	    }
-	  }
-	
-	  function initialize() {
-	    document.getElementById('consume-all-button')
-	            .addEventListener('click', (e) => consumeAll(e));
-	    document.getElementById('pause-game-button')
-	            .addEventListener('click', (e) => pause());
-	
-	    pausedView = document.getElementById('paused-view');
-	  }
-	
-	  function addClass(element, klass) {
-	    var classes = element.className.match(/(^| ).+?($| )/g);
-	    classes = classes.map(s => s.trim());
-	    if (classes.includes(klass)) return;
-	    element.className += ' ' + klass;
-	  }
-	
-	  function removeClass(element, klass) {
-	    var classes = element.className.match(/(^| ).+?($| )/g);
-	    classes = classes.map(s => s.trim());
-	    element.className = classes.filter((k) => k !== klass).join(' ');
-	  }
-	
-	  module.exports = {
-	    initialize: initialize,
-	    setConsumeAll: setConsumeAll,
-	    setPause: setPause,
-	    showPaused: showPaused
-	  };
-	})();
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
 	(() => {
 	  var peopleCount = 0;
 	  var enticementCount = 0;
@@ -18186,7 +18126,7 @@
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18218,7 +18158,7 @@
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18247,6 +18187,69 @@
 	  module.exports = {
 	    initialize: initialize,
 	    draw: draw
+	  };
+	})();
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	(function() {
+	  var pause = () => { console.log('No pause function registered'); };
+	
+	  var entities;
+	
+	  var pausedView;
+	  var gameOverView;
+	
+	  function consumeAll() {
+	    entities.consumeAll();
+	  }
+	
+	  function setPause(pauseFn) {
+	    pause = (paused) => {
+	      pauseFn(paused);
+	    };
+	  }
+	
+	  function showPaused(show) {
+	    if (show) {
+	      removeClass(pausedView, 'hidden');
+	    } else {
+	      addClass(pausedView, 'hidden');
+	    }
+	  }
+	
+	  function initialize(ents) {
+	    entities = ents;
+	
+	    document.getElementById('consume-all-button')
+	            .addEventListener('click', (e) => consumeAll(e));
+	    document.getElementById('pause-game-button')
+	            .addEventListener('click', (e) => pause());
+	
+	    pausedView = document.getElementById('paused-view');
+	    gameOverView = document.getElementById('game-over');
+	  }
+	
+	  function addClass(element, klass) {
+	    var classes = element.className.match(/(^| ).+?($| )/g);
+	    classes = classes.map(s => s.trim());
+	    if (classes.includes(klass)) return;
+	    element.className += ' ' + klass;
+	  }
+	
+	  function removeClass(element, klass) {
+	    var classes = element.className.match(/(^| ).+?($| )/g);
+	    classes = classes.map(s => s.trim());
+	    element.className = classes.filter((k) => k !== klass).join(' ');
+	  }
+	
+	  module.exports = {
+	    initialize: initialize,
+	    setPause: setPause,
+	    showPaused: showPaused
 	  };
 	})();
 

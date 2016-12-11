@@ -3,8 +3,8 @@
   'use strict';
 
   var entities = require('./crappy-entities.js');
-  var stats = require('./crappy-stats.js');
-  var gui = require('./crappy-gui.js');
+  var stats = require('./gui/crappy-stats.js');
+  var gui = require('./gui/crappy-gui.js');
   var gameState = require('./crappy-state.js');
   var config = require('./configuration.js');
 
@@ -14,7 +14,7 @@
     var canvasElement = document.getElementById('canvas');
     entities.initialize(canvasElement);
     stats.initialize();
-    gui.initialize();
+    gui.initialize(entities);
     gui.setPause(pause);
     requestAnimationFrame(grandLoop);
   };
