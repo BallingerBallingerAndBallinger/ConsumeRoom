@@ -62,7 +62,9 @@
       }
 
       function getRenderX(renderer) {
-        return self.x * renderer.getWidth();
+        var squeezeFactor = (self.y / 2 + 0.5);
+        var squeezed = (self.x - 0.5) * squeezeFactor + 0.5;
+        return squeezed * renderer.getWidth() - 40;
       }
 
       function getRenderHeight(renderer) {
