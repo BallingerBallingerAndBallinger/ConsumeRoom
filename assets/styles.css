@@ -42,19 +42,19 @@ stats {
     flex-direction: row;
 }
 .ui-area{
-    width: 20%;
+    display: flex;
+    flex-direction: column;
+
+    min-width: 300px;
+    padding: 4px;
+
+    background-color: rgba(0, 0, 0, .2);
 }
 .ui-column-container{
     display: flex;
     flex-direction: column;
 
-    max-width: 300px;
-    min-width: 130px;
-
-    padding: 8px;
-    margin-bottom: 8px;
-
-    background-color: rgba(0, 0, 0, .15);
+    background-color: rgba(255, 255, 255, .8);
 }
 
 .stat-container{
@@ -74,9 +74,6 @@ stats {
     font-size: 20px;
     font-weight: 700;
 
-    margin-top: 8px;
-    margin-bottom: 8px;
-
 }
 
 .info-text-item{
@@ -87,7 +84,6 @@ stats {
 
 .section-text-title{
     font-size: 12px;
-    margin-bottom: 8px;
     text-transform: uppercase;
 }
 
@@ -102,10 +98,6 @@ stats {
 }
 
 .stat-text-container{
-
-    background-color: rgba(255, 255, 255, .4);
-    color: black;
-
     margin: 4px;
     padding: 2px;
 
@@ -119,14 +111,19 @@ stats {
     margin-top: 4px;
     margin-bottom: 4px;
 
-    background-color: rgba(255,255,255, .6);
+    background-color: rgba(0,0,0, .1);
+    color: black;
+
+    border-style: solid; 
+    border-width: 1px; 
+    border-color: gray; 
 
     border-radius: 4px;
    
 }
 .action-button-wrapper:hover{
     background-color: rgba(255,255,255,1);
-    cursor: pointer;
+    cursor: pointer; 
 }
 
 .action-button{
@@ -141,4 +138,33 @@ stats {
 
 .cmb-bold{
     font-weight: 700;
+}
+
+.fill-space{
+    flex-grow: 1;
+}
+
+.container-padding{
+    padding: 8px;
+}
+.child-padding{
+    margin: 8px;
+}
+.bottom-spacer{
+    margin-bottom: 4px;
+}
+
+.button-container{
+    display: flex;
+    flex-direction: column;
+
+    padding: 4px;
+}
+
+.button-padding{
+    margin: 4px;
+}
+
+.height-spacer{
+    height:16px;
 }
