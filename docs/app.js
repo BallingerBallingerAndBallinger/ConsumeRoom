@@ -123,6 +123,7 @@
 	  var gui = __webpack_require__(13);
 	  var gameState = __webpack_require__(14);
 	  var entities = [];
+	  var eating;
 	
 	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
@@ -163,16 +164,17 @@
 	  }
 	
 	  function update(timestamp, delta) {
-	    if (Math.random() < config.basePartyGoerProbability) {
-	      introducePartygoer();
-	    }
+	    if (!eating) {
+	      if (Math.random() < config.basePartyGoerProbability) {
+	        introducePartygoer();
+	      }
 	
-	    if (Math.random() < config.basePartyGoerLeavesProbability) {
-	      partyGoerWantsToLeave();
+	      if (Math.random() < config.basePartyGoerLeavesProbability) {
+	        partyGoerWantsToLeave();
+	      }
 	    }
 	
 	    gameState.fondleEntities(entities);
-	
 	    renderer.clear();
 	    entities.sort(compareEntities);
 	    entities.forEach(e => e.update(timestamp, delta));
@@ -183,14 +185,23 @@
 	  }
 	
 	  function consumeAll() {
-	    var originalCount = entities.length;
-	    entities = entities.filter(e => {
-	      return e.isPerson ? false : true;
-	    });
-	    gameState.bankHappiness(originalCount - entities.length);
+	    eating = true;
 	    renderer.stopAudio('sound');
 	    renderer.audio('eat');
-	    setTimeout(() => renderer.audio('sound'), config.eatSoundTime);
+	
+	    var originalCount = entities.length;
+	    var people = entities.filter(e => {
+	      return e.isPerson ? true : false;
+	    });
+	
+	    people.forEach(p => p.setGoal(0.5, 0.5));
+	
+	    setTimeout(() => {
+	      entities = _.difference(entities, people);
+	      gameState.bankHappiness(originalCount - entities.length);
+	      renderer.audio('sound');
+	      eating = false;
+	    }, config.eatSoundTime);
 	  }
 	
 	  function introducePartygoer() {
@@ -213,7 +224,10 @@
 	    if (leaver === undefined) return;
 	
 	    console.log(leaver.getSelf().name + ' is leaving!');
-	    leaver.setGoal(1, 0, () => { entities = entities.filter(e => e !== leaver); });
+	    leaver.setGoal(1, 0, () => {
+	      if (eating) return;
+	      entities = entities.filter(e => e !== leaver);
+	    });
 	  }
 	
 	  module.exports = {
