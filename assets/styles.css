@@ -26,17 +26,119 @@ stats {
     margin: 0;
 }
 
-.stat-container{
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
 .stat-label {
     font-style: sans-serif;
 }
 
 .stat {
     font-style: sans-serif;
+}
+
+/*Chris' stupid inefficient css section
+-------------------------------------------------------*/
+
+.main-page{
+    display: flex;
+    flex-direction: row;
+}
+.ui-area{
+    width: 20%;
+}
+.ui-column-container{
+    display: flex;
+    flex-direction: column;
+
+    max-width: 300px;
+    min-width: 130px;
+
+    padding: 8px;
+    margin-bottom: 8px;
+
+    background-color: rgba(0, 0, 0, .15);
+}
+
+.stat-container{
+    display: flex;
+    flex-direction: row;
+   
+}
+.stat-all-container{
+    display: flex;
+    flex-direction: column;
+
+    padding-top: 20px;
+    padding-bottom: 20px;   
+}
+
+.info-text-title{
+    font-size: 20px;
+    font-weight: 700;
+
+    margin-top: 8px;
+    margin-bottom: 8px;
+
+}
+
+.info-text-item{
+    font-size: 16px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.section-text-title{
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.remove-ul-padding{
+    padding:0;
+    list-style-type: disc;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 1em;
+}
+
+.stat-text-container{
+
+    background-color: rgba(255, 255, 255, .4);
+    color: black;
+
+    margin: 4px;
+    padding: 2px;
+
+}
+.action-button-wrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+    background-color: rgba(255,255,255, .6);
+
+    border-radius: 4px;
+   
+}
+.action-button-wrapper:hover{
+    background-color: rgba(255,255,255,1);
+    cursor: pointer;
+}
+
+.action-button{
+    margin: 8px;
+}
+
+.action-button-icon{
+    margin: 4px;
+    height:30px;
+    width:30px;
+}
+
+.cmb-bold{
+    font-weight: 700;
 }
