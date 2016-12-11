@@ -6,6 +6,7 @@
   var doorBuilder = require('./entities/door.js');
   var bearBuilder = require('./entities/bear.js');
   var renderer = require('./rendering.js');
+  var gui = require('./crappy-gui.js');
   var stats;
   var width;
   var entities = [];
@@ -16,6 +17,9 @@
     height = canvasElement.height;
 
     renderer.initialize(canvasElement);
+    gui.initialize(canvasElement);
+    gui.setConsumeAll(consumeAll);
+
     stats = incomingStats;
     stats.initialize();
 
@@ -62,6 +66,12 @@
 
   function compareEntities(a, b) {
     return a.getY() - b.getY();
+  }
+
+  function consumeAll() {
+    entities = entities.filter(e => {
+      return e.isPerson ? false : true;
+    });
   }
 
   function updateGameState() {

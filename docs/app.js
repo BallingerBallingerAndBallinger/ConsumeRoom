@@ -49,7 +49,7 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(11);
+	  var stats = __webpack_require__(12);
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
@@ -97,6 +97,7 @@
 	  var doorBuilder = __webpack_require__(8);
 	  var bearBuilder = __webpack_require__(9);
 	  var renderer = __webpack_require__(10);
+	  var gui = __webpack_require__(11);
 	  var stats;
 	  var width;
 	  var entities = [];
@@ -107,6 +108,9 @@
 	    height = canvasElement.height;
 	
 	    renderer.initialize(canvasElement);
+	    gui.initialize(canvasElement);
+	    gui.setConsumeAll(consumeAll);
+	
 	    stats = incomingStats;
 	    stats.initialize();
 	
@@ -153,6 +157,12 @@
 	
 	  function compareEntities(a, b) {
 	    return a.getY() - b.getY();
+	  }
+	
+	  function consumeAll() {
+	    entities = entities.filter(e => {
+	      return e.isPerson ? false : true;
+	    });
 	  }
 	
 	  function updateGameState() {
@@ -17958,6 +17968,29 @@
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	(function() {
+	  var consumeAll = () => { console.log('No consume function registered'); };
+	
+	  function setConsumeAll(consumeFn) {
+	    consumeAll = consumeFn;
+	  }
+	
+	  function initialize() {
+	    document.getElementById('consume-all-button')
+	            .addEventListener('click', (e) => consumeAll(e));
+	  }
+	
+	  module.exports = {
+	    initialize: initialize,
+	    setConsumeAll: setConsumeAll
+	  };
+	})();
+
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	(function() {
