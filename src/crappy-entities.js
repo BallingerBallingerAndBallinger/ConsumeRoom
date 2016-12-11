@@ -8,20 +8,12 @@
   var renderer = require('./rendering.js');
   var gui = require('./crappy-gui.js');
   var gameState = require('./crappy-state.js');
-  var stats;
-  var width;
   var entities = [];
 
-  function initialize(canvasElement, incomingStats) {
-    width = canvasElement.width;
-    height = canvasElement.height;
-
+  function initialize(canvasElement) {
     renderer.initialize(canvasElement);
     gui.initialize(canvasElement);
     gui.setConsumeAll(consumeAll);
-
-    stats = incomingStats;
-    stats.initialize();
 
     var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
     var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
@@ -61,7 +53,8 @@
     if (Math.random() < 0.01) {
       introducePartygoer();
     }
-    updateGameState();
+    gameState.fondleEntities(entities);
+
     renderer.clear();
     entities.sort(compareEntities);
     entities.forEach(e => e.update(timestamp, delta));
@@ -77,11 +70,6 @@
       return e.isPerson ? false : true;
     });
     gameState.bankHappiness(originalCount - entities.length);
-  }
-
-  function updateGameState() {
-    gameState.fondleEntities(entities);
-    stats.draw(gameState);
   }
 
   function introducePartygoer() {

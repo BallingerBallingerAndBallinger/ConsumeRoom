@@ -50,10 +50,12 @@
 	
 	  var entities = __webpack_require__(1);
 	  var stats = __webpack_require__(13);
+	  var gameState = __webpack_require__(12);
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
-	    entities.initialize(canvasElement, stats);
+	    entities.initialize(canvasElement);
+	    stats.initialize();
 	    requestAnimationFrame(grandLoop);
 	  };
 	
@@ -67,6 +69,7 @@
 	    if (delta < 50) return;
 	    updateDelta(timestamp);
 	    entities.update(timestamp, delta);
+	    stats.draw(gameState);
 	  }
 	
 	  var last;
@@ -99,20 +102,12 @@
 	  var renderer = __webpack_require__(10);
 	  var gui = __webpack_require__(11);
 	  var gameState = __webpack_require__(12);
-	  var stats;
-	  var width;
 	  var entities = [];
 	
-	  function initialize(canvasElement, incomingStats) {
-	    width = canvasElement.width;
-	    height = canvasElement.height;
-	
+	  function initialize(canvasElement) {
 	    renderer.initialize(canvasElement);
 	    gui.initialize(canvasElement);
 	    gui.setConsumeAll(consumeAll);
-	
-	    stats = incomingStats;
-	    stats.initialize();
 	
 	    var bloon = bloonBuilder.initialize(renderer, logMove, checkMovement);
 	    var bear = bearBuilder.initialize(renderer, logMove, checkMovement);
@@ -152,7 +147,8 @@
 	    if (Math.random() < 0.01) {
 	      introducePartygoer();
 	    }
-	    updateGameState();
+	    gameState.fondleEntities(entities);
+	
 	    renderer.clear();
 	    entities.sort(compareEntities);
 	    entities.forEach(e => e.update(timestamp, delta));
@@ -168,11 +164,6 @@
 	      return e.isPerson ? false : true;
 	    });
 	    gameState.bankHappiness(originalCount - entities.length);
-	  }
-	
-	  function updateGameState() {
-	    gameState.fondleEntities(entities);
-	    stats.draw(gameState);
 	  }
 	
 	  function introducePartygoer() {
@@ -17972,13 +17963,14 @@
 	  var happiness = 0;
 	  var peopleCount = 0;
 	  var enticementCount = 0;
+	  var enticingness = 0;
 	
 	  var banked = 0;
 	
 	  function fondleEntities(entities) {
-	    happiness = entities.map(e => {
+	    enticingness = entities.map(e => {
 	      return e.getHappiness ? e.getHappiness() : 0;
-	    }).reduce((acc, val) => acc + val, 0) + banked;
+	    }).reduce((acc, val) => acc + val, 0);
 	
 	    peopleCount = entities.filter(e => {
 	      return e.isPerson ? true : false;
@@ -17994,9 +17986,10 @@
 	  }
 	
 	  module.exports = {
-	    getHappiness: () => happiness,
+	    getHappiness: () => banked,
 	    getPeopleCount: () => peopleCount,
 	    getEnticementCount: () => enticementCount,
+	    getEnticingness: () => enticingness,
 	    fondleEntities: fondleEntities,
 	    bankHappiness: bankHappiness
 	  };

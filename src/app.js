@@ -4,10 +4,12 @@
 
   var entities = require('./crappy-entities.js');
   var stats = require('./crappy-stats.js');
+  var gameState = require('./crappy-state.js');
 
   window.onload = () => {
     var canvasElement = document.getElementById('canvas');
-    entities.initialize(canvasElement, stats);
+    entities.initialize(canvasElement);
+    stats.initialize();
     requestAnimationFrame(grandLoop);
   };
 
@@ -21,6 +23,7 @@
     if (delta < 50) return;
     updateDelta(timestamp);
     entities.update(timestamp, delta);
+    stats.draw(gameState);
   }
 
   var last;
