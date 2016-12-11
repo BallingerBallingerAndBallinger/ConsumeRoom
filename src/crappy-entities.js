@@ -2,6 +2,7 @@
   var _ = require('lodash');
   var bloonBuilder = require('./entities/bloon.js');
   var roomBuilder = require('./entities/room.js');
+  var girl1Builder = require('./entities/girl1.js');
   var goerBuilder = require('./entities/party-goer.js');
   var doorBuilder = require('./entities/door.js');
   var bearBuilder = require('./entities/bear.js');
@@ -75,11 +76,19 @@
       return e.isPerson ? false : true;
     });
     gameState.bankHappiness(originalCount - entities.length);
-    renderer.audio('eat')
+    renderer.stopAudio('sound');
+    renderer.audio('eat');
+    setTimeout(() => renderer.audio('sound'), config.eatSoundTime);
   }
 
   function introducePartygoer() {
-    var goer = goerBuilder.initialize(renderer, logMove, checkMovement);
+    var goer;
+    if (Math.random > 0.5) {
+      goer = goerBuilder.initialize(renderer, logMove, checkMovement);
+    } else {
+      goer = girl1Builder.initialize(renderer, logMove, checkMovement);
+    }
+
     goer.setX(1);
     goer.setY(0);
     entities.push(goer);

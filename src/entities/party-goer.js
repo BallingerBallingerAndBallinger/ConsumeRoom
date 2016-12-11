@@ -7,10 +7,9 @@
       var render = renderer;
 
       var self = entity.getSelf();
-      self.name = 'girl1';
-      self.x = Math.random();
-      self.y = Math.random();
+      self.name = 'crappy-party-dude';
       self.size = 400;
+
       var goer = Object.assign({}, entity);
       goer.update = update;
       goer.setX = setX;

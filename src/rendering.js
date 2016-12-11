@@ -200,6 +200,12 @@
     sound.play();
   }
 
+  function stopAudio(audioId) {
+    var sound = document.getElementById(audioId);
+    sound.pause();
+    sound.currentTime = 0;
+  }
+
   // ----------------------------------------------------------------------------
   // Render the current path
   //
@@ -240,6 +246,7 @@
     image: image,
     video: video,
     audio: audio,
+    stopAudio: stopAudio,
     getWidth: getWidth,
     getHeight: getHeight
   };
