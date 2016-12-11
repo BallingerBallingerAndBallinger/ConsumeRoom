@@ -21,6 +21,11 @@
   function drawFrame(timestamp) {
     var delta = getDelta(timestamp);
     if (delta < 50) return;
+
+
+    if (Math.random() < 0.001) {
+      gameState.bankHappiness(-1);
+    }
     updateDelta(timestamp);
     entities.update(timestamp, delta);
     stats.draw(gameState);

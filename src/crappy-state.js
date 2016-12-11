@@ -1,10 +1,9 @@
 (() => {
-  var happiness = 0;
   var peopleCount = 0;
   var enticementCount = 0;
   var enticingness = 0;
 
-  var banked = 0;
+  var banked = 10;
 
   function fondleEntities(entities) {
     enticingness = entities.map(e => {

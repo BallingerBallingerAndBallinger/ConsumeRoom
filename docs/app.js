@@ -67,6 +67,11 @@
 	  function drawFrame(timestamp) {
 	    var delta = getDelta(timestamp);
 	    if (delta < 50) return;
+	
+	
+	    if (Math.random() < 0.001) {
+	      gameState.bankHappiness(-1);
+	    }
 	    updateDelta(timestamp);
 	    entities.update(timestamp, delta);
 	    stats.draw(gameState);
@@ -17960,12 +17965,11 @@
 /***/ function(module, exports) {
 
 	(() => {
-	  var happiness = 0;
 	  var peopleCount = 0;
 	  var enticementCount = 0;
 	  var enticingness = 0;
 	
-	  var banked = 0;
+	  var banked = 10;
 	
 	  function fondleEntities(entities) {
 	    enticingness = entities.map(e => {
