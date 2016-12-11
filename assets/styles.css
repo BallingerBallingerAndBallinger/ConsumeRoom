@@ -57,6 +57,107 @@ stats {
   font-size: 45px;
 }
 
+.enticement-view {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  
+
+  align-self: center;
+
+  z-index: 3;
+
+  border-radius: 4px;
+  color: white;
+  background-color: rgba(255,255,255,1);
+
+}
+
+.enticement-container{
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+
+    width: 100%;
+
+    justify-content: space-around;
+
+
+}
+
+.description-area{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    background-color: rgba(0,0,0, .2);
+}
+
+.description-area-text{
+    min-height: 32px;
+}
+
+.modal-header{
+    display: flex;
+    justify-content: space-between;
+
+    align-items: center;
+
+    width: 100%;
+}
+
+.close-icon{
+    height: 24px;
+    width: 24px;
+
+    flex-basis: auto;
+}
+
+.close-icon:hover{
+    opacity: .7;
+}
+
+.enticement{
+    display: flex;
+    flex-direction: column;
+
+    height: 128px;
+    width: 160px;
+
+    border-radius: 4px;
+
+    background-color: rgba(128,0,0,1);
+}
+
+.enticement:hover, .enticement:active{
+    background-color: rgba(128,0,0,.9);
+    -webkit-box-shadow: 0 8px 6px -4px black;
+    -moz-box-shadow: 0 8px 6px -4px black;
+    box-shadow: 0 8px 6px -4px black;
+}
+
+.enticement-item-container{
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    height: 50%;
+    width: 100%;
+
+    border-radius: 4px;
+    
+
+    background-color: white;
+}
+
+.enticement-item-icon{
+    height: 48px;
+    width: 48px;
+}
+
 .hidden {
   display: none;
 }
@@ -69,7 +170,7 @@ stats {
     display: flex;
     flex-direction: row;
 
-    align-items: flex-end;
+    justify-content: center;
     height:100%;
     background: black;
 }
@@ -79,6 +180,7 @@ stats {
     align-self: flex-start;
 
     position: fixed;
+    left: 0;
     z-index: 2;
     
 
@@ -206,3 +308,16 @@ stats {
 .height-spacer{
     height:16px;
 }
+
+.dark-text{
+    color: black;
+}
+
+.light-text{
+    color: white;
+}
+
+.align-self-end{
+    align-self: flex-end;
+}
+
