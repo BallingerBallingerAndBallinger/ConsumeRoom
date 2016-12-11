@@ -49,10 +49,10 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(17);
-	  var gui = __webpack_require__(18);
-	  var gameState = __webpack_require__(14);
-	  var config = __webpack_require__(12);
+	  var stats = __webpack_require__(18);
+	  var gui = __webpack_require__(19);
+	  var gameState = __webpack_require__(15);
+	  var config = __webpack_require__(13);
 	
 	  var paused = false;
 	
@@ -115,16 +115,16 @@
 	  var _ = __webpack_require__(2);
 	  var bloonBuilder = __webpack_require__(4);
 	  var roomBuilder = __webpack_require__(6);
-	  var girl1Builder = __webpack_require__(7);
-	  var goerBuilder = __webpack_require__(8);
-	  var doorBuilder = __webpack_require__(9);
-	  var windowBuilder = __webpack_require__(10);
+	  var doorBuilder = __webpack_require__(7);
+	  var windowBuilder = __webpack_require__(8);
 	  var bearBuilder = __webpack_require__(11);
-	  var config = __webpack_require__(12);
-	  var renderer = __webpack_require__(13);
-	  var gameState = __webpack_require__(14);
-	  var click = __webpack_require__(15);
-	  var movementHandler = __webpack_require__(16);
+	  var dude1Builder = __webpack_require__(12);
+	  var girl1Builder = __webpack_require__(9);
+	  var config = __webpack_require__(13);
+	  var renderer = __webpack_require__(14);
+	  var gameState = __webpack_require__(15);
+	  var click = __webpack_require__(16);
+	  var movementHandler = __webpack_require__(17);
 	  var entities = [];
 	  var eating;
 	  var room;
@@ -214,12 +214,13 @@
 	  }
 	
 	  function introducePartygoer() {
-	    var goer;
-	    if (Math.random() < 0.5) {
-	      goer = goerBuilder.initialize(renderer, movementHandler);
-	    } else {
-	      goer = girl1Builder.initialize(renderer, movementHandler);
-	    }
+	    var goerBuilders = [
+	      () => { return dude1Builder.initialize(renderer, movementHandler); },
+	      () => { return girl1Builder.initialize(renderer, movementHandler); }
+	    ];
+	
+	    var selection = Math.floor(Math.random() * goerBuilders.length);
+	    var goer = goerBuilders[selection]();
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
@@ -17432,77 +17433,24 @@
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
 	      var steps = 0;
-	      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
 	      var goalCallback;
+	
 	      return {
 	        update: update,
-	        setGoal: setGoal,
+	        // Getters and setters
 	        getSelf: getSelf,
+	        setX: setX,
+	        setY: setY,
+	        getX: getX,
+	        getY: getY,
 	        getRenderX: getRenderX,
 	        getRenderY: getRenderY,
 	        getRenderHeight: getRenderHeight,
-	        getScreenBoundingRect: getScreenBoundingRect,
-	        setStepsGenerator: setStepsGenerator
+	        getScreenBoundingRect: getScreenBoundingRect
 	      };
 	
 	      function update(timestamp, delta) {
-	        moveTowardGoal();
-	      }
 	
-	      function setGoal(x, y, callback) {
-	        goalCallback = callback;
-	        if (x !== undefined && y !== undefined) {
-	          self.gx = x;
-	          self.gy = y;
-	        } else {
-	          while (true) {
-	            // Set distance
-	            var distance = Math.random() / 3;
-	            // Set a goal
-	            var angle = Math.random() * Math.PI * 2;
-	
-	            self.gx = self.x + Math.sin(angle) * distance;
-	            self.gy = self.y + Math.cos(angle) * distance;
-	
-	            if (movementHandler.check(self.gx, self.gy)) {
-	              break;
-	            }
-	          }
-	        }
-	
-	        // Set steps
-	        steps = stepsGenerator();
-	        console.log("Moving in " + steps + "steps");
-	
-	        // Set speed
-	        // var speed = distance / steps;
-	        self.vx = (self.gx - self.x) / steps;
-	        self.vy = (self.gy - self.y) / steps;
-	      }
-	
-	      function setStepsGenerator(newGenerator) {
-	        stepsGenerator = newGenerator;
-	      }
-	
-	      function moveTowardGoal() {
-	        if (steps <= 0) {
-	          if (goalCallback) {
-	            var cb = goalCallback;
-	            goalCallback = undefined;
-	            cb();
-	          } else {
-	            setGoal();
-	          }
-	        }
-	
-	        var newx = self.x + self.vx;
-	        var newy = self.y + self.vy;
-	        var toMove = movementHandler.check(newx, newy);
-	        if (toMove === true) {
-	          self.x = newx;
-	          self.y = newy;
-	        }
-	        steps--;
 	      }
 	
 	      function getSelf() {
@@ -17534,6 +17482,22 @@
 	          top: getRenderY(),
 	          bottom: getRenderY() + getRenderHeight()
 	        };
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+	
+	      function setY(newY) {
+	        self.y = newY;
 	      }
 	    };
 	    return initializer();
@@ -17616,108 +17580,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(8);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var self = entity.getSelf();
-	      self.name = 'girl1';
-	      if (Math.random() < 0.5) {
-	        self.name = 'girl2';
-	      }
-	      self.size = 400;
-	
-	      var goer = Object.assign({}, entity);
-	      goer.update = update;
-	      return goer;
-	
-	      function update(timestamp, delta) {
-	        draw(timestamp, delta);
-	        entity.update(timestamp, delta);
-	      }
-	
-	      function draw(timestamp, delta) {
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(5);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var self = entity.getSelf();
-	      self.name = 'crappy-party-dude';
-	      self.size = 400;
-	
-	      var goer = Object.assign({}, entity);
-	      goer.update = update;
-	      goer.draw = draw;
-	      goer.setX = setX;
-	      goer.setY = setY;
-	      goer.getX = getX;
-	      goer.getY = getY;
-	      goer.isPerson = true;
-	      return goer;
-	
-	      function update(timestamp, delta) {
-	        entity.update(timestamp, delta);
-	        draw(timestamp, delta);
-	      }
-	
-	      function draw(timestamp, delta) {
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
-	      }
-	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function setX(newX) {
-	        self.x = newX;
-	      }
-	
-	      function setY(newY) {
-	        self.y = newY;
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
 	  var entityBase = __webpack_require__(5);
 	
 	  function initialize(renderer, movementHandler) {
@@ -17760,12 +17622,12 @@
 
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var partyGoer = __webpack_require__(7);
+	  var partyGoer = __webpack_require__(9);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17816,6 +17678,150 @@
 	            pacer.setGoal(0, -0.03, reverseGoal);
 	          }
 	        }
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(10);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'girl1';
+	      if (Math.random() < 0.5) {
+	        self.name = 'girl2';
+	      }
+	      self.size = 400;
+	
+	      var goer = Object.assign({}, entity);
+	      goer.update = update;
+	      return goer;
+	
+	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
+	        entity.update(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	      var steps = 0;
+	      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
+	      var goalCallback;
+	
+	      var self = entity.getSelf();
+	      self.name = 'crappy-party-dude';
+	      self.size = 400;
+	
+	      var goer = Object.assign({}, entity);
+	      goer.update = update;
+	      goer.draw = draw;
+	      goer.setGoal = setGoal;
+	      goer.isPerson = true;
+	      goer.setStepsGenerator = setStepsGenerator;
+	      return goer;
+	
+	      function update(timestamp, delta) {
+	        entity.update(timestamp, delta);
+	        moveTowardGoal();
+	        draw(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
+	      }
+	
+	      function setGoal(x, y, callback) {
+	        goalCallback = callback;
+	        if (x !== undefined && y !== undefined) {
+	          self.gx = x;
+	          self.gy = y;
+	        } else {
+	          while (true) {
+	            // Set distance
+	            var distance = Math.random() / 3;
+	            // Set a goal
+	            var angle = Math.random() * Math.PI * 2;
+	
+	            self.gx = self.x + Math.sin(angle) * distance;
+	            self.gy = self.y + Math.cos(angle) * distance;
+	
+	            if (movementHandler.check(self.gx, self.gy)) {
+	              break;
+	            }
+	          }
+	        }
+	
+	        // Set steps
+	        steps = stepsGenerator();
+	
+	        // Set speed
+	        // var speed = distance / steps;
+	        self.vx = (self.gx - self.x) / steps;
+	        self.vy = (self.gy - self.y) / steps;
+	      }
+	
+	      function setStepsGenerator(newGenerator) {
+	        stepsGenerator = newGenerator;
+	      }
+	
+	      function moveTowardGoal() {
+	        if (steps <= 0) {
+	          if (goalCallback) {
+	            // Now the callback can set a new goal
+	            var cb = goalCallback;
+	            goalCallback = undefined;
+	            cb();
+	          } else {
+	            setGoal();
+	          }
+	        }
+	
+	        var newx = self.x + self.vx;
+	        var newy = self.y + self.vy;
+	        var toMove = movementHandler.check(newx, newy);
+	        if (toMove === true) {
+	          self.x = newx;
+	          self.y = newy;
+	        }
+	        steps--;
 	      }
 	    };
 	
@@ -17930,6 +17936,44 @@
 
 /***/ },
 /* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(10);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'crappy-party-dude';
+	      self.size = 400;
+	
+	      var goer = Object.assign({}, entity);
+	      goer.update = update;
+	      return goer;
+	
+	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
+	        entity.update(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 13 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -17943,7 +17987,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18209,7 +18253,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18249,7 +18293,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18276,7 +18320,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18308,7 +18352,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18342,7 +18386,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	(function() {

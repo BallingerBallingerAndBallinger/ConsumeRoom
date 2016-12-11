@@ -5,6 +5,9 @@
     var constructor = () => {
       var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
+      var steps = 0;
+      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
+      var goalCallback;
 
       var self = entity.getSelf();
       self.name = 'crappy-party-dude';
@@ -13,15 +16,14 @@
       var goer = Object.assign({}, entity);
       goer.update = update;
       goer.draw = draw;
-      goer.setX = setX;
-      goer.setY = setY;
-      goer.getX = getX;
-      goer.getY = getY;
+      goer.setGoal = setGoal;
       goer.isPerson = true;
+      goer.setStepsGenerator = setStepsGenerator;
       return goer;
 
       function update(timestamp, delta) {
         entity.update(timestamp, delta);
+        moveTowardGoal();
         draw(timestamp, delta);
       }
 
@@ -29,20 +31,60 @@
         render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 
-      function getX() {
-        return self.x;
+      function setGoal(x, y, callback) {
+        goalCallback = callback;
+        if (x !== undefined && y !== undefined) {
+          self.gx = x;
+          self.gy = y;
+        } else {
+          while (true) {
+            // Set distance
+            var distance = Math.random() / 3;
+            // Set a goal
+            var angle = Math.random() * Math.PI * 2;
+
+            self.gx = self.x + Math.sin(angle) * distance;
+            self.gy = self.y + Math.cos(angle) * distance;
+
+            if (movementHandler.check(self.gx, self.gy)) {
+              break;
+            }
+          }
+        }
+
+        // Set steps
+        steps = stepsGenerator();
+
+        // Set speed
+        // var speed = distance / steps;
+        self.vx = (self.gx - self.x) / steps;
+        self.vy = (self.gy - self.y) / steps;
       }
 
-      function getY() {
-        return self.y;
+      function setStepsGenerator(newGenerator) {
+        stepsGenerator = newGenerator;
       }
 
-      function setX(newX) {
-        self.x = newX;
-      }
+      function moveTowardGoal() {
+        if (steps <= 0) {
+          if (goalCallback) {
+            // Now the callback can set a new goal
+            var cb = goalCallback;
+            goalCallback = undefined;
+            cb();
+          } else {
+            setGoal();
+          }
+        }
 
-      function setY(newY) {
-        self.y = newY;
+        var newx = self.x + self.vx;
+        var newy = self.y + self.vy;
+        var toMove = movementHandler.check(newx, newy);
+        if (toMove === true) {
+          self.x = newx;
+          self.y = newy;
+        }
+        steps--;
       }
     };
 
