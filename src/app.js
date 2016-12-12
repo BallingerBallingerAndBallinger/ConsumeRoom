@@ -75,6 +75,7 @@
   function gameOver() {
     stopped = true;
     entities.gameOver();
+    gui.showShop(false);
     views.show('game-over-view');
   }
 
