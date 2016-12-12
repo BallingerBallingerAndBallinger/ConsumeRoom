@@ -32,6 +32,8 @@ stats {
 #room-happiness {
     font-style: sans-serif;
     margin: 0;
+    font-size: 90px;
+    text-align: center;
 }
 
 .stat-label {
@@ -413,11 +415,16 @@ text-shadow: 0 2px 2px black;
 }
 
 .menu-container{
-    padding-right: 20%;
+    margin-right:auto;
     margin-left: 4%; 
 }
 
 .flex-container-right{
     display: flex;
     justify-content: flex-end;
+}
+
+.paragraph-title-screen{
+    margin-right: 25%;
+
 }

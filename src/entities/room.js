@@ -1,9 +1,11 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
+  var doorBuilder = require('./door.js');
 
   function initialize(renderer, movementHandler) {
     var constructor = () => {
       var entity = entityBase.initialize(renderer, movementHandler);
+      var door = doorBuilder.initialize(renderer);
       var render = renderer;
 
       var self = { name: 'floor-closed', x: 0, y: -1 };
@@ -31,6 +33,8 @@
         } else {
           render.image(self.x, 500, 'floor-closed', 1000, 500);
         }
+
+        door.update(timestamp, delta);
       }
 
       function getX() {
@@ -47,6 +51,7 @@
 
       function setEating(newEating) {
         eating = newEating;
+        door.setClosed(newEating);
       }
     };
 

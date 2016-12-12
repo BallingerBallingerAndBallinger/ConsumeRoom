@@ -5,6 +5,7 @@
     var constructor = () => {
       var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
+      var closed = false;
       var self = { name: door, y: -1 };
 
       var door = Object.assign({}, entity);
@@ -12,10 +13,19 @@
       door.getX = getX;
       door.getY = getY;
       door.getZ = getZ;
+      door.setClosed = setClosed;
       return door;
 
+      function setClosed(newClosed) {
+        closed = newClosed;
+      }
+
       function update(timestamp, delta) {
-        render.image(830, 300, 'door', 55, 400);
+        if (closed) {
+          render.image(630, 353, 'closed-door', 80, 148);
+        } else {
+          render.image(710, 350, 'open-door', 55, '');
+        }
       }
 
       function getX() {

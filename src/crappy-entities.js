@@ -6,7 +6,6 @@
   var bearBuilder = require('./entities/items/bear.js');
   var plantBuilder = require('./entities/items/plant.js');
   var roomBuilder = require('./entities/room.js');
-  var doorBuilder = require('./entities/door.js');
   var windowBuilder = require('./entities/window.js');
   //
   var party = require('./crappy-party.js');
