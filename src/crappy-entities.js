@@ -16,9 +16,15 @@
   var eating;
   var room;
   var clickEvent;
+  var timeout;
 
   function initialize(canvasElement) {
+    if (timeout) clearTimeout(timeout);
+    eating = false;
+
     renderer.initialize(canvasElement);
+    renderer.audio('sound');
+
     movementHandler.initialize();
     click.initialize(canvasElement);
     click.register((e) => { clickEvent = e; });
@@ -85,15 +91,17 @@
       }
     }));
 
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       entities = _.difference(entities, people);
       gameState.bankHappiness(originalCount - entities.length);
       renderer.audio('sound');
       eating = false;
+      timeout = undefined;
     }, config.eatSoundTime);
   }
 
   function addBear() {
+    if (gameState.getHappiness() <= 0) return;
     var bear = discoBuilder.initialize(renderer, movementHandler);
     bear.setY(Math.random());
     entities.push(bear);
