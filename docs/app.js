@@ -49,11 +49,11 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(21);
-	  var gui = __webpack_require__(22);
-	  var views = __webpack_require__(24);
-	  var gameState = __webpack_require__(17);
-	  var config = __webpack_require__(6);
+	  var stats = __webpack_require__(22);
+	  var gui = __webpack_require__(23);
+	  var views = __webpack_require__(25);
+	  var gameState = __webpack_require__(18);
+	  var config = __webpack_require__(7);
 	
 	  var paused = false;
 	  var stopped = true;
@@ -161,22 +161,26 @@
 	  var _ = __webpack_require__(2);
 	  // Builders
 	  var bloonBuilder = __webpack_require__(4);
-	  var discoBuilder = __webpack_require__(7);
-	  var bearBuilder = __webpack_require__(8);
-	  var plantBuilder = __webpack_require__(9);
-	  var roomBuilder = __webpack_require__(10);
-	  var windowBuilder = __webpack_require__(12);
+	  var discoBuilder = __webpack_require__(8);
+	  var bearBuilder = __webpack_require__(9);
+	  var plantBuilder = __webpack_require__(10);
+	  var roomBuilder = __webpack_require__(11);
+	  var windowBuilder = __webpack_require__(13);
 	  //
-	  var party = __webpack_require__(13);
-	  var config = __webpack_require__(6);
-	  var renderer = __webpack_require__(18);
-	  var gameState = __webpack_require__(17);
-	  var click = __webpack_require__(19);
-	  var movementHandler = __webpack_require__(20);
+	  var party = __webpack_require__(14);
+	  var config = __webpack_require__(7);
+	  var renderer = __webpack_require__(19);
+	  var gameState = __webpack_require__(18);
+	  var click = __webpack_require__(20);
+	  var movementHandler = __webpack_require__(21);
 	  var entities = [];
 	  var eating;
 	  var room;
 	  var clickEvent;
+	  var dragStartEvent;
+	  var dragEndEvent;
+	  var dragEvent;
+	  var draggedEntity;
 	  var timeout;
 	
 	  function initialize(canvasElement) {
@@ -186,6 +190,10 @@
 	    movementHandler.initialize();
 	    click.initialize(canvasElement);
 	    click.register((e) => { clickEvent = e; });
+	
+	    canvasElement.addEventListener('mousedown', e => { dragStartEvent = e; });
+	    canvasElement.addEventListener('mouseup', e => { dragEndEvent = e; });
+	    canvasElement.addEventListener('mousemove', e => { dragEvent = e; });
 	
 	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
 	    bloon.setGetHappiness(() => 0);
@@ -215,12 +223,43 @@
 	    gameState.fondleEntities(entities);
 	    renderer.clear();
 	    entities.sort(compareEntities);
-	    if (clickEvent) {
-	      var coords = renderer.transformEventToCoords(clickEvent);
+	
+	    var coords;
+	    var entity;
+	    if (dragStartEvent) {
+	      coords = renderer.transformEventToCoords(dragStartEvent);
 	      for (var i = entities.length - 1; i >= 0; i--) {
-	        var entity = entities[i];
+	        entity = entities[i];
+	        if (entity.handleDrag) {
+	          if (entity.handleDragStart(coords.x, coords.y)) {
+	            draggedEntity = entity;
+	            break;
+	          }
+	        }
+	      }
+	      dragStartEvent = undefined;
+	      dragEvent = undefined;
+	      dragEndEvent = undefined;
+	    }
+	    if (dragEvent && draggedEntity) {
+	      coords = renderer.transformEventToCoords(dragEvent);
+	      draggedEntity.handleDrag(coords.x, coords.y);
+	      dragEvent = undefined;
+	    }
+	    if (dragEndEvent && draggedEntity) {
+	      draggedEntity.handleDragEnd;
+	      draggedEntity = undefined;
+	      dragEndEvent = undefined;
+	    }
+	
+	    if (clickEvent) {
+	      coords = renderer.transformEventToCoords(clickEvent);
+	      for (var i = entities.length - 1; i >= 0; i--) {
+	        entity = entities[i];
 	        if (entity.handleClick) {
-	          if (entity.handleClick(coords.x, coords.y)) break;
+	          if (entity.handleClick(coords.x, coords.y)) {
+	            break;
+	          }
 	        }
 	      }
 	      clickEvent = undefined;
@@ -357,7 +396,7 @@
 	  var undefined;
 	
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 	
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3401,7 +3440,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = 0,
 	          length = path.length;
@@ -3587,9 +3626,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 	
@@ -4150,7 +4192,7 @@
 	            value = baseGet(object, path);
 	
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4226,8 +4268,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+	
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4348,7 +4399,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -4689,9 +4740,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+	
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 	
 	    /**
@@ -4831,14 +4884,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 	
 	    /**
@@ -6463,7 +6512,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -6940,7 +6989,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 	
 	    /**
@@ -7080,6 +7129,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+	
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9814,10 +9865,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 	
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11185,10 +11238,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 	
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13804,16 +13861,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13863,7 +13913,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 	
 	    /**
@@ -13885,16 +13935,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 	
 	    /**
@@ -13927,15 +13968,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length;
 	
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16445,7 +16486,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 	
 	    /**
@@ -17433,7 +17474,7 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var configuration = __webpack_require__(6);
+	  var configuration = __webpack_require__(7);
 	
 	  var velocity = 0.00001;
 	
@@ -17496,6 +17537,80 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	(() => {
+	  var entityBase = __webpack_require__(6);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	
+	      var item = Object.assign({}, entity);
+	      item.isEnticement = true;
+	      item.update = update;
+	      item.handleDragStart = handleDragStart;
+	      item.handleDrag = handleDrag;
+	      item.handleDragEnd = handleDragEnd;
+	      return item;
+	
+	      function update(timestamp, delta) {
+	        entity.update(timestamp, delta);
+	      }
+	
+	      function handleDragStart(x, y) {
+	        var bounds = entity.getScreenBoundingRect();
+	        if (bounds.left < x &&
+	            bounds.right > x &&
+	            bounds.top < y &&
+	            bounds.bottom > y) {
+	          return true;
+	        }
+	        return false;
+	      }
+	
+	      function handleDrag(x, y) {
+	        if (entity.getRenderX() > x)
+	          self.x -= 0.01;
+	        if (entity.getRenderX() < x)
+	          self.x += 0.01;
+	        if (entity.getRenderY() > y)
+	          self.y -= 0.01;
+	        if (entity.getRenderY() < y)
+	          self.y += 0.01;
+	
+	        if (self.x > 1) {
+	          self.x = 1;
+	        }
+	        if (self.x < 0) {
+	          self.x = 0;
+	        }
+	        if (self.y > 1) {
+	          self.y = 1;
+	        }
+	        if (self.y < 0) {
+	          self.y = 0;
+	        }
+	      }
+	
+	      function handleDragEnd() {
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
 	(function() {
 	  // Includes
 	  var _ = __webpack_require__(2);
@@ -17514,6 +17629,8 @@
 	        getY: getY,
 	        getRenderX: getRenderX,
 	        getRenderY: getRenderY,
+	        getSelfY: getSelfY,
+	        getSelfX: getSelfX,
 	        getRenderHeight: getRenderHeight,
 	        getScreenBoundingRect: getScreenBoundingRect
 	      };
@@ -17526,14 +17643,19 @@
 	        return self;
 	      }
 	
+	      function getSelfY(renderX, renderY) {
+	        var renderHeight = getRenderHeight();
+	        return ((renderY / renderHeight) + -0.5 + 1 + -(1 / 10)) / (0.8 * 0.5);
+	      }
+	
+	      function getSelfX(renderX, renderY) {
+	        return (((renderX - 0.5) * 2) / (0.5 * self.y + 0.5)) + 1;
+	      }
+	
 	      function getRenderX() {
 	        var squeezeFactor = (self.y / 2 + 0.5);
 	        var squeezed = (self.x - 0.5) * squeezeFactor + 0.5;
 	        return squeezed * renderer.getWidth() - 40;
-	      }
-	
-	      function getRenderHeight() {
-	        return ((self.y * 0.5555) + 0.3333) * self.size;
 	      }
 	
 	      function getRenderY() {
@@ -17542,6 +17664,10 @@
 	        renderY = renderY - renderHeight;
 	        renderY = renderY + (renderHeight / 10);
 	        return renderY;
+	      }
+	
+	      function getRenderHeight() {
+	        return ((self.y * 0.5555) + 0.3333) * self.size;
 	      }
 	
 	      function getScreenBoundingRect() {
@@ -17580,7 +17706,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -17615,12 +17741,12 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var configuration = __webpack_require__(6);
+	  var configuration = __webpack_require__(7);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17641,7 +17767,12 @@
 	      disco.update = update;
 	      disco.getHappiness = () => configuration.disco.happiness;
 	      disco.isEnticement = true;
+	      disco.handleDragStart = handleDragStart;
 	      return disco;
+	
+	      function handleDragStart(x, y) {
+	        return false;
+	      }
 	
 	      function update(timestamp, delta) {
 	        var renderHeight = entity.getRenderHeight();
@@ -17670,12 +17801,12 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var configuration = __webpack_require__(6);
+	  var configuration = __webpack_require__(7);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17746,12 +17877,12 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var configuration = __webpack_require__(6);
+	  var configuration = __webpack_require__(7);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17797,12 +17928,12 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(5);
-	  var doorBuilder = __webpack_require__(11);
+	  var entityBase = __webpack_require__(6);
+	  var doorBuilder = __webpack_require__(12);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17878,11 +18009,11 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(5);
+	  var entityBase = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17940,12 +18071,12 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(5);
-	  var party = __webpack_require__(13);
+	  var entityBase = __webpack_require__(6);
+	  var party = __webpack_require__(14);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18012,14 +18143,14 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var dude1Builder = __webpack_require__(14);
-	  var girl1Builder = __webpack_require__(16);
-	  var config = __webpack_require__(6);
-	  var gameState = __webpack_require__(17);
+	  var dude1Builder = __webpack_require__(15);
+	  var girl1Builder = __webpack_require__(17);
+	  var config = __webpack_require__(7);
+	  var gameState = __webpack_require__(18);
 	
 	  function rollGoer() {
 	    var roll = Math.random();
@@ -18068,11 +18199,11 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(15);
+	  var entityBase = __webpack_require__(16);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18101,11 +18232,11 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(5);
+	  var entityBase = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18221,11 +18352,11 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(15);
+	  var entityBase = __webpack_require__(16);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18262,7 +18393,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18309,7 +18440,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18581,7 +18712,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18612,7 +18743,7 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18644,7 +18775,7 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18681,12 +18812,12 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function() {
-	  var $ = __webpack_require__(23);
-	  var configuration = __webpack_require__(6);
+	  var $ = __webpack_require__(24);
+	  var configuration = __webpack_require__(7);
 	  var pause = () => { console.log('No pause function registered'); };
 	  var win = () => { console.log('No win function registered'); };
 	
@@ -18810,7 +18941,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18833,11 +18964,11 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var $ = __webpack_require__(23);
+	  var $ = __webpack_require__(24);
 	
 	  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view', 'win-view'];
 	  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button', 'continue-after-win-button'];
