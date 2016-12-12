@@ -10,7 +10,7 @@
       self.name = 'house-plant';
       self.x = Math.random();
       self.y = Math.random();
-      self.size = 150;
+      self.size = 350;
       var plant = Object.assign({}, entity);
 
       plant.update = update;
@@ -31,7 +31,7 @@
       }
 
       function update(timestamp, delta) {
-        render.image(entity.getRenderX(), entity.getRenderY(), self.name, entity.getRenderHeight());
+        render.image(entity.getRenderX(), entity.getRenderY(), self.name, '', entity.getRenderHeight());
       }
     };
 
