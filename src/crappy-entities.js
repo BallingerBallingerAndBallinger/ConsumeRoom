@@ -103,11 +103,29 @@
     }, config.eatSoundTime);
   }
 
+  function attemptPayment(amount) {
+    if (gameState.getHappiness() > amount) {
+      gameState.bankHappiness(-amount);
+      return true;
+    }
+
+    return false;
+  }
   function addBear() {
-    if (gameState.getHappiness() <= 0) return;
-    var bear = discoBuilder.initialize(renderer, movementHandler);
+    var bear = bearBuilder.initialize(renderer, movementHandler);
     entities.push(bear);
-    gameState.bankHappiness(-1);
+  }
+  function addDisco() {
+    var disco = discoBuilder.initialize(renderer, movementHandler);
+    entities.push(disco);
+  }
+  function addPlant() {
+    var plant = discoBuilder.initialize(renderer, movementHandler);
+    entities.push(plant);
+  }
+  function addBloon() {
+    var bloon = bloonBuilder.initialize(renderer, movementHandler);
+    entities.push(bloon);
   }
 
   function introducePartygoer() {
@@ -133,6 +151,10 @@
     gameOver: gameOver,
     consumeAll: consumeAll,
     addBear: addBear,
+    addDisco: addDisco,
+    addPlant: addPlant,
+    addBloon: addBloon,
+    attemptPayment: attemptPayment,
     update: update,
     initialize: initialize
   };
