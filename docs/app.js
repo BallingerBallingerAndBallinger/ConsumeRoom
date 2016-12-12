@@ -17812,6 +17812,7 @@
 	
 	      var self = { name: 'floor-closed', x: 0, y: -1 };
 	      var eating = false;
+	      var puckeringFactor = 1;
 	
 	      var room = Object.assign({}, entity);
 	      room.update = update;
@@ -17825,9 +17826,19 @@
 	        render.image(self.x, 200, 'room-base', 1000, '');
 	
 	        if (eating) {
-	          render.image(325, 600, 'floor-open', 350, '');
+	          puckeringFactor = Math.random() > 0.5 ? puckeringFactor + 0.01 : puckeringFactor - 0.01;
 	        } else {
-	          render.image(325, 600, 'floor-closed', 350, '');
+	          puckeringFactor = 1;
+	        }
+	
+	
+	        var width  = 350 * puckeringFactor;
+	        var height = 350 * puckeringFactor * (300 / 428);
+	
+	        if (eating) {
+	          render.image(500 - (width / 2), 750 - (height / 2), 'floor-open', width, height);
+	        } else {
+	          render.image(500 - (width / 2), 750 - (height / 2), 'floor-closed', width, height);
 	        }
 	
 	        door.update(timestamp, delta);
