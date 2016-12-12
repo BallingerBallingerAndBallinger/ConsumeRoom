@@ -5,38 +5,14 @@
   var entities;
 
   var enticementView;
-  var enticementBuy;
   var enticementDesc;
   var pausedView;
   var selectedItem;
-  var shopItems = [
-    { name: 'buy-plant',
-      description: 'Back when YOU were human, you remember vaugly enjoying house plants.',
-      action: addBear,
-      price: 5
-    },
-    { name: 'buy-bear',
-      description: 'Nothing says "This room is totally safe" like a cuddly teddy!',
-      action: addBear,
-      price: 10
-    },
-    { name: 'buy-disco',
-      description: 'It\'s not a party in your tummy without one of these.',
-      action: addBear,
-      price: 25
-    },
-    { name: 'buy-bloon',
-      description: 'The bloons aren\'t even really for the humans, are they?',
-      action: addBear,
-      price: 50
-    }];
+  var shopItems;
+  var shopShown = false;;
 
   function consumeAll() {
     entities.consumeAll();
-  }
-
-  function addBear() {
-    entities.addBear();
   }
 
   function setPause(pauseFn) {
@@ -54,6 +30,7 @@
   }
 
   function showShop(show) {
+    shopShown = show;
     if (show) {
       $.removeClass(enticementView, 'hidden');
     } else {
@@ -64,18 +41,46 @@
   function initialize(ents) {
     entities = ents;
 
+    shopItems = [
+      { name: 'buy-plant',
+        description: 'Back when YOU were human, you remember vaugly enjoying house plants.',
+        action: entities.addPlant,
+        price: 5
+      },
+      { name: 'buy-bear',
+        description: 'Nothing says "This room is totally safe" like a cuddly teddy!',
+        action: entities.addBear,
+        price: 10
+      },
+      { name: 'buy-disco',
+        description: 'It\'s not a party in your tummy without one of these.',
+        action: entities.addDisco,
+        price: 25
+      },
+      { name: 'buy-bloon',
+        description: 'The bloons aren\'t even really for the humans, are they?',
+        action: entities.addBloon,
+        price: 50
+      }];
+
     if (pausedView) return;
     document.getElementById('consume-all-button')
             .addEventListener('click', (e) => consumeAll(e));
     document.getElementById('pause-game-button')
             .addEventListener('click', (e) => pause());
     document.getElementById('purchase-enticement-button')
-            .addEventListener('click', (e) => showShop(true));
+            .addEventListener('click', (e) => showShop(!shopShown));
     document.getElementById('close-enticement-button')
             .addEventListener('click', (e) => showShop(false));
     document.getElementById('purchase-selected-enticement')
-            .addEventListener('click', (e) => selectedItem.action());
-
+            .addEventListener('click', (e) => {
+              if (entities.attemptPayment(selectedItem.price)) {
+                selectedItem.action();
+                showShop(false);
+              } else {
+                // Todo, add feedback
+              }
+            });
 
     pausedView = document.getElementById('paused-view');
     enticementView = document.getElementById('enticement-view');
@@ -84,7 +89,6 @@
     selectedItem = shopItems[0];
     $.addClass(document.getElementById(selectedItem.name), 'enticement-activated');
     enticementDesc.innerHTML = selectedItem.description;
-
 
     shopItems.forEach((item) => {
       item.element = document.getElementById(item.name);
