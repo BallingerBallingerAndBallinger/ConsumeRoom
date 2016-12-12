@@ -17720,20 +17720,20 @@
 	  entryDistance: 0.4,
 	  fullEntryProbability: 0.2,
 	  plant: {
-	    happiness: 5,
+	    happiness: 8,
 	    price: 5
 	  },
 	  bear: {
-	    happiness: 15,
+	    happiness: 40,
 	    price: 10
 	  },
 	  disco: {
-	    happiness: 50,
+	    happiness: 160,
 	    price: 25
 	  },
 	  bloon: {
-	    happiness: 200,
-	    price: 50
+	    happiness: 500,
+	    price: 100
 	  }
 	};
 
