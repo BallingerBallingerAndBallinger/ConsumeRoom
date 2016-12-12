@@ -17478,7 +17478,7 @@
 	      }
 	
 	      function getRenderHeight() {
-	        return ((self.y * 0.6666) + 0.3333) * self.size;
+	        return ((self.y * 0.5555) + 0.3333) * self.size;
 	      }
 	
 	      function getRenderY() {
