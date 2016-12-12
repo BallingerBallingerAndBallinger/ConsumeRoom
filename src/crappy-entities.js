@@ -116,7 +116,6 @@
     goer.setX(0.9);
     goer.setY(0);
     entities.push(goer);
-    console.log(goer.getSelf().name + ' has arrived!');
   }
 
   function partyGoerWantsToLeave() {
@@ -124,7 +123,6 @@
     var leaver = people[Math.floor(Math.random() * people.length)];
     if (leaver === undefined) return;
 
-    console.log(leaver.getSelf().name + ' is leaving!');
     leaver.setGoal(0.9, 0, () => {
       if (eating) return;
       entities = entities.filter(e => e !== leaver);

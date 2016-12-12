@@ -12,18 +12,17 @@
   }
 
   function show(id) {
-    views.map(v => $.addClass(v, 'hidden'));
-
     var idx = viewIds.indexOf(id);
-    if (idx < 0) return;
+
     views.map(v => $.addClass(v, 'hidden'));
+    if (idx < 0) return;
+
     $.removeClass(views[idx], 'hidden');
   }
 
   function wire(id, callback) {
     var idx = buttonIds.indexOf(id);
     if (idx < 0) return;
-
     buttons[idx].addEventListener('click', callback);
   }
 
