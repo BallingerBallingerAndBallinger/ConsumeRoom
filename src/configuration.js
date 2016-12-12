@@ -6,5 +6,6 @@ module.exports = {
   basePartyGoerProbability: 0.03,
   basePartyGoerLeavesProbability: 0.03,
   irresistableEnticingness: 10000,
-  packedHouse: 400
+  packedHouse: 400,
+  leaveAttempts: 15
 };
