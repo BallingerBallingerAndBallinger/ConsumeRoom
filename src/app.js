@@ -14,13 +14,18 @@
 
   window.onload = () => {
     views.initialize();
-    views.show('title-screen-view');
     views.wire('begin-game-button', quoteScreen);
+    views.wire('continue-button', startGame);
+    views.wire('start-over-button', start);
+    start();
   };
+
+  function start() {
+    views.show('title-screen-view');
+  }
 
   function quoteScreen() {
     views.show('quote-view');
-    views.wire('continue-button', startGame);
   }
 
   function startGame() {
@@ -67,12 +72,9 @@
   }
 
   function gameOver() {
-    gameState.initialize();
-    var canvasElement = document.getElementById('canvas');
-    entities.initialize(canvasElement);
-    stats.initialize();
-    gui.initialize(entities);
-    gui.setPause(pause);
+    stopped = true;
+    entities.gameOver();
+    views.show('game-over-view');
   }
 
   var last;

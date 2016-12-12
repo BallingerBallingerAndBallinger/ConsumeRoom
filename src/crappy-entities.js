@@ -72,6 +72,10 @@
     return a.getY() - b.getY();
   }
 
+  function gameOver() {
+    renderer.stopAudio('sound');
+  }
+
   function consumeAll() {
     if (eating) return;
     eating = true;
@@ -129,6 +133,7 @@
   }
 
   module.exports = {
+    gameOver: gameOver,
     consumeAll: consumeAll,
     addBear: addBear,
     update: update,
