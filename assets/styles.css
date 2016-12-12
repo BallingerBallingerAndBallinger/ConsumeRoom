@@ -117,6 +117,7 @@ stats {
 
 .description-area-text{
     min-height: 32px;
+    font-size: 130%;
 }
 
 .modal-header{
