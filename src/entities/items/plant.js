@@ -12,15 +12,8 @@
       self.y = Math.random();
       self.size = 150;
       var plant = Object.assign({}, entity);
-      var squish = 0;
-      var isSquishing;
 
       plant.update = update;
-      plant.getX = getX;
-      plant.getY = getY;
-      plant.getZ = getZ;
-      plant.setX = setX;
-      plant.setY = setY;
       plant.handleClick = handleClick;
       plant.getHappiness = () => 33;
       plant.isEnticement = true;
@@ -32,34 +25,13 @@
             bounds.right > x &&
             bounds.top < y &&
             bounds.bottom > y) {
-          squeak();
           return true;
         }
         return false;
       }
 
       function update(timestamp, delta) {
-        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, entity.getRenderHeight(renderer));
-      }
-
-      function getX() {
-        return self.x;
-      }
-
-      function getY() {
-        return self.y;
-      }
-
-      function getZ() {
-        return self.z;
-      }
-
-      function setX(newX) {
-        self.x = newX;
-      }
-
-      function setY(newY) {
-        self.y = newY;
+        render.image(entity.getRenderX(), entity.getRenderY(), self.name, entity.getRenderHeight());
       }
     };
 

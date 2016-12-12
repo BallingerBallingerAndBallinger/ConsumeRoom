@@ -1,12 +1,15 @@
 (function() {
   var _ = require('lodash');
+  // Builders
   var bloonBuilder = require('./entities/items/bloon.js');
+  var discoBuilder = require('./entities/items/disco.js');
+  var bearBuilder = require('./entities/items/bear.js');
+  var plantBuilder = require('./entities/items/plant.js');
   var roomBuilder = require('./entities/room.js');
   var doorBuilder = require('./entities/door.js');
   var windowBuilder = require('./entities/window.js');
-  var bearBuilder = require('./entities/items/bear.js');
+  //
   var party = require('./crappy-party.js');
-  var discoBuilder = require('./entities/items/disco.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
@@ -120,7 +123,7 @@
     entities.push(disco);
   }
   function addPlant() {
-    var plant = discoBuilder.initialize(renderer, movementHandler);
+    var plant = plantBuilder.initialize(renderer, movementHandler);
     entities.push(plant);
   }
   function addBloon() {

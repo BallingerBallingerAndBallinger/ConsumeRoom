@@ -49,11 +49,11 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(20);
-	  var gui = __webpack_require__(21);
-	  var views = __webpack_require__(23);
-	  var gameState = __webpack_require__(14);
-	  var config = __webpack_require__(13);
+	  var stats = __webpack_require__(21);
+	  var gui = __webpack_require__(22);
+	  var views = __webpack_require__(24);
+	  var gameState = __webpack_require__(17);
+	  var config = __webpack_require__(16);
 	
 	  var paused = false;
 	  var stopped = true;
@@ -147,18 +147,21 @@
 
 	(function() {
 	  var _ = __webpack_require__(2);
+	  // Builders
 	  var bloonBuilder = __webpack_require__(4);
-	  var roomBuilder = __webpack_require__(6);
-	  var doorBuilder = __webpack_require__(7);
-	  var windowBuilder = __webpack_require__(8);
-	  var bearBuilder = __webpack_require__(15);
-	  var party = __webpack_require__(9);
-	  var discoBuilder = __webpack_require__(16);
-	  var config = __webpack_require__(13);
-	  var renderer = __webpack_require__(17);
-	  var gameState = __webpack_require__(14);
-	  var click = __webpack_require__(18);
-	  var movementHandler = __webpack_require__(19);
+	  var discoBuilder = __webpack_require__(6);
+	  var bearBuilder = __webpack_require__(7);
+	  var plantBuilder = __webpack_require__(8);
+	  var roomBuilder = __webpack_require__(9);
+	  var doorBuilder = __webpack_require__(10);
+	  var windowBuilder = __webpack_require__(11);
+	  //
+	  var party = __webpack_require__(12);
+	  var config = __webpack_require__(16);
+	  var renderer = __webpack_require__(18);
+	  var gameState = __webpack_require__(17);
+	  var click = __webpack_require__(19);
+	  var movementHandler = __webpack_require__(20);
 	  var entities = [];
 	  var eating;
 	  var room;
@@ -267,7 +270,7 @@
 	    entities.push(disco);
 	  }
 	  function addPlant() {
-	    var plant = discoBuilder.initialize(renderer, movementHandler);
+	    var plant = plantBuilder.initialize(renderer, movementHandler);
 	    entities.push(plant);
 	  }
 	  function addBloon() {
@@ -335,7 +338,7 @@
 	  var undefined;
 	
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 	
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3379,7 +3382,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = 0,
 	          length = path.length;
@@ -3565,9 +3568,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 	
@@ -4128,7 +4134,7 @@
 	            value = baseGet(object, path);
 	
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4204,8 +4210,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+	
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4326,7 +4341,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -4667,9 +4682,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+	
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 	
 	    /**
@@ -4809,14 +4826,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 	
 	    /**
@@ -6441,7 +6454,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -6918,7 +6931,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 	
 	    /**
@@ -7058,6 +7071,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+	
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9792,10 +9807,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 	
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11163,10 +11180,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 	
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13782,16 +13803,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13841,7 +13855,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 	
 	    /**
@@ -13863,16 +13877,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 	
 	    /**
@@ -13905,15 +13910,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length;
 	
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16423,7 +16428,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 	
 	    /**
@@ -17588,6 +17593,238 @@
 	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	
+	      var self = entity.getSelf();
+	      self.name = 'disco';
+	      self.x = Math.random();
+	      self.y = Math.random() * 0.25;
+	      self.size = 200;
+	
+	      var starX = Math.random();
+	      var starY = Math.random();
+	      var starMove = 0;
+	
+	      var disco = Object.assign({}, entity);
+	      disco.update = update;
+	      disco.getHappiness = () => 100;
+	      disco.isEnticement = true;
+	      return disco;
+	
+	      function update(timestamp, delta) {
+	        var renderHeight = entity.getRenderHeight();
+	        var renderX = entity.getRenderX();
+	        var renderY = entity.getRenderY() + -300 + renderHeight * 0.5;
+	
+	        starMove -= delta;
+	        if (starMove <= 0) {
+	          starMove = Math.random() * 3000;
+	          starX = Math.random();
+	          starY = Math.random();
+	        }
+	
+	        render.image(renderX, renderY, self.name, '', renderHeight);
+	        render.image(renderX + (starX * renderHeight) - (renderHeight / 10), renderY + (starY * renderHeight) - (renderHeight / 10), 'stars', '', renderHeight / 5);
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var squishVelocity = 0.05;
+	
+	      var self = entity.getSelf();
+	      self.name = 'bear';
+	      self.x = Math.random();
+	      self.y = Math.random();
+	      self.size = 150;
+	      var bear = Object.assign({}, entity);
+	      var squish = 0;
+	      var isSquishing;
+	
+	      bear.update = update;
+	      bear.getX = getX;
+	      bear.getY = getY;
+	      bear.getZ = getZ;
+	      bear.setX = setX;
+	      bear.setY = setY;
+	      bear.handleClick = handleClick;
+	      bear.getHappiness = () => 33;
+	      bear.isEnticement = true;
+	      return bear;
+	
+	      function handleClick(x, y) {
+	        var bounds = entity.getScreenBoundingRect();
+	        if (bounds.left < x &&
+	            bounds.right > x &&
+	            bounds.top < y &&
+	            bounds.bottom > y) {
+	          squeak();
+	          return true;
+	        }
+	        return false;
+	      }
+	
+	      function squeak() {
+	        isSquishing = true;
+	        squish = 30;
+	        render.audio('squeak');
+	      }
+	
+	      function update(timestamp, delta) {
+	        if (!isSquishing) {
+	          if (Math.random() < 0.0001) {
+	            squeak();
+	          }
+	        }
+	
+	        var squished = 0;
+	        if (squish > 0) {
+	          squish = squish - (squishVelocity * delta);
+	          squished = squish;
+	        } else {
+	          isSquishing = false;
+	        }
+	
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function getZ() {
+	        return self.z;
+	      }
+	
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+	
+	      function setY(newY) {
+	        self.y = newY;
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'house-plant';
+	      self.x = Math.random();
+	      self.y = Math.random();
+	      self.size = 150;
+	      var plant = Object.assign({}, entity);
+	      var squish = 0;
+	      var isSquishing;
+	
+	      plant.update = update;
+	      plant.getX = getX;
+	      plant.getY = getY;
+	      plant.getZ = getZ;
+	      plant.setX = setX;
+	      plant.setY = setY;
+	      plant.handleClick = handleClick;
+	      plant.getHappiness = () => 33;
+	      plant.isEnticement = true;
+	      return plant;
+	
+	      function handleClick(x, y) {
+	        var bounds = entity.getScreenBoundingRect();
+	        if (bounds.left < x &&
+	            bounds.right > x &&
+	            bounds.top < y &&
+	            bounds.bottom > y) {
+	          squeak();
+	          return true;
+	        }
+	        return false;
+	      }
+	
+	      function update(timestamp, delta) {
+	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, entity.getRenderHeight(renderer));
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function getZ() {
+	        return self.z;
+	      }
+	
+	      function setX(newX) {
+	        self.x = newX;
+	      }
+	
+	      function setY(newY) {
+	        self.y = newY;
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
 	      var self = { name: 'floor-closed', x: 0, y: -1 };
 	      var eating = false;
 	      var chew = false;
@@ -17642,7 +17879,7 @@
 
 
 /***/ },
-/* 7 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17688,12 +17925,12 @@
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var party = __webpack_require__(9);
+	  var party = __webpack_require__(12);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17760,14 +17997,14 @@
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var dude1Builder = __webpack_require__(10);
-	  var girl1Builder = __webpack_require__(12);
-	  var config = __webpack_require__(13);
-	  var gameState = __webpack_require__(14);
+	  var dude1Builder = __webpack_require__(13);
+	  var girl1Builder = __webpack_require__(15);
+	  var config = __webpack_require__(16);
+	  var gameState = __webpack_require__(17);
 	
 	  function rollGoer() {
 	    var roll = Math.random();
@@ -17816,11 +18053,11 @@
 
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(11);
+	  var entityBase = __webpack_require__(14);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17849,7 +18086,7 @@
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17969,11 +18206,11 @@
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(11);
+	  var entityBase = __webpack_require__(14);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18010,7 +18247,7 @@
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -18028,7 +18265,7 @@
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18075,161 +18312,7 @@
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(5);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var squishVelocity = 0.05;
-	
-	      var self = entity.getSelf();
-	      self.name = 'bear';
-	      self.x = Math.random();
-	      self.y = Math.random();
-	      self.size = 150;
-	      var bear = Object.assign({}, entity);
-	      var squish = 0;
-	      var isSquishing;
-	
-	      bear.update = update;
-	      bear.getX = getX;
-	      bear.getY = getY;
-	      bear.getZ = getZ;
-	      bear.setX = setX;
-	      bear.setY = setY;
-	      bear.handleClick = handleClick;
-	      bear.getHappiness = () => 33;
-	      bear.isEnticement = true;
-	      return bear;
-	
-	      function handleClick(x, y) {
-	        var bounds = entity.getScreenBoundingRect();
-	        if (bounds.left < x &&
-	            bounds.right > x &&
-	            bounds.top < y &&
-	            bounds.bottom > y) {
-	          squeak();
-	          return true;
-	        }
-	        return false;
-	      }
-	
-	      function squeak() {
-	        isSquishing = true;
-	        squish = 30;
-	        render.audio('squeak');
-	      }
-	
-	      function update(timestamp, delta) {
-	        if (!isSquishing) {
-	          if (Math.random() < 0.0001) {
-	            squeak();
-	          }
-	        }
-	
-	        var squished = 0;
-	        if (squish > 0) {
-	          squish = squish - (squishVelocity * delta);
-	          squished = squish;
-	        } else {
-	          isSquishing = false;
-	        }
-	
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
-	      }
-	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function getZ() {
-	        return self.z;
-	      }
-	
-	      function setX(newX) {
-	        self.x = newX;
-	      }
-	
-	      function setY(newY) {
-	        self.y = newY;
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(5);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var self = entity.getSelf();
-	      self.name = 'disco';
-	      self.x = Math.random();
-	      self.y = Math.random() * 0.25;
-	      self.size = 200;
-	
-	      var starX = Math.random();
-	      var starY = Math.random();
-	      var starMove = 0;
-	
-	      var disco = Object.assign({}, entity);
-	      disco.update = update;
-	      disco.getHappiness = () => 100;
-	      disco.isEnticement = true;
-	      return disco;
-	
-	      function update(timestamp, delta) {
-	        var renderHeight = entity.getRenderHeight();
-	        var renderX = entity.getRenderX();
-	        var renderY = entity.getRenderY() + -300 + renderHeight * 0.5;
-	
-	        starMove -= delta;
-	        if (starMove <= 0) {
-	          starMove = Math.random() * 3000;
-	          starX = Math.random();
-	          starY = Math.random();
-	        }
-	
-	        render.image(renderX, renderY, self.name, '', renderHeight);
-	        render.image(renderX + (starX * renderHeight) - (renderHeight / 10), renderY + (starY * renderHeight) - (renderHeight / 10), 'stars', '', renderHeight / 5);
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18495,7 +18578,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18526,7 +18609,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18558,7 +18641,7 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18595,11 +18678,11 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function() {
-	  var $ = __webpack_require__(22);
+	  var $ = __webpack_require__(23);
 	  var pause = () => { console.log('No pause function registered'); };
 	
 	  var entities;
@@ -18712,7 +18795,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18735,11 +18818,11 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var $ = __webpack_require__(22);
+	  var $ = __webpack_require__(23);
 	
 	  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view'];
 	  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button'];
