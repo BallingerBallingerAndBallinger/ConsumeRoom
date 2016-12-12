@@ -16,6 +16,8 @@
         getY: getY,
         getRenderX: getRenderX,
         getRenderY: getRenderY,
+        getSelfY: getSelfY,
+        getSelfX: getSelfX,
         getRenderHeight: getRenderHeight,
         getScreenBoundingRect: getScreenBoundingRect
       };
@@ -28,14 +30,19 @@
         return self;
       }
 
+      function getSelfY(renderX, renderY) {
+        var renderHeight = getRenderHeight();
+        return ((renderY / renderHeight) + -0.5 + 1 + -(1 / 10)) / (0.8 * 0.5);
+      }
+
+      function getSelfX(renderX, renderY) {
+        return (((renderX - 0.5) * 2) / (0.5 * self.y + 0.5)) + 1;
+      }
+
       function getRenderX() {
         var squeezeFactor = (self.y / 2 + 0.5);
         var squeezed = (self.x - 0.5) * squeezeFactor + 0.5;
         return squeezed * renderer.getWidth() - 40;
-      }
-
-      function getRenderHeight() {
-        return ((self.y * 0.5555) + 0.3333) * self.size;
       }
 
       function getRenderY() {
@@ -44,6 +51,10 @@
         renderY = renderY - renderHeight;
         renderY = renderY + (renderHeight / 10);
         return renderY;
+      }
+
+      function getRenderHeight() {
+        return ((self.y * 0.5555) + 0.3333) * self.size;
       }
 
       function getScreenBoundingRect() {

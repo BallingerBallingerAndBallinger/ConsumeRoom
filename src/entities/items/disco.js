@@ -1,5 +1,5 @@
 (() => {
-  var entityBase = require('../../crappy-entity.js');
+  var entityBase = require('../item.js');
   var configuration = require('../../configuration.js');
 
   function initialize(renderer, movementHandler) {
@@ -21,7 +21,12 @@
       disco.update = update;
       disco.getHappiness = () => configuration.disco.happiness;
       disco.isEnticement = true;
+      disco.handleDragStart = handleDragStart;
       return disco;
+
+      function handleDragStart(x, y) {
+        return false;
+      }
 
       function update(timestamp, delta) {
         var renderHeight = entity.getRenderHeight();

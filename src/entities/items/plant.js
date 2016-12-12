@@ -1,5 +1,5 @@
 (() => {
-  var entityBase = require('../../crappy-entity.js');
+  var entityBase = require('../item.js');
   var configuration = require('../../configuration.js');
 
   function initialize(renderer, movementHandler) {

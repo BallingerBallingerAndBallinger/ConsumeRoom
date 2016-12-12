@@ -18,6 +18,10 @@
   var eating;
   var room;
   var clickEvent;
+  var dragStartEvent;
+  var dragEndEvent;
+  var dragEvent;
+  var draggedEntity;
   var timeout;
 
   function initialize(canvasElement) {
@@ -27,6 +31,10 @@
     movementHandler.initialize();
     click.initialize(canvasElement);
     click.register((e) => { clickEvent = e; });
+
+    canvasElement.addEventListener('mousedown', e => { dragStartEvent = e; });
+    canvasElement.addEventListener('mouseup', e => { dragEndEvent = e; });
+    canvasElement.addEventListener('mousemove', e => { dragEvent = e; });
 
     var bloon = bloonBuilder.initialize(renderer, movementHandler);
     bloon.setGetHappiness(() => 0);
@@ -56,12 +64,43 @@
     gameState.fondleEntities(entities);
     renderer.clear();
     entities.sort(compareEntities);
-    if (clickEvent) {
-      var coords = renderer.transformEventToCoords(clickEvent);
+
+    var coords;
+    var entity;
+    if (dragStartEvent) {
+      coords = renderer.transformEventToCoords(dragStartEvent);
       for (var i = entities.length - 1; i >= 0; i--) {
-        var entity = entities[i];
+        entity = entities[i];
+        if (entity.handleDrag) {
+          if (entity.handleDragStart(coords.x, coords.y)) {
+            draggedEntity = entity;
+            break;
+          }
+        }
+      }
+      dragStartEvent = undefined;
+      dragEvent = undefined;
+      dragEndEvent = undefined;
+    }
+    if (dragEvent && draggedEntity) {
+      coords = renderer.transformEventToCoords(dragEvent);
+      draggedEntity.handleDrag(coords.x, coords.y);
+      dragEvent = undefined;
+    }
+    if (dragEndEvent && draggedEntity) {
+      draggedEntity.handleDragEnd;
+      draggedEntity = undefined;
+      dragEndEvent = undefined;
+    }
+
+    if (clickEvent) {
+      coords = renderer.transformEventToCoords(clickEvent);
+      for (var i = entities.length - 1; i >= 0; i--) {
+        entity = entities[i];
         if (entity.handleClick) {
-          if (entity.handleClick(coords.x, coords.y)) break;
+          if (entity.handleClick(coords.x, coords.y)) {
+            break;
+          }
         }
       }
       clickEvent = undefined;
