@@ -5,5 +5,6 @@ module.exports = {
   baseHungerProbability: 0.005,
   basePartyGoerProbability: 0.03,
   basePartyGoerLeavesProbability: 0.03,
-  irresistableEnticingness: 10000
+  irresistableEnticingness: 10000,
+  packedHouse: 400
 };
