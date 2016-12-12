@@ -280,6 +280,7 @@
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
+	    goer.setGoal(config.entryDistance * Math.random(), config.entryDistance * Math.random());
 	    entities.push(goer);
 	  }
 	
@@ -18021,7 +18022,8 @@
 	  basePartyGoerLeavesProbability: 0.03,
 	  irresistableEnticingness: 10000,
 	  packedHouse: 400,
-	  leaveAttempts: 15
+	  leaveAttempts: 15,
+	  entryDistance: 0.5
 	};
 
 

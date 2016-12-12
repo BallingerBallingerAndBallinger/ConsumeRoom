@@ -133,6 +133,7 @@
 
     goer.setX(0.9);
     goer.setY(0);
+    goer.setGoal(config.entryDistance * Math.random(), config.entryDistance * Math.random());
     entities.push(goer);
   }
 
