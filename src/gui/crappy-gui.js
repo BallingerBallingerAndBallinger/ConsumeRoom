@@ -1,5 +1,6 @@
 (function() {
   var $ = require('./lol-jquery.js');
+  var configuration = require('../configuration.js');
   var pause = () => { console.log('No pause function registered'); };
 
   var entities;
@@ -9,7 +10,7 @@
   var pausedView;
   var selectedItem;
   var shopItems;
-  var shopShown = false;;
+  var shopShown = false;
 
   function consumeAll() {
     entities.consumeAll();
@@ -45,22 +46,22 @@
       { name: 'buy-plant',
         description: 'Back when YOU were human, you remember vaguely enjoying house plants.',
         action: entities.addPlant,
-        price: 5
+        price: configuration.plant.price
       },
       { name: 'buy-bear',
         description: 'Nothing says "This room is totally safe" like a cuddly teddy!',
         action: entities.addBear,
-        price: 10
+        price: configuration.bear.price
       },
       { name: 'buy-disco',
         description: 'It\'s not a party in your tummy without one of these.',
         action: entities.addDisco,
-        price: 25
+        price: configuration.disco.price
       },
       { name: 'buy-bloon',
         description: 'The bloons aren\'t even really for the humans, are they?',
         action: entities.addBloon,
-        price: 50
+        price: configuration.bloon.price
       }];
 
     if (pausedView) return;
@@ -92,6 +93,7 @@
 
     shopItems.forEach((item) => {
       item.element = document.getElementById(item.name);
+      item.element.getElementsByClasssName('cost')[0].innerHTML = item.price + ' happiness';
       item.element.addEventListener('mouseover', (e) => { enticementDesc.innerHTML = item.description; });
       item.element.addEventListener('mouseout', (e) => { enticementDesc.innerHTML = selectedItem.description; });
       item.element.addEventListener('click', (e) => {

@@ -53,7 +53,7 @@
 	  var gui = __webpack_require__(22);
 	  var views = __webpack_require__(24);
 	  var gameState = __webpack_require__(17);
-	  var config = __webpack_require__(16);
+	  var config = __webpack_require__(6);
 	
 	  var paused = false;
 	  var stopped = true;
@@ -149,15 +149,15 @@
 	  var _ = __webpack_require__(2);
 	  // Builders
 	  var bloonBuilder = __webpack_require__(4);
-	  var discoBuilder = __webpack_require__(6);
-	  var bearBuilder = __webpack_require__(7);
-	  var plantBuilder = __webpack_require__(8);
-	  var roomBuilder = __webpack_require__(9);
-	  var doorBuilder = __webpack_require__(10);
-	  var windowBuilder = __webpack_require__(11);
+	  var discoBuilder = __webpack_require__(7);
+	  var bearBuilder = __webpack_require__(8);
+	  var plantBuilder = __webpack_require__(9);
+	  var roomBuilder = __webpack_require__(10);
+	  var doorBuilder = __webpack_require__(11);
+	  var windowBuilder = __webpack_require__(12);
 	  //
-	  var party = __webpack_require__(12);
-	  var config = __webpack_require__(16);
+	  var party = __webpack_require__(13);
+	  var config = __webpack_require__(6);
 	  var renderer = __webpack_require__(18);
 	  var gameState = __webpack_require__(17);
 	  var click = __webpack_require__(19);
@@ -17416,6 +17416,7 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  var velocity = 0.00001;
 	
@@ -17435,7 +17436,7 @@
 	      var travel = 0;
 	
 	      bloon.update = update;
-	      bloon.getHappiness = () => 100;
+	      bloon.getHappiness = () => configuration.bloon.happiness;
 	      bloon.isEnticement = true;
 	      return bloon;
 	
@@ -17558,10 +17559,45 @@
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  title: 'Consume Room',
+	  frameMs: 50,
+	  eatSoundTime: 11500,
+	  baseHungerProbability: 0.005,
+	  basePartyGoerProbability: 0.03,
+	  basePartyGoerLeavesProbability: 0.03,
+	  irresistableEnticingness: 10000,
+	  packedHouse: 400,
+	  leaveAttempts: 15,
+	  entryDistance: 0.5,
+	  bear: {
+	    happiness: 15,
+	    price: 10
+	  },
+	  bloon: {
+	    happiness: 200,
+	    price: 50
+	  },
+	  plant: {
+	    happiness: 5,
+	    price: 5
+	  },
+	  disco: {
+	    happiness: 50,
+	    price: 25
+	  }
+	};
+
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17580,7 +17616,7 @@
 	
 	      var disco = Object.assign({}, entity);
 	      disco.update = update;
-	      disco.getHappiness = () => 100;
+	      disco.getHappiness = () => configuration.disco.happiness;
 	      disco.isEnticement = true;
 	      return disco;
 	
@@ -17611,11 +17647,12 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17634,13 +17671,8 @@
 	      var isSquishing;
 	
 	      bear.update = update;
-	      bear.getX = getX;
-	      bear.getY = getY;
-	      bear.getZ = getZ;
-	      bear.setX = setX;
-	      bear.setY = setY;
 	      bear.handleClick = handleClick;
-	      bear.getHappiness = () => 33;
+	      bear.getHappiness = () => configuration.bear.happiness;
 	      bear.isEnticement = true;
 	      return bear;
 	
@@ -17677,27 +17709,7 @@
 	          isSquishing = false;
 	        }
 	
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
-	      }
-	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function getZ() {
-	        return self.z;
-	      }
-	
-	      function setX(newX) {
-	        self.x = newX;
-	      }
-	
-	      function setY(newY) {
-	        self.y = newY;
+	        render.image(entity.getRenderX(), entity.getRenderY() + squished, self.name, entity.getRenderHeight(), entity.getRenderHeight() - squished);
 	      }
 	    };
 	
@@ -17711,11 +17723,12 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17731,7 +17744,7 @@
 	
 	      plant.update = update;
 	      plant.handleClick = handleClick;
-	      plant.getHappiness = () => 33;
+	      plant.getHappiness = () => configuration.plant.happiness;
 	      plant.isEnticement = true;
 	      return plant;
 	
@@ -17761,7 +17774,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17826,7 +17839,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17872,12 +17885,12 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var party = __webpack_require__(12);
+	  var party = __webpack_require__(13);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17944,13 +17957,13 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var dude1Builder = __webpack_require__(13);
-	  var girl1Builder = __webpack_require__(15);
-	  var config = __webpack_require__(16);
+	  var dude1Builder = __webpack_require__(14);
+	  var girl1Builder = __webpack_require__(16);
+	  var config = __webpack_require__(6);
 	  var gameState = __webpack_require__(17);
 	
 	  function rollGoer() {
@@ -18000,11 +18013,11 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(14);
+	  var entityBase = __webpack_require__(15);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18033,7 +18046,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -18153,11 +18166,11 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(14);
+	  var entityBase = __webpack_require__(15);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18191,24 +18204,6 @@
 	    initialize: initialize
 	  };
 	})();
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	  title: 'Consume Room',
-	  frameMs: 50,
-	  eatSoundTime: 11500,
-	  baseHungerProbability: 0.005,
-	  basePartyGoerProbability: 0.03,
-	  basePartyGoerLeavesProbability: 0.03,
-	  irresistableEnticingness: 10000,
-	  packedHouse: 400,
-	  leaveAttempts: 15,
-	  entryDistance: 0.5
-	};
 
 
 /***/ },
@@ -18630,6 +18625,7 @@
 
 	(function() {
 	  var $ = __webpack_require__(23);
+	  var configuration = __webpack_require__(6);
 	  var pause = () => { console.log('No pause function registered'); };
 	
 	  var entities;
@@ -18639,7 +18635,7 @@
 	  var pausedView;
 	  var selectedItem;
 	  var shopItems;
-	  var shopShown = false;;
+	  var shopShown = false;
 	
 	  function consumeAll() {
 	    entities.consumeAll();
@@ -18675,22 +18671,22 @@
 	      { name: 'buy-plant',
 	        description: 'Back when YOU were human, you remember vaguely enjoying house plants.',
 	        action: entities.addPlant,
-	        price: 5
+	        price: configuration.plant.price
 	      },
 	      { name: 'buy-bear',
 	        description: 'Nothing says "This room is totally safe" like a cuddly teddy!',
 	        action: entities.addBear,
-	        price: 10
+	        price: configuration.bear.price
 	      },
 	      { name: 'buy-disco',
 	        description: 'It\'s not a party in your tummy without one of these.',
 	        action: entities.addDisco,
-	        price: 25
+	        price: configuration.disco.price
 	      },
 	      { name: 'buy-bloon',
 	        description: 'The bloons aren\'t even really for the humans, are they?',
 	        action: entities.addBloon,
-	        price: 50
+	        price: configuration.bloon.price
 	      }];
 	
 	    if (pausedView) return;
@@ -18722,6 +18718,7 @@
 	
 	    shopItems.forEach((item) => {
 	      item.element = document.getElementById(item.name);
+	      item.element.getElementsByClasssName('cost')[0].innerHTML = item.price + ' happiness';    
 	      item.element.addEventListener('mouseover', (e) => { enticementDesc.innerHTML = item.description; });
 	      item.element.addEventListener('mouseout', (e) => { enticementDesc.innerHTML = selectedItem.description; });
 	      item.element.addEventListener('click', (e) => {

@@ -27,6 +27,8 @@ stats {
 #happiness-label {
     font-style: sans-serif;
     margin: 0;
+    font-size: 90px;
+    text-align: center;
 }
 
 #room-happiness {
