@@ -103,7 +103,6 @@
   function addBear() {
     if (gameState.getHappiness() <= 0) return;
     var bear = discoBuilder.initialize(renderer, movementHandler);
-    bear.setY(Math.random());
     entities.push(bear);
     gameState.bankHappiness(-1);
   }
