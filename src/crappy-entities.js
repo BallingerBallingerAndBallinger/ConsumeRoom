@@ -43,7 +43,7 @@
         introducePartygoer();
       }
 
-      if (Math.random() < config.basePartyGoerLeavesProbability) {
+      if (party.rollLeaver()) {
         partyGoerWantsToLeave();
       }
     }

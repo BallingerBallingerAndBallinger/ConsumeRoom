@@ -8,7 +8,18 @@
     var roll = Math.random();
     var irresistibility = (gameState.getEnticingness() / config.irresistableEnticingness);
     var required = config.basePartyGoerProbability + irresistibility;
-    console.log(roll + " out of " + required);
+    if (roll < required) {
+      return true;
+    }
+  }
+
+  function rollLeaver() {
+    var roll = Math.random();
+
+    var people = gameState.getPeopleCount();
+    var packedPenalty = (people / config.packedHouse);
+    var required = config.basePartyLeavesProbability + packedPenalty;
+ 
     if (roll < required) {
       return true;
     }
@@ -27,6 +38,7 @@
 
   module.exports = {
     getPartyGoer: getPartyGoer,
-    rollGoer: rollGoer
+    rollGoer: rollGoer,
+    rollLeaver: rollGoer
   };
 })();
