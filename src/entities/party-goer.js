@@ -30,7 +30,7 @@
       }
 
       function draw(timestamp, delta) {
-        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
+        render.image(entity.getRenderX(renderer) - 50, entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
       }
 
       function setSteps(newSteps) {

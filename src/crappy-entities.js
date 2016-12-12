@@ -96,7 +96,6 @@
 
   function addBear() {
     var bear = discoBuilder.initialize(renderer, movementHandler);
-    bear.setY(Math.random());
     entities.push(bear);
     gameState.bankHappiness(-1);
   }

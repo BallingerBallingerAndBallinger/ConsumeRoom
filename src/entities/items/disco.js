@@ -9,7 +9,7 @@
       var self = entity.getSelf();
       self.name = 'disco';
       self.x = Math.random();
-      self.y = Math.random();
+      self.y = Math.random() * 0.25;
       self.size = 200;
 
       var starX = Math.random();
@@ -25,7 +25,7 @@
       function update(timestamp, delta) {
         var renderHeight = entity.getRenderHeight();
         var renderX = entity.getRenderX();
-        var renderY = entity.getRenderY() - 3 * renderHeight;
+        var renderY = entity.getRenderY() + -300 + renderHeight * 0.5;
 
         starMove -= delta;
         if (starMove <= 0) {

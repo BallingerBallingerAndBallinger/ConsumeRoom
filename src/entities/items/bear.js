@@ -11,7 +11,7 @@
       var self = entity.getSelf();
       self.name = 'bear';
       self.x = Math.random();
-      self.y = 1;
+      self.y = Math.random();
       self.size = 150;
       var bear = Object.assign({}, entity);
       var squish = 0;

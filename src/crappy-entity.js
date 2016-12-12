@@ -5,8 +5,6 @@
   function initialize(renderer, movementHandler) {
     var initializer = () => {
       var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
-      var steps = 0;
-      var goalCallback;
 
       return {
         update: update,
@@ -42,7 +40,7 @@
 
       function getRenderY() {
         var renderHeight = getRenderHeight();
-        var renderY = (self.y * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+        var renderY = ((self.y * 0.5) * (0.8 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
         renderY = renderY - renderHeight;
         renderY = renderY + (renderHeight / 10);
         return renderY;

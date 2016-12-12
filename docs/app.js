@@ -209,7 +209,6 @@
 	
 	  function addBear() {
 	    var bear = discoBuilder.initialize(renderer, movementHandler);
-	    bear.setY(Math.random());
 	    entities.push(bear);
 	    gameState.bankHappiness(-1);
 	  }
@@ -17435,8 +17434,6 @@
 	  function initialize(renderer, movementHandler) {
 	    var initializer = () => {
 	      var self = {name: 'generic', x: 0.5, y: 0.5, vx: 0, vy: 0, gx: 0, gy: 0, size: 0};
-	      var steps = 0;
-	      var goalCallback;
 	
 	      return {
 	        update: update,
@@ -17472,7 +17469,7 @@
 	
 	      function getRenderY() {
 	        var renderHeight = getRenderHeight();
-	        var renderY = (self.y * (0.5 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
+	        var renderY = ((self.y * 0.5) * (0.8 * renderer.getHeight()) + (0.5 * renderer.getHeight()));
 	        renderY = renderY - renderHeight;
 	        renderY = renderY + (renderHeight / 10);
 	        return renderY;
@@ -17773,7 +17770,7 @@
 	      }
 	
 	      function draw(timestamp, delta) {
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
+	        render.image(entity.getRenderX(renderer) - 50, entity.getRenderY(renderer), self.name, '', entity.getRenderHeight(renderer));
 	      }
 	
 	      function setSteps(newSteps) {
@@ -17869,7 +17866,7 @@
 	      var self = entity.getSelf();
 	      self.name = 'bear';
 	      self.x = Math.random();
-	      self.y = 1;
+	      self.y = Math.random();
 	      self.size = 150;
 	      var bear = Object.assign({}, entity);
 	      var squish = 0;
@@ -17967,7 +17964,7 @@
 	      var self = entity.getSelf();
 	      self.name = 'disco';
 	      self.x = Math.random();
-	      self.y = Math.random();
+	      self.y = Math.random() * 0.25;
 	      self.size = 200;
 	
 	      var starX = Math.random();
@@ -17983,7 +17980,7 @@
 	      function update(timestamp, delta) {
 	        var renderHeight = entity.getRenderHeight();
 	        var renderX = entity.getRenderX();
-	        var renderY = entity.getRenderY() - 3 * renderHeight;
+	        var renderY = entity.getRenderY() + -300 + renderHeight * 0.5;
 	
 	        starMove -= delta;
 	        if (starMove <= 0) {
@@ -17993,7 +17990,7 @@
 	        }
 	
 	        render.image(renderX, renderY, self.name, '', renderHeight);
-	        render.image(renderX + (starX * renderHeight) - (renderHeight/10), renderY + (starY * renderHeight) - (renderHeight / 10), 'stars', '', renderHeight / 5);
+	        render.image(renderX + (starX * renderHeight) - (renderHeight / 10), renderY + (starY * renderHeight) - (renderHeight / 10), 'stars', '', renderHeight / 5);
 	      }
 	    };
 	
@@ -18053,7 +18050,7 @@
 	  frameMs: 50,
 	  eatSoundTime: 11500,
 	  baseHungerProbability: 0.005,
-	  basePartyGoerProbability: 0.01,
+	  basePartyGoerProbability: 1.01,
 	  basePartyGoerLeavesProbability: 0.01
 	};
 
