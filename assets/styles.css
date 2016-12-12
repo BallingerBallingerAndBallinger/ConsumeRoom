@@ -42,6 +42,25 @@ stats {
     font-style: sans-serif;
 }
 
+.screen-overlay {
+  position: fixed;
+  display: flex;
+  flex-direction: column;  
+
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 3;
+
+  color: white;
+  background-color: rgba(0,0,0,1);
+
+}
+
 .paused-view {
   position: fixed;
   display: flex;
@@ -279,7 +298,9 @@ stats {
 .cmb-bold{
     font-weight: 700;
 }
-
+.cmb-italic{
+     font-style: italic;
+}
 .fill-space{
     flex-grow: 1;
 }
@@ -317,7 +338,86 @@ stats {
     color: white;
 }
 
+.maroon-text{
+    color: rgba(200,0,0,1);
+}
+
 .align-self-end{
     align-self: flex-end;
 }
 
+
+/* crappy css I pulled from something else I was doing earlier */
+.sub-title{
+    color:lightgray; 
+    font-size: 2vw; 
+    margin:8px;
+}
+
+.link-wrapper{
+    padding:4px;
+}
+.link-container{
+    display: inline-block;
+
+    width: auto;
+    height: auto;
+
+    padding: 8px;
+    margin:4px;
+    border-radius: 4px;
+
+    font-size: 3vw;
+    color: black;
+    background-color: rgba(255,255,255,.6);
+
+}
+.link-container:hover{
+    background-color: rgba(255,255,255,1);
+    cursor: pointer;  
+}
+
+.name-chris{
+    font-size: 6vw;
+    padding: 8px;
+    color: lightgray;
+}
+
+.picture-shadow{
+box-shadow: 0 2px 2px black;
+}
+.text-shadow{
+text-shadow: 0 2px 2px black;
+}
+
+@media (max-width: 768px){
+
+    .name-chris{
+        font-size: 8vw;
+    }
+
+    .perspective-button span{
+        font-size: 6vw;
+    }
+
+    .link-container{
+    
+        font-size: 6vw;
+    }
+    .sub-title{
+    
+        font-size: 4vw; 
+    
+    }
+
+}
+
+.menu-container{
+    padding-right: 20%;
+    margin-left: 4%; 
+}
+
+.flex-container-right{
+    display: flex;
+    justify-content: flex-end;
+}
