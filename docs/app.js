@@ -52,8 +52,8 @@
 	  var stats = __webpack_require__(20);
 	  var gui = __webpack_require__(21);
 	  var views = __webpack_require__(23);
-	  var gameState = __webpack_require__(17);
-	  var config = __webpack_require__(15);
+	  var gameState = __webpack_require__(14);
+	  var config = __webpack_require__(13);
 	
 	  var paused = false;
 	  var stopped = true;
@@ -151,12 +151,12 @@
 	  var roomBuilder = __webpack_require__(6);
 	  var doorBuilder = __webpack_require__(7);
 	  var windowBuilder = __webpack_require__(8);
-	  var bearBuilder = __webpack_require__(13);
+	  var bearBuilder = __webpack_require__(15);
 	  var party = __webpack_require__(9);
-	  var discoBuilder = __webpack_require__(14);
-	  var config = __webpack_require__(15);
-	  var renderer = __webpack_require__(16);
-	  var gameState = __webpack_require__(17);
+	  var discoBuilder = __webpack_require__(16);
+	  var config = __webpack_require__(13);
+	  var renderer = __webpack_require__(17);
+	  var gameState = __webpack_require__(14);
 	  var click = __webpack_require__(18);
 	  var movementHandler = __webpack_require__(19);
 	  var entities = [];
@@ -186,7 +186,7 @@
 	
 	  function update(timestamp, delta) {
 	    if (!eating) {
-	      if (Math.random() < config.basePartyGoerProbability) {
+	      if (party.rollGoer()) {
 	        introducePartygoer();
 	      }
 	
@@ -17737,12 +17737,23 @@
 	(() => {
 	  var dude1Builder = __webpack_require__(10);
 	  var girl1Builder = __webpack_require__(12);
+	  var config = __webpack_require__(13);
+	  var gameState = __webpack_require__(14);
+	
+	  function rollGoer() {
+	    var roll = Math.random();
+	    var irresistibility = (gameState.getEnticingness() / config.irresistableEnticingness);
+	    var required = config.basePartyGoerProbability + irresistibility;
+	    console.log(roll + " out of " + required);
+	    if (roll < required) {
+	      return true;
+	    }
+	  }
 	
 	  function getPartyGoer(renderer, movementHandler) {
 	    var goerBuilders = [
 	      () => { return dude1Builder.initialize(renderer, movementHandler); },
-	      () => { return girl1Builder.initialize(renderer, movementHandler); }
-	   ];
+	      () => { return girl1Builder.initialize(renderer, movementHandler); } ];
 	
 	    var selection = Math.floor(Math.random() * goerBuilders.length);
 	    var goer = goerBuilders[selection]();
@@ -17751,7 +17762,8 @@
 	  }
 	
 	  module.exports = {
-	    getPartyGoer: getPartyGoer
+	    getPartyGoer: getPartyGoer,
+	    rollGoer: rollGoer
 	  };
 	})();
 
@@ -17947,6 +17959,68 @@
 
 /***/ },
 /* 13 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  title: 'Consume Room',
+	  frameMs: 50,
+	  eatSoundTime: 11500,
+	  baseHungerProbability: 0.005,
+	  basePartyGoerProbability: 0.03,
+	  basePartyGoerLeavesProbability: 0.03,
+	  irresistableEnticingness: 10000
+	};
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	(() => {
+	  var peopleCount;
+	  var enticementCount;
+	  var enticingness;
+	  var banked;
+	
+	  function initialize() {
+	    peopleCount = 0;
+	    enticementCount = 0;
+	    enticingness = 0;
+	    banked = 10;
+	  }
+	
+	  function fondleEntities(entities) {
+	    enticingness = entities.map(e => {
+	      return e.getHappiness ? e.getHappiness() : 0;
+	    }).reduce((acc, val) => acc + val, 0);
+	
+	    peopleCount = entities.filter(e => {
+	      return e.isPerson ? true : false;
+	    }).length;
+	
+	    enticementCount = entities.filter(e => {
+	      return e.isEnticement ? true : false;
+	    }).length;
+	  }
+	
+	  function bankHappiness(hopesAndDreams) {
+	    banked += hopesAndDreams;
+	  }
+	
+	  module.exports = {
+	    initialize: initialize,
+	    getHappiness: () => banked,
+	    getPeopleCount: () => peopleCount,
+	    getEnticementCount: () => enticementCount,
+	    getEnticingness: () => enticingness,
+	    fondleEntities: fondleEntities,
+	    bankHappiness: bankHappiness
+	  };
+	})();
+
+
+/***/ },
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -18046,7 +18120,7 @@
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -18100,21 +18174,7 @@
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	  title: 'Consume Room',
-	  frameMs: 50,
-	  eatSoundTime: 11500,
-	  baseHungerProbability: 0.005,
-	  basePartyGoerProbability: 0.03,
-	  basePartyGoerLeavesProbability: 0.01
-	};
-
-
-/***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18376,53 +18436,6 @@
 	    transformEventToCoords: transformEventToCoords
 	  };
 	
-	})();
-
-
-/***/ },
-/* 17 */
-/***/ function(module, exports) {
-
-	(() => {
-	  var peopleCount;
-	  var enticementCount;
-	  var enticingness;
-	  var banked;
-	
-	  function initialize() {
-	    peopleCount = 0;
-	    enticementCount = 0;
-	    enticingness = 0;
-	    banked = 10;
-	  }
-	
-	  function fondleEntities(entities) {
-	    enticingness = entities.map(e => {
-	      return e.getHappiness ? e.getHappiness() : 0;
-	    }).reduce((acc, val) => acc + val, 0);
-	
-	    peopleCount = entities.filter(e => {
-	      return e.isPerson ? true : false;
-	    }).length;
-	
-	    enticementCount = entities.filter(e => {
-	      return e.isEnticement ? true : false;
-	    }).length;
-	  }
-	
-	  function bankHappiness(hopesAndDreams) {
-	    banked += hopesAndDreams;
-	  }
-	
-	  module.exports = {
-	    initialize: initialize,
-	    getHappiness: () => banked,
-	    getPeopleCount: () => peopleCount,
-	    getEnticementCount: () => enticementCount,
-	    getEnticingness: () => enticingness,
-	    fondleEntities: fondleEntities,
-	    bankHappiness: bankHappiness
-	  };
 	})();
 
 
