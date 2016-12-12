@@ -49,15 +49,16 @@
 	  'use strict';
 	
 	  var entities = __webpack_require__(1);
-	  var stats = __webpack_require__(19);
-	  var gui = __webpack_require__(20);
-	  var gameState = __webpack_require__(16);
-	  var config = __webpack_require__(14);
+	  var stats = __webpack_require__(20);
+	  var gui = __webpack_require__(21);
+	  var gameState = __webpack_require__(17);
+	  var config = __webpack_require__(15);
 	
 	  var paused = false;
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
+	    gameState.initialize();
 	    entities.initialize(canvasElement);
 	    stats.initialize();
 	    gui.initialize(entities);
@@ -81,6 +82,9 @@
 	
 	    if (Math.random() < config.baseHungerProbability) {
 	      gameState.bankHappiness(-1);
+	      if (gameState.getHappiness() < 0) {
+	        gameOver();
+	      }
 	    }
 	    entities.update(timestamp, delta);
 	    stats.draw(gameState);
@@ -89,6 +93,15 @@
 	  function pause() {
 	    paused = !paused;
 	    gui.showPaused(paused);
+	  }
+	
+	  function gameOver() {
+	    gameState.initialize();
+	    var canvasElement = document.getElementById('canvas');
+	    entities.initialize(canvasElement);
+	    stats.initialize();
+	    gui.initialize(entities);
+	    gui.setPause(pause);
 	  }
 	
 	  var last;
@@ -117,22 +130,27 @@
 	  var roomBuilder = __webpack_require__(6);
 	  var doorBuilder = __webpack_require__(7);
 	  var windowBuilder = __webpack_require__(8);
-	  var bearBuilder = __webpack_require__(11);
-	  var discoBuilder = __webpack_require__(12);
-	  var dude1Builder = __webpack_require__(13);
-	  var girl1Builder = __webpack_require__(9);
-	  var config = __webpack_require__(14);
-	  var renderer = __webpack_require__(15);
-	  var gameState = __webpack_require__(16);
-	  var click = __webpack_require__(17);
-	  var movementHandler = __webpack_require__(18);
+	  var bearBuilder = __webpack_require__(13);
+	  var party = __webpack_require__(9);
+	  var discoBuilder = __webpack_require__(14);
+	  var config = __webpack_require__(15);
+	  var renderer = __webpack_require__(16);
+	  var gameState = __webpack_require__(17);
+	  var click = __webpack_require__(18);
+	  var movementHandler = __webpack_require__(19);
 	  var entities = [];
 	  var eating;
 	  var room;
 	  var clickEvent;
+	  var timeout;
 	
 	  function initialize(canvasElement) {
+	    if (timeout) clearTimeout(timeout);
+	    eating = false;
+	
 	    renderer.initialize(canvasElement);
+	    renderer.audio('sound');
+	
 	    movementHandler.initialize();
 	    click.initialize(canvasElement);
 	    click.register((e) => { clickEvent = e; });
@@ -199,28 +217,24 @@
 	      }
 	    }));
 	
-	    setTimeout(() => {
+	    timeout = setTimeout(() => {
 	      entities = _.difference(entities, people);
 	      gameState.bankHappiness(originalCount - entities.length);
 	      renderer.audio('sound');
 	      eating = false;
+	      timeout = undefined;
 	    }, config.eatSoundTime);
 	  }
 	
 	  function addBear() {
+	    if (gameState.getHappiness() <= 0) return;
 	    var bear = discoBuilder.initialize(renderer, movementHandler);
 	    entities.push(bear);
 	    gameState.bankHappiness(-1);
 	  }
 	
 	  function introducePartygoer() {
-	    var goerBuilders = [
-	      () => { return dude1Builder.initialize(renderer, movementHandler); },
-	      () => { return girl1Builder.initialize(renderer, movementHandler); }
-	    ];
-	
-	    var selection = Math.floor(Math.random() * goerBuilders.length);
-	    var goer = goerBuilders[selection]();
+	    var goer = party.getPartyGoer(renderer, movementHandler);
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
@@ -17627,7 +17641,7 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var partyGoer = __webpack_require__(9);
+	  var party = __webpack_require__(9);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17637,7 +17651,7 @@
 	
 	      var pacers = [];
 	      for (var i = 0; i < 30; i++) {
-	        var pacer = partyGoer.initialize(renderer, { check: () => true });
+	        var pacer = party.getPartyGoer(renderer, { check: () => true });
 	
 	        pacer.setX(Math.random());
 	        pacer.setY(-0.03);
@@ -17698,18 +17712,40 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(10);
+	  var dude1Builder = __webpack_require__(10);
+	  var girl1Builder = __webpack_require__(12);
+	
+	  function getPartyGoer(renderer, movementHandler) {
+	    var goerBuilders = [
+	      () => { return dude1Builder.initialize(renderer, movementHandler); },
+	      () => { return girl1Builder.initialize(renderer, movementHandler); }
+	    ];
+	
+	    var selection = Math.floor(Math.random() * goerBuilders.length);
+	    var goer = goerBuilders[selection]();
+	
+	    return goer;
+	  }
+	
+	  module.exports = {
+	    getPartyGoer: getPartyGoer
+	  };
+	})();
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(11);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
 	
 	      var self = entity.getSelf();
-	      self.name = 'girl1';
-	      if (Math.random() < 0.5) {
-	        self.name = 'girl2';
-	      }
+	      self.name = (Math.random() > 0.5) ? 'hipsterbro1' : 'hipsterbro2';
 	      self.size = 400;
 	
 	      var goer = Object.assign({}, entity);
@@ -17717,11 +17753,7 @@
 	      return goer;
 	
 	      function update(timestamp, delta) {
-	        draw(timestamp, delta);
 	        entity.update(timestamp, delta);
-	      }
-	
-	      function draw(timestamp, delta) {
 	      }
 	    };
 	
@@ -17735,7 +17767,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17850,7 +17882,48 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(11);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'girl1';
+	      if (Math.random() < 0.5) {
+	        self.name = 'girl2';
+	      }
+	      self.size = 400;
+	
+	      var goer = Object.assign({}, entity);
+	      goer.update = update;
+	      return goer;
+	
+	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
+	        entity.update(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17950,7 +18023,7 @@
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -18004,45 +18077,7 @@
 
 
 /***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(10);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var self = entity.getSelf();
-	      self.name = 'crappy-party-dude';
-	      self.size = 400;
-	
-	      var goer = Object.assign({}, entity);
-	      goer.update = update;
-	      return goer;
-	
-	      function update(timestamp, delta) {
-	        draw(timestamp, delta);
-	        entity.update(timestamp, delta);
-	      }
-	
-	      function draw(timestamp, delta) {
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -18056,7 +18091,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	// PRIMITIVE RENDERING CALLS
@@ -18322,15 +18357,21 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(() => {
-	  var peopleCount = 0;
-	  var enticementCount = 0;
-	  var enticingness = 0;
+	  var peopleCount;
+	  var enticementCount;
+	  var enticingness;
+	  var banked;
 	
-	  var banked = 10;
+	  function initialize() {
+	    peopleCount = 0;
+	    enticementCount = 0;
+	    enticingness = 0;
+	    banked = 10;
+	  }
 	
 	  function fondleEntities(entities) {
 	    enticingness = entities.map(e => {
@@ -18351,6 +18392,7 @@
 	  }
 	
 	  module.exports = {
+	    initialize: initialize,
 	    getHappiness: () => banked,
 	    getPeopleCount: () => peopleCount,
 	    getEnticementCount: () => enticementCount,
@@ -18362,7 +18404,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18389,7 +18431,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	(() => {
@@ -18421,7 +18463,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -18458,7 +18500,7 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	(function() {

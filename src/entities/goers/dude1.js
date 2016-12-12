@@ -4,10 +4,9 @@
   function initialize(renderer, movementHandler) {
     var constructor = () => {
       var entity = entityBase.initialize(renderer, movementHandler);
-      var render = renderer;
 
       var self = entity.getSelf();
-      self.name = 'crappy-party-dude';
+      self.name = (Math.random() > 0.5) ? 'hipsterbro1' : 'hipsterbro2';
       self.size = 400;
 
       var goer = Object.assign({}, entity);
@@ -15,11 +14,7 @@
       return goer;
 
       function update(timestamp, delta) {
-        draw(timestamp, delta);
         entity.update(timestamp, delta);
-      }
-
-      function draw(timestamp, delta) {
       }
     };
 

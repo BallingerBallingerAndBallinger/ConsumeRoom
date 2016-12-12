@@ -5,9 +5,8 @@
   var doorBuilder = require('./entities/door.js');
   var windowBuilder = require('./entities/window.js');
   var bearBuilder = require('./entities/items/bear.js');
+  var party = require('./crappy-party.js');
   var discoBuilder = require('./entities/items/disco.js');
-  var dude1Builder = require('./entities/goers/dude1.js');
-  var girl1Builder = require('./entities/goers/girl1.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
@@ -17,9 +16,15 @@
   var eating;
   var room;
   var clickEvent;
+  var timeout;
 
   function initialize(canvasElement) {
+    if (timeout) clearTimeout(timeout);
+    eating = false;
+
     renderer.initialize(canvasElement);
+    renderer.audio('sound');
+
     movementHandler.initialize();
     click.initialize(canvasElement);
     click.register((e) => { clickEvent = e; });
@@ -86,28 +91,24 @@
       }
     }));
 
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       entities = _.difference(entities, people);
       gameState.bankHappiness(originalCount - entities.length);
       renderer.audio('sound');
       eating = false;
+      timeout = undefined;
     }, config.eatSoundTime);
   }
 
   function addBear() {
+    if (gameState.getHappiness() <= 0) return;
     var bear = discoBuilder.initialize(renderer, movementHandler);
     entities.push(bear);
     gameState.bankHappiness(-1);
   }
 
   function introducePartygoer() {
-    var goerBuilders = [
-      () => { return dude1Builder.initialize(renderer, movementHandler); },
-      () => { return girl1Builder.initialize(renderer, movementHandler); }
-    ];
-
-    var selection = Math.floor(Math.random() * goerBuilders.length);
-    var goer = goerBuilders[selection]();
+    var goer = party.getPartyGoer(renderer, movementHandler);
 
     goer.setX(0.9);
     goer.setY(0);
