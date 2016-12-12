@@ -175,8 +175,8 @@ stats {
 }
 
 .enticement-item-icon{
-    height: 48px;
-    width: 48px;
+   height: 80%;
+   margin: 4px;
 }
 
 .hidden {
