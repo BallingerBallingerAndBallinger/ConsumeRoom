@@ -2,6 +2,7 @@
   var $ = require('./lol-jquery.js');
   var configuration = require('../configuration.js');
   var pause = () => { console.log('No pause function registered'); };
+  var win = () => { console.log('No win function registered'); };
 
   var entities;
 
@@ -20,6 +21,10 @@
     pause = (paused) => {
       pauseFn(paused);
     };
+  }
+
+  function setWin(winFn) {
+    win = winFn;
   }
 
   function showPaused(show) {
@@ -60,7 +65,7 @@
       },
       { name: 'buy-bloon',
         description: 'The bloons aren\'t even really for the humans, are they?',
-        action: entities.addBloon,
+        action: () => { win(); entities.addBloon(); },
         price: configuration.bloon.price
       }];
 
@@ -108,6 +113,7 @@
     initialize: initialize,
     setPause: setPause,
     showPaused: showPaused,
-    showShop: showShop
+    showShop: showShop,
+    setWin: setWin
   };
 })();

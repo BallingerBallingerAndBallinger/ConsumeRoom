@@ -63,6 +63,7 @@
 	    views.wire('begin-game-button', quoteScreen);
 	    views.wire('continue-button', startGame);
 	    views.wire('start-over-button', start);
+	    views.wire('continue-after-win-button', continueAfterWin);
 	    start();
 	  };
 	
@@ -72,6 +73,16 @@
 	
 	  function quoteScreen() {
 	    views.show('quote-view');
+	  }
+	
+	  function win() {
+	    paused = true;
+	    views.show('win-view');
+	  }
+	
+	  function continueAfterWin() {
+	    paused = false;
+	    views.show();
 	  }
 	
 	  function startGame() {
@@ -85,6 +96,7 @@
 	    stats.initialize();
 	    gui.initialize(entities);
 	    gui.setPause(pause);
+	    gui.setWin(win);
 	    requestAnimationFrame(grandLoop);
 	  }
 	
@@ -17577,7 +17589,7 @@
 	  eatSoundTime: 11500,
 	  baseHungerProbability: 0.01,
 	  basePartyGoerProbability: 0.05,
-	  basePartyGoerLeavesProbability: 0.003,
+	  basePartyGoerLeavesProbability: 0.008,
 	  irresistableEnticingness: 5000,
 	  packedHouse: 400,
 	  leaveAttempts: 2,
@@ -18671,6 +18683,7 @@
 	  var $ = __webpack_require__(23);
 	  var configuration = __webpack_require__(6);
 	  var pause = () => { console.log('No pause function registered'); };
+	  var win = () => { console.log('No win function registered'); };
 	
 	  var entities;
 	
@@ -18689,6 +18702,10 @@
 	    pause = (paused) => {
 	      pauseFn(paused);
 	    };
+	  }
+	
+	  function setWin(winFn) {
+	    win = winFn;
 	  }
 	
 	  function showPaused(show) {
@@ -18729,7 +18746,7 @@
 	      },
 	      { name: 'buy-bloon',
 	        description: 'The bloons aren\'t even really for the humans, are they?',
-	        action: entities.addBloon,
+	        action: () => { win(); entities.addBloon(); },
 	        price: configuration.bloon.price
 	      }];
 	
@@ -18777,7 +18794,8 @@
 	    initialize: initialize,
 	    setPause: setPause,
 	    showPaused: showPaused,
-	    showShop: showShop
+	    showShop: showShop,
+	    setWin: setWin
 	  };
 	})();
 
@@ -18812,8 +18830,8 @@
 	(() => {
 	  var $ = __webpack_require__(23);
 	
-	  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view'];
-	  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button'];
+	  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view', 'win-view'];
+	  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button', 'continue-after-win-button'];
 	  var views;
 	  var buttons;
 	

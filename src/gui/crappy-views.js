@@ -1,8 +1,8 @@
 (() => {
   var $ = require('./lol-jquery.js');
 
-  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view'];
-  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button'];
+  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view', 'win-view'];
+  var buttonIds = ['begin-game-button', 'continue-button', 'start-over-button', 'continue-after-win-button'];
   var views;
   var buttons;
 

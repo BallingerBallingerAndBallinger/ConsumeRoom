@@ -17,6 +17,7 @@
     views.wire('begin-game-button', quoteScreen);
     views.wire('continue-button', startGame);
     views.wire('start-over-button', start);
+    views.wire('continue-after-win-button', continueAfterWin);
     start();
   };
 
@@ -26,6 +27,16 @@
 
   function quoteScreen() {
     views.show('quote-view');
+  }
+
+  function win() {
+    paused = true;
+    views.show('win-view');
+  }
+
+  function continueAfterWin() {
+    paused = false;
+    views.show();
   }
 
   function startGame() {
@@ -39,6 +50,7 @@
     stats.initialize();
     gui.initialize(entities);
     gui.setPause(pause);
+    gui.setWin(win);
     requestAnimationFrame(grandLoop);
   }
 

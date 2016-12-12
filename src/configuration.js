@@ -4,7 +4,7 @@ module.exports = {
   eatSoundTime: 11500,
   baseHungerProbability: 0.01,
   basePartyGoerProbability: 0.05,
-  basePartyGoerLeavesProbability: 0.003,
+  basePartyGoerLeavesProbability: 0.008,
   irresistableEnticingness: 5000,
   packedHouse: 400,
   leaveAttempts: 2,
