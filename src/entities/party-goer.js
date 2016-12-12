@@ -6,7 +6,7 @@
       var entity = entityBase.initialize(renderer, movementHandler);
       var render = renderer;
       var steps = 0;
-      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
+      var stepsGenerator = () => Math.round(10 + Math.random() * 25);
       var goalCallback;
 
       var self = entity.getSelf();

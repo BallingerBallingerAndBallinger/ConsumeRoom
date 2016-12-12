@@ -29,6 +29,8 @@
     click.register((e) => { clickEvent = e; });
 
     var bloon = bloonBuilder.initialize(renderer, movementHandler);
+    bloon.setGetHappiness(() => 0);
+
     var window = windowBuilder.initialize(renderer);
 
     room = roomBuilder.initialize(renderer);
@@ -135,7 +137,14 @@
 
     goer.setX(0.9);
     goer.setY(0);
-    goer.setGoal(config.entryDistance * Math.random(), config.entryDistance * Math.random());
+    var fullEntry = Math.random() < config.fullEntryProbability;
+    if (fullEntry) {
+      // the callback prevents their goal from being reset
+      goer.setGoal(config.entryDistance * Math.random(),
+                   config.entryDistance * Math.random(), () => {});
+
+      goer.setSteps(100);
+    }
     entities.push(goer);
   }
 

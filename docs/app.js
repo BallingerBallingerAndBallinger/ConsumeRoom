@@ -176,6 +176,8 @@
 	    click.register((e) => { clickEvent = e; });
 	
 	    var bloon = bloonBuilder.initialize(renderer, movementHandler);
+	    bloon.setGetHappiness(() => 0);
+	
 	    var window = windowBuilder.initialize(renderer);
 	
 	    room = roomBuilder.initialize(renderer);
@@ -282,7 +284,14 @@
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
-	    goer.setGoal(config.entryDistance * Math.random(), config.entryDistance * Math.random());
+	    var fullEntry = Math.random() < config.fullEntryProbability;
+	    if (fullEntry) {
+	      // the callback prevents their goal from being reset
+	      goer.setGoal(config.entryDistance * Math.random(),
+	                   config.entryDistance * Math.random(), () => {});
+	
+	      goer.setSteps(100);
+	    }
 	    entities.push(goer);
 	  }
 	
@@ -17434,8 +17443,13 @@
 	
 	      bloon.update = update;
 	      bloon.getHappiness = () => configuration.bloon.happiness;
+	      bloon.setGetHappiness = setGetHappiness;
 	      bloon.isEnticement = true;
 	      return bloon;
+	
+	      function setGetHappiness(happinessFn) {
+	        bloon.getHappiness = happinessFn;
+	      }
 	
 	      function update(timestamp, delta) {
 	        var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
@@ -17562,13 +17576,14 @@
 	  title: 'Consume Room',
 	  frameMs: 50,
 	  eatSoundTime: 11500,
-	  baseHungerProbability: 0.005,
-	  basePartyGoerProbability: 0.03,
-	  basePartyGoerLeavesProbability: 0.03,
-	  irresistableEnticingness: 10000,
+	  baseHungerProbability: 0.01,
+	  basePartyGoerProbability: 0.05,
+	  basePartyGoerLeavesProbability: 0.003,
+	  irresistableEnticingness: 5000,
 	  packedHouse: 400,
-	  leaveAttempts: 15,
-	  entryDistance: 0.5,
+	  leaveAttempts: 2,
+	  entryDistance: 0.4,
+	  fullEntryProbability: 0.2,
 	  plant: {
 	    happiness: 5,
 	    price: 5
@@ -18069,7 +18084,7 @@
 	      var entity = entityBase.initialize(renderer, movementHandler);
 	      var render = renderer;
 	      var steps = 0;
-	      var stepsGenerator = () => Math.round(20 + Math.random() * 30);
+	      var stepsGenerator = () => Math.round(10 + Math.random() * 25);
 	      var goalCallback;
 	
 	      var self = entity.getSelf();

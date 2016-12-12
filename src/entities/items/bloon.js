@@ -21,8 +21,13 @@
 
       bloon.update = update;
       bloon.getHappiness = () => configuration.bloon.happiness;
+      bloon.setGetHappiness = setGetHappiness;
       bloon.isEnticement = true;
       return bloon;
+
+      function setGetHappiness(happinessFn) {
+        bloon.getHappiness = happinessFn;
+      }
 
       function update(timestamp, delta) {
         var attemptedTravel = goingLeft ? -1 * velocity * delta : velocity * delta;
