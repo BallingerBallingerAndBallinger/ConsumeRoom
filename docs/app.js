@@ -229,8 +229,7 @@
 	  function consumeAll() {
 	    if (eating) return;
 	    eating = true;
-	    renderer.stopAudio('sound');
-	    renderer.audio('eat');
+	    renderer.pauseAudio('sound');
 	
 	    var people = entities.filter(e => {
 	      return e.isPerson ? true : false;
@@ -17841,6 +17840,12 @@
 	      }
 	
 	      function setEating(newEating) {
+	        if (eating !== newEating) {
+	          if (newEating) {
+	            render.stopAudio('eat');
+	            render.audio('eat');
+	          }
+	        }
 	        eating = newEating;
 	        door.setClosed(newEating);
 	      }
@@ -17878,6 +17883,12 @@
 	      return door;
 	
 	      function setClosed(newClosed) {
+	        if (closed !== newClosed) {
+	          if (newClosed) {
+	            render.stopAudio('slam');
+	            render.audio('slam');
+	          }
+	        }
 	        closed = newClosed;
 	      }
 	
@@ -18492,6 +18503,11 @@
 	    sound.currentTime = 0;
 	  }
 	
+	  function pauseAudio(audioId) {
+	    var sound = document.getElementById(audioId);
+	    sound.pause();
+	  }
+	
 	  // ----------------------------------------------------------------------------
 	  // Render the current path
 	  //
@@ -18538,6 +18554,7 @@
 	    video: video,
 	    audio: audio,
 	    stopAudio: stopAudio,
+	    pauseAudio: pauseAudio,
 	    getWidth: getWidth,
 	    getHeight: getHeight,
 	    transformEventToCoords: transformEventToCoords

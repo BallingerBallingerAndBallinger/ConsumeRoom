@@ -82,8 +82,7 @@
   function consumeAll() {
     if (eating) return;
     eating = true;
-    renderer.stopAudio('sound');
-    renderer.audio('eat');
+    renderer.pauseAudio('sound');
 
     var people = entities.filter(e => {
       return e.isPerson ? true : false;

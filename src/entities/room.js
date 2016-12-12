@@ -50,6 +50,12 @@
       }
 
       function setEating(newEating) {
+        if (eating !== newEating) {
+          if (newEating) {
+            render.stopAudio('eat');
+            render.audio('eat');
+          }
+        }
         eating = newEating;
         door.setClosed(newEating);
       }

@@ -344,6 +344,9 @@ stats {
     color: rgba(200,40,40,1);
 }
 
+.gold-text{
+    color: goldenrod;
+}
 .align-self-end{
     align-self: flex-end;
 }
@@ -382,7 +385,6 @@ stats {
 .name-chris{
     font-size: 6vw;
     padding: 8px;
-    color: lightgray;
 }
 
 .picture-shadow{
@@ -417,6 +419,7 @@ text-shadow: 0 2px 2px black;
 .menu-container{
     margin-right:auto;
     margin-left: 4%; 
+    z-index:1;
 }
 
 .flex-container-right{
@@ -427,4 +430,17 @@ text-shadow: 0 2px 2px black;
 .paragraph-title-screen{
     margin-right: 25%;
 
+}
+
+.floating-bloon{
+    position: fixed;
+    margin-left: 20%;
+    height:60%;
+    
+}
+
+.floating-bloon2{
+    position: fixed;
+    margin-left: 25%;
+    height:40%; 
 }

@@ -17,6 +17,12 @@
       return door;
 
       function setClosed(newClosed) {
+        if (closed !== newClosed) {
+          if (newClosed) {
+            render.stopAudio('slam');
+            render.audio('slam');
+          }
+        }
         closed = newClosed;
       }
 

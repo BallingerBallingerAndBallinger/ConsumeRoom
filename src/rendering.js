@@ -206,6 +206,11 @@
     sound.currentTime = 0;
   }
 
+  function pauseAudio(audioId) {
+    var sound = document.getElementById(audioId);
+    sound.pause();
+  }
+
   // ----------------------------------------------------------------------------
   // Render the current path
   //
@@ -252,6 +257,7 @@
     video: video,
     audio: audio,
     stopAudio: stopAudio,
+    pauseAudio: pauseAudio,
     getWidth: getWidth,
     getHeight: getHeight,
     transformEventToCoords: transformEventToCoords
