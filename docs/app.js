@@ -248,7 +248,7 @@
 	    });
 	    var originalCount = people.length;
 	
-	    people.forEach(p => p.setGoal(0.6, 0.55, () => {
+	    people.forEach(p => p.setGoal(0.57, 0.55, () => {
 	      if (p.eaten) {
 	        p.eaten();
 	      } else {
