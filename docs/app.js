@@ -334,14 +334,18 @@
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
+	
+	    var stayer = Math.random() < config.stayerProbability;
 	    var fullEntry = Math.random() < config.fullEntryProbability;
-	    if (fullEntry) {
+	    if (fullEntry && !stayer) {
 	      // the callback prevents their goal from being reset
 	      goer.setGoal(config.entryDistance * Math.random(),
 	                   config.entryDistance * Math.random(), () => {});
-	
 	      goer.setSteps(100);
-	    }
+	    };
+	
+	    if (stayer) goer.setStayer(true);
+	
 	    entities.push(goer);
 	  }
 	
@@ -350,7 +354,7 @@
 	    var people = entities.filter((e) => e.isPerson) || [];
 	    var leaver = people[Math.floor(Math.random() * people.length)];
 	
-	    while (leaver === undefined || leaver.hasGoalCallback()) {
+	    while (leaver === undefined || leaver.hasGoalCallback() || leaver.isStayer()) {
 	      leaver = people[Math.floor(Math.random() * people.length)];
 	      attempts++;
 	      if (attempts > config.leaveAttempts) {
@@ -17713,12 +17717,13 @@
 	  eatSoundTime: 11500,
 	  baseHungerProbability: 0.007,
 	  basePartyGoerProbability: 0.05,
-	  basePartyGoerLeavesProbability: 0.008,
+	  basePartyGoerLeavesProbability: 0,
 	  irresistableEnticingness: 3500,
-	  packedHouse: 400,
+	  packedHouse: 700,
 	  leaveAttempts: 2,
 	  entryDistance: 0.4,
 	  fullEntryProbability: 0.2,
+	  stayerProbability: 0.05,
 	  plant: {
 	    happiness: 8,
 	    price: 5
@@ -18288,6 +18293,7 @@
 	      var steps = 0;
 	      var stepsGenerator = () => Math.round(10 + Math.random() * 25);
 	      var goalCallback;
+	      var stayer = false;
 	
 	      var self = entity.getSelf();
 	      self.name = 'crappy-party-dude';
@@ -18302,6 +18308,8 @@
 	      goer.setSteps = setSteps;
 	      goer.getSteps = getSteps;
 	      goer.hasGoalCallback = hasGoalCallback;
+	      goer.setStayer = setStayer;
+	      goer.isStayer = () => stayer;
 	      return goer;
 	
 	      function update(timestamp, delta) {
@@ -18322,6 +18330,10 @@
 	
 	      function getSteps() {
 	        return steps;
+	      }
+	
+	      function setStayer(newStayer) {
+	        stayer = newStayer;
 	      }
 	
 	      function hasGoalCallback() {

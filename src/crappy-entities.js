@@ -175,14 +175,18 @@
 
     goer.setX(0.9);
     goer.setY(0);
+
+    var stayer = Math.random() < config.stayerProbability;
     var fullEntry = Math.random() < config.fullEntryProbability;
-    if (fullEntry) {
+    if (fullEntry && !stayer) {
       // the callback prevents their goal from being reset
       goer.setGoal(config.entryDistance * Math.random(),
                    config.entryDistance * Math.random(), () => {});
-
       goer.setSteps(100);
-    }
+    };
+
+    if (stayer) goer.setStayer(true);
+
     entities.push(goer);
   }
 
@@ -191,7 +195,7 @@
     var people = entities.filter((e) => e.isPerson) || [];
     var leaver = people[Math.floor(Math.random() * people.length)];
 
-    while (leaver === undefined || leaver.hasGoalCallback()) {
+    while (leaver === undefined || leaver.hasGoalCallback() || leaver.isStayer()) {
       leaver = people[Math.floor(Math.random() * people.length)];
       attempts++;
       if (attempts > config.leaveAttempts) {

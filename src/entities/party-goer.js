@@ -8,6 +8,7 @@
       var steps = 0;
       var stepsGenerator = () => Math.round(10 + Math.random() * 25);
       var goalCallback;
+      var stayer = false;
 
       var self = entity.getSelf();
       self.name = 'crappy-party-dude';
@@ -22,6 +23,8 @@
       goer.setSteps = setSteps;
       goer.getSteps = getSteps;
       goer.hasGoalCallback = hasGoalCallback;
+      goer.setStayer = setStayer;
+      goer.isStayer = () => stayer;
       return goer;
 
       function update(timestamp, delta) {
@@ -42,6 +45,10 @@
 
       function getSteps() {
         return steps;
+      }
+
+      function setStayer(newStayer) {
+        stayer = newStayer;
       }
 
       function hasGoalCallback() {
