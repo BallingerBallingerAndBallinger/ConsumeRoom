@@ -17572,21 +17572,21 @@
 	  packedHouse: 400,
 	  leaveAttempts: 15,
 	  entryDistance: 0.5,
-	  bear: {
-	    happiness: 15,
-	    price: 10
-	  },
-	  bloon: {
-	    happiness: 200,
-	    price: 50
-	  },
 	  plant: {
 	    happiness: 5,
 	    price: 5
 	  },
+	  bear: {
+	    happiness: 15,
+	    price: 10
+	  },
 	  disco: {
 	    happiness: 50,
 	    price: 25
+	  },
+	  bloon: {
+	    happiness: 200,
+	    price: 100
 	  }
 	};
 
@@ -18718,7 +18718,7 @@
 	
 	    shopItems.forEach((item) => {
 	      item.element = document.getElementById(item.name);
-	      item.element.getElementsByClasssName('cost')[0].innerHTML = item.price + ' happiness';    
+	      item.element.getElementsByClassName('cost')[0].innerHTML = item.price + ' happiness';
 	      item.element.addEventListener('mouseover', (e) => { enticementDesc.innerHTML = item.description; });
 	      item.element.addEventListener('mouseout', (e) => { enticementDesc.innerHTML = selectedItem.description; });
 	      item.element.addEventListener('click', (e) => {

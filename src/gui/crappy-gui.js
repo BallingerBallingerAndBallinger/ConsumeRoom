@@ -93,7 +93,7 @@
 
     shopItems.forEach((item) => {
       item.element = document.getElementById(item.name);
-      item.element.getElementsByClasssName('cost')[0].innerHTML = item.price + ' happiness';
+      item.element.getElementsByClassName('cost')[0].innerHTML = item.price + ' happiness';
       item.element.addEventListener('mouseover', (e) => { enticementDesc.innerHTML = item.description; });
       item.element.addEventListener('mouseout', (e) => { enticementDesc.innerHTML = selectedItem.description; });
       item.element.addEventListener('click', (e) => {

@@ -9,20 +9,20 @@ module.exports = {
   packedHouse: 400,
   leaveAttempts: 15,
   entryDistance: 0.5,
-  bear: {
-    happiness: 15,
-    price: 10
-  },
-  bloon: {
-    happiness: 200,
-    price: 50
-  },
   plant: {
     happiness: 5,
     price: 5
   },
+  bear: {
+    happiness: 15,
+    price: 10
+  },
   disco: {
     happiness: 50,
     price: 25
+  },
+  bloon: {
+    happiness: 200,
+    price: 50
   }
 };
