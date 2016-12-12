@@ -1,9 +1,15 @@
 (() => {
-  var peopleCount = 0;
-  var enticementCount = 0;
-  var enticingness = 0;
+  var peopleCount;
+  var enticementCount;
+  var enticingness;
+  var banked;
 
-  var banked = 10;
+  function initialize() {
+    peopleCount = 0;
+    enticementCount = 0;
+    enticingness = 0;
+    banked = 10;
+  }
 
   function fondleEntities(entities) {
     enticingness = entities.map(e => {
@@ -24,6 +30,7 @@
   }
 
   module.exports = {
+    initialize: initialize,
     getHappiness: () => banked,
     getPeopleCount: () => peopleCount,
     getEnticementCount: () => enticementCount,

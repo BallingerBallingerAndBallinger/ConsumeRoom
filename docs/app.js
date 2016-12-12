@@ -58,6 +58,7 @@
 	
 	  window.onload = () => {
 	    var canvasElement = document.getElementById('canvas');
+	    gameState.initialize();
 	    entities.initialize(canvasElement);
 	    stats.initialize();
 	    gui.initialize(entities);
@@ -81,6 +82,9 @@
 	
 	    if (Math.random() < config.baseHungerProbability) {
 	      gameState.bankHappiness(-1);
+	      if (gameState.getHappiness() < 0) {
+	        gameOver();
+	      }
 	    }
 	    entities.update(timestamp, delta);
 	    stats.draw(gameState);
@@ -89,6 +93,15 @@
 	  function pause() {
 	    paused = !paused;
 	    gui.showPaused(paused);
+	  }
+	
+	  function gameOver() {
+	    gameState.initialize();
+	    var canvasElement = document.getElementById('canvas');
+	    entities.initialize(canvasElement);
+	    stats.initialize();
+	    gui.initialize(entities);
+	    gui.setPause(pause);
 	  }
 	
 	  var last;
@@ -18341,11 +18354,17 @@
 /***/ function(module, exports) {
 
 	(() => {
-	  var peopleCount = 0;
-	  var enticementCount = 0;
-	  var enticingness = 0;
+	  var peopleCount;
+	  var enticementCount;
+	  var enticingness;
+	  var banked;
 	
-	  var banked = 10;
+	  function initialize() {
+	    peopleCount = 0;
+	    enticementCount = 0;
+	    enticingness = 0;
+	    banked = 10;
+	  }
 	
 	  function fondleEntities(entities) {
 	    enticingness = entities.map(e => {
@@ -18366,6 +18385,7 @@
 	  }
 	
 	  module.exports = {
+	    initialize: initialize,
 	    getHappiness: () => banked,
 	    getPeopleCount: () => peopleCount,
 	    getEnticementCount: () => enticementCount,
