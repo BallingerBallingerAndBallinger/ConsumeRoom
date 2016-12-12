@@ -6,6 +6,7 @@
   var windowBuilder = require('./entities/window.js');
   var bearBuilder = require('./entities/items/bear.js');
   var party = require('./crappy-party.js');
+  var discoBuilder = require('./entities/items/disco.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
@@ -93,7 +94,7 @@
   }
 
   function addBear() {
-    var bear = bearBuilder.initialize(renderer, movementHandler);
+    var bear = discoBuilder.initialize(renderer, movementHandler);
     bear.setY(Math.random());
     entities.push(bear);
     gameState.bankHappiness(-1);

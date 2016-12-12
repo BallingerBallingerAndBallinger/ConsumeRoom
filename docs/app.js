@@ -117,8 +117,10 @@
 	  var roomBuilder = __webpack_require__(6);
 	  var doorBuilder = __webpack_require__(7);
 	  var windowBuilder = __webpack_require__(8);
-	  var bearBuilder = __webpack_require__(13);
-	  var party = __webpack_require__(9);
+	  var bearBuilder = __webpack_require__(11);
+	  var discoBuilder = __webpack_require__(12);
+	  var dude1Builder = __webpack_require__(13);
+	  var girl1Builder = __webpack_require__(9);
 	  var config = __webpack_require__(14);
 	  var renderer = __webpack_require__(15);
 	  var gameState = __webpack_require__(16);
@@ -206,14 +208,20 @@
 	  }
 	
 	  function addBear() {
-	    var bear = bearBuilder.initialize(renderer, movementHandler);
+	    var bear = discoBuilder.initialize(renderer, movementHandler);
 	    bear.setY(Math.random());
 	    entities.push(bear);
 	    gameState.bankHappiness(-1);
 	  }
 	
 	  function introducePartygoer() {
-	    var goer = party.getPartyGoer(renderer, movementHandler);
+	    var goerBuilders = [
+	      () => { return dude1Builder.initialize(renderer, movementHandler); },
+	      () => { return girl1Builder.initialize(renderer, movementHandler); }
+	    ];
+	
+	    var selection = Math.floor(Math.random() * goerBuilders.length);
+	    var goer = goerBuilders[selection]();
 	
 	    goer.setX(0.9);
 	    goer.setY(0);
@@ -260,7 +268,7 @@
 	  var undefined;
 	
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 	
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3304,7 +3312,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = 0,
 	          length = path.length;
@@ -3490,9 +3498,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 	
@@ -4053,7 +4064,7 @@
 	            value = baseGet(object, path);
 	
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4129,8 +4140,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+	
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4251,7 +4271,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -4592,9 +4612,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+	
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 	
 	    /**
@@ -4734,14 +4756,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 	
 	    /**
@@ -6366,7 +6384,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -6843,7 +6861,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 	
 	    /**
@@ -6983,6 +7001,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+	
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9717,10 +9737,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 	
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11088,10 +11110,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 	
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13707,16 +13733,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13766,7 +13785,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 	
 	    /**
@@ -13788,16 +13807,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 	
 	    /**
@@ -13830,15 +13840,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length;
 	
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16348,7 +16358,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 	
 	    /**
@@ -17620,7 +17630,7 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var party = __webpack_require__(9);
+	  var partyGoer = __webpack_require__(9);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17630,7 +17640,7 @@
 	
 	      var pacers = [];
 	      for (var i = 0; i < 30; i++) {
-	        var pacer = party.getPartyGoer(renderer, { check: () => true });
+	        var pacer = partyGoer.initialize(renderer, { check: () => true });
 	
 	        pacer.setX(Math.random());
 	        pacer.setY(-0.03);
@@ -17691,40 +17701,18 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var dude1Builder = __webpack_require__(10);
-	  var girl1Builder = __webpack_require__(12);
-	
-	  function getPartyGoer(renderer, movementHandler) {
-	    var goerBuilders = [
-	      () => { return dude1Builder.initialize(renderer, movementHandler); },
-	      () => { return girl1Builder.initialize(renderer, movementHandler); }
-	    ];
-	
-	    var selection = Math.floor(Math.random() * goerBuilders.length);
-	    var goer = goerBuilders[selection]();
-	
-	    return goer;
-	  }
-	
-	  module.exports = {
-	    getPartyGoer: getPartyGoer
-	  };
-	})();
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(11);
+	  var entityBase = __webpack_require__(10);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
 	
 	      var self = entity.getSelf();
-	      self.name = (Math.random() > 0.5) ? 'hipsterbro1' : 'hipsterbro2';
+	      self.name = 'girl1';
+	      if (Math.random() < 0.5) {
+	        self.name = 'girl2';
+	      }
 	      self.size = 400;
 	
 	      var goer = Object.assign({}, entity);
@@ -17732,7 +17720,11 @@
 	      return goer;
 	
 	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
 	        entity.update(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
 	      }
 	    };
 	
@@ -17746,7 +17738,7 @@
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17861,48 +17853,7 @@
 
 
 /***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(11);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	
-	      var self = entity.getSelf();
-	      self.name = 'girl1';
-	      if (Math.random() < 0.5) {
-	        self.name = 'girl2';
-	      }
-	      self.size = 400;
-	
-	      var goer = Object.assign({}, entity);
-	      goer.update = update;
-	      return goer;
-	
-	      function update(timestamp, delta) {
-	        draw(timestamp, delta);
-	        entity.update(timestamp, delta);
-	      }
-	
-	      function draw(timestamp, delta) {
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -17989,6 +17940,98 @@
 	
 	      function setY(newY) {
 	        self.y = newY;
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'disco';
+	      self.x = Math.random();
+	      self.y = Math.random();
+	      self.size = 200;
+	
+	      var starX = Math.random();
+	      var starY = Math.random();
+	      var starMove = 0;
+	
+	      var disco = Object.assign({}, entity);
+	      disco.update = update;
+	      disco.getHappiness = () => 100;
+	      disco.isEnticement = true;
+	      return disco;
+	
+	      function update(timestamp, delta) {
+	        var renderHeight = entity.getRenderHeight();
+	        var renderX = entity.getRenderX();
+	        var renderY = entity.getRenderY() - 3 * renderHeight;
+	
+	        starMove -= delta;
+	        if (starMove <= 0) {
+	          starMove = Math.random() * 3000;
+	          starX = Math.random();
+	          starY = Math.random();
+	        }
+	
+	        render.image(renderX, renderY, self.name, '', renderHeight);
+	        render.image(renderX + (starX * renderHeight) - (renderHeight/10), renderY + (starY * renderHeight) - (renderHeight / 10), 'stars', '', renderHeight / 5);
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(10);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	
+	      var self = entity.getSelf();
+	      self.name = 'crappy-party-dude';
+	      self.size = 400;
+	
+	      var goer = Object.assign({}, entity);
+	      goer.update = update;
+	      return goer;
+	
+	      function update(timestamp, delta) {
+	        draw(timestamp, delta);
+	        entity.update(timestamp, delta);
+	      }
+	
+	      function draw(timestamp, delta) {
 	      }
 	    };
 	
