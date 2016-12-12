@@ -17584,13 +17584,13 @@
 	          self.x = 1;
 	        }
 	        if (self.x < 0) {
-	          self.x = 0;
+	          self.x = 0.01;
 	        }
 	        if (self.y > 1) {
 	          self.y = 1;
 	        }
 	        if (self.y < 0) {
-	          self.y = 0;
+	          self.y = 0.01;
 	        }
 	      }
 	
@@ -17951,6 +17951,9 @@
 	      var room = Object.assign({}, entity);
 	      room.update = update;
 	      room.setEating = setEating;
+	      room.getX = getX;
+	      room.getY = getY;
+	      room.self = self;
 	      return room;
 	
 	      function update(timestamp, delta) {
@@ -17961,7 +17964,6 @@
 	        } else {
 	          puckeringFactor = 1;
 	        }
-	
 	
 	        var width  = 350 * puckeringFactor;
 	        var height = 350 * puckeringFactor * (300 / 428);
@@ -18032,6 +18034,13 @@
 	        }
 	        eating = newEating;
 	        door.setClosed(newEating);
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	      function getY() {
+	        return self.y;
 	      }
 	    };
 	
