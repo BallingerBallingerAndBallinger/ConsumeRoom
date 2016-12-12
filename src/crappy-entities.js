@@ -5,6 +5,7 @@
   var doorBuilder = require('./entities/door.js');
   var windowBuilder = require('./entities/window.js');
   var bearBuilder = require('./entities/items/bear.js');
+  var discoBuilder = require('./entities/items/disco.js');
   var dude1Builder = require('./entities/goers/dude1.js');
   var girl1Builder = require('./entities/goers/girl1.js');
   var config = require('./configuration.js');
@@ -94,7 +95,7 @@
   }
 
   function addBear() {
-    var bear = bearBuilder.initialize(renderer, movementHandler);
+    var bear = discoBuilder.initialize(renderer, movementHandler);
     bear.setY(Math.random());
     entities.push(bear);
     gameState.bankHappiness(-1);
