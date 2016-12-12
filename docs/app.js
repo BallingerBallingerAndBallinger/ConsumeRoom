@@ -286,7 +286,7 @@
 	  function partyGoerWantsToLeave() {
 	    var people = entities.filter((e) => e.isPerson) || [];
 	    var leaver = people[Math.floor(Math.random() * people.length)];
-	    if (leaver === undefined) return;
+	    if (leaver === undefined || leaver.hasGoalCallback()) return;
 	
 	    leaver.setGoal(0.9, 0, () => {
 	      if (eating) return;
@@ -17764,8 +17764,7 @@
 	
 	  function rollGoer() {
 	    var roll = Math.random();
-	    var irresistibility = (gameState.getEnticingness() / config.irresistableEnticingness);
-	    var required = config.basePartyGoerProbability + irresistibility;
+	    var required = config.basePartyGoerProbability + irresistableness();
 	    if (roll < required) {
 	      return true;
 	    }
@@ -17774,10 +17773,11 @@
 	  function rollLeaver() {
 	    var roll = Math.random();
 	
+	    var softCap = irresistableness() * config.packedHouse;
 	    var people = gameState.getPeopleCount();
-	    var packedPenalty = (people / config.packedHouse);
-	    var required = config.basePartyLeavesProbability + packedPenalty;
-	 
+	    var packedPenalty = people / softCap;
+	    var required = config.basePartyGoerLeavesProbability + packedPenalty;
+	
 	    if (roll < required) {
 	      return true;
 	    }
@@ -17794,10 +17794,16 @@
 	    return goer;
 	  }
 	
+	  function irresistableness() {
+	    var irresistability = (gameState.getEnticingness() / config.irresistableEnticingness);
+	    if (irresistability > 1) return 1;
+	    return irresistability;
+	  }
+	
 	  module.exports = {
 	    getPartyGoer: getPartyGoer,
 	    rollGoer: rollGoer,
-	    rollLeaver: rollGoer
+	    rollLeaver: rollLeaver
 	  };
 	})();
 
@@ -17862,6 +17868,7 @@
 	      goer.setStepsGenerator = setStepsGenerator;
 	      goer.setSteps = setSteps;
 	      goer.getSteps = getSteps;
+	      goer.hasGoalCallback = hasGoalCallback;
 	      return goer;
 	
 	      function update(timestamp, delta) {
@@ -17882,6 +17889,10 @@
 	
 	      function getSteps() {
 	        return steps;
+	      }
+	
+	      function hasGoalCallback() {
+	        return goalCallback ? true : false;
 	      }
 	
 	      function setGoal(x, y, callback) {
@@ -18002,7 +18013,8 @@
 	  baseHungerProbability: 0.005,
 	  basePartyGoerProbability: 0.03,
 	  basePartyGoerLeavesProbability: 0.03,
-	  irresistableEnticingness: 10000
+	  irresistableEnticingness: 10000,
+	  packedHouse: 400
 	};
 
 

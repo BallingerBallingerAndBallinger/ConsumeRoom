@@ -139,7 +139,7 @@
   function partyGoerWantsToLeave() {
     var people = entities.filter((e) => e.isPerson) || [];
     var leaver = people[Math.floor(Math.random() * people.length)];
-    if (leaver === undefined) return;
+    if (leaver === undefined || leaver.hasGoalCallback()) return;
 
     leaver.setGoal(0.9, 0, () => {
       if (eating) return;

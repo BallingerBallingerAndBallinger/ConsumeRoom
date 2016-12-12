@@ -21,6 +21,7 @@
       goer.setStepsGenerator = setStepsGenerator;
       goer.setSteps = setSteps;
       goer.getSteps = getSteps;
+      goer.hasGoalCallback = hasGoalCallback;
       return goer;
 
       function update(timestamp, delta) {
@@ -41,6 +42,10 @@
 
       function getSteps() {
         return steps;
+      }
+
+      function hasGoalCallback() {
+        return goalCallback ? true : false;
       }
 
       function setGoal(x, y, callback) {
