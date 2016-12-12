@@ -51,12 +51,28 @@
 	  var entities = __webpack_require__(1);
 	  var stats = __webpack_require__(20);
 	  var gui = __webpack_require__(21);
+	  var views = __webpack_require__(23);
 	  var gameState = __webpack_require__(17);
 	  var config = __webpack_require__(15);
 	
 	  var paused = false;
+	  var stopped = true;
 	
 	  window.onload = () => {
+	    views.initialize();
+	    views.show('title-screen-view');
+	    views.wire('begin-game-button', quoteScreen);
+	  };
+	
+	  function quoteScreen() {
+	    views.show('quote-view');
+	    views.wire('continue-button', startGame);
+	  }
+	
+	  function startGame() {
+	    views.show();
+	    stopped = false;
+	
 	    var canvasElement = document.getElementById('canvas');
 	    gameState.initialize();
 	    entities.initialize(canvasElement);
@@ -64,9 +80,10 @@
 	    gui.initialize(entities);
 	    gui.setPause(pause);
 	    requestAnimationFrame(grandLoop);
-	  };
+	  }
 	
 	  function grandLoop(timestamp) {
+	    if (stopped) return;
 	    drawFrame(timestamp);
 	    requestAnimationFrame(grandLoop);
 	  }
@@ -18502,21 +18519,21 @@
 
 /***/ },
 /* 21 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	(function() {
+	  var $ = __webpack_require__(22);
 	  var pause = () => { console.log('No pause function registered'); };
 	
 	  var entities;
 	
 	  var pausedView;
-	  var gameOverView;
 	
 	  function consumeAll() {
 	    entities.consumeAll();
 	  }
 	
-	  function addBear(){
+	  function addBear() {
 	    entities.addBear();
 	  }
 	
@@ -18528,9 +18545,9 @@
 	
 	  function showPaused(show) {
 	    if (show) {
-	      removeClass(pausedView, 'hidden');
+	      $.removeClass(pausedView, 'hidden');
 	    } else {
-	      addClass(pausedView, 'hidden');
+	      $.addClass(pausedView, 'hidden');
 	    }
 	  }
 	
@@ -18545,9 +18562,21 @@
 	            .addEventListener('click', (e) => addBear(e));
 	
 	    pausedView = document.getElementById('paused-view');
-	    gameOverView = document.getElementById('game-over');
 	  }
 	
+	  module.exports = {
+	    initialize: initialize,
+	    setPause: setPause,
+	    showPaused: showPaused
+	  };
+	})();
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	(() => {
 	  function addClass(element, klass) {
 	    var classes = element.className.match(/(^| ).+?($| )/g);
 	    classes = classes.map(s => s.trim());
@@ -18562,9 +18591,49 @@
 	  }
 	
 	  module.exports = {
+	    addClass: addClass,
+	    removeClass: removeClass
+	  };
+	})();
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var $ = __webpack_require__(22);
+	
+	  var viewIds = ['title-screen-view', 'quote-view', 'game-over-view'];
+	  var buttonIds = ['begin-game-button', 'continue-button'];
+	  var views;
+	  var buttons;
+	
+	  function initialize() {
+	    views = viewIds.map(id => document.getElementById(id));
+	    buttons = buttonIds.map(id => document.getElementById(id));
+	  }
+	
+	  function show(id) {
+	    views.map(v => $.addClass(v, 'hidden'));
+	
+	    var idx = viewIds.indexOf(id);
+	    if (idx < 0) return;
+	    views.map(v => $.addClass(v, 'hidden'));
+	    $.removeClass(views[idx], 'hidden');
+	  }
+	
+	  function wire(id, callback) {
+	    var idx = buttonIds.indexOf(id);
+	    if (idx < 0) return;
+	
+	    buttons[idx].addEventListener('click', callback);
+	  }
+	
+	  module.exports = {
 	    initialize: initialize,
-	    setPause: setPause,
-	    showPaused: showPaused
+	    show: show,
+	    wire: wire
 	  };
 	})();
 

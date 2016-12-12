@@ -5,12 +5,28 @@
   var entities = require('./crappy-entities.js');
   var stats = require('./gui/crappy-stats.js');
   var gui = require('./gui/crappy-gui.js');
+  var views = require('./gui/crappy-views.js');
   var gameState = require('./crappy-state.js');
   var config = require('./configuration.js');
 
   var paused = false;
+  var stopped = true;
 
   window.onload = () => {
+    views.initialize();
+    views.show('title-screen-view');
+    views.wire('begin-game-button', quoteScreen);
+  };
+
+  function quoteScreen() {
+    views.show('quote-view');
+    views.wire('continue-button', startGame);
+  }
+
+  function startGame() {
+    views.show();
+    stopped = false;
+
     var canvasElement = document.getElementById('canvas');
     gameState.initialize();
     entities.initialize(canvasElement);
@@ -18,9 +34,10 @@
     gui.initialize(entities);
     gui.setPause(pause);
     requestAnimationFrame(grandLoop);
-  };
+  }
 
   function grandLoop(timestamp) {
+    if (stopped) return;
     drawFrame(timestamp);
     requestAnimationFrame(grandLoop);
   }

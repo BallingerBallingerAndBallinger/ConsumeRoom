@@ -1,16 +1,16 @@
 (function() {
+  var $ = require('./lol-jquery.js');
   var pause = () => { console.log('No pause function registered'); };
 
   var entities;
 
   var pausedView;
-  var gameOverView;
 
   function consumeAll() {
     entities.consumeAll();
   }
 
-  function addBear(){
+  function addBear() {
     entities.addBear();
   }
 
@@ -22,9 +22,9 @@
 
   function showPaused(show) {
     if (show) {
-      removeClass(pausedView, 'hidden');
+      $.removeClass(pausedView, 'hidden');
     } else {
-      addClass(pausedView, 'hidden');
+      $.addClass(pausedView, 'hidden');
     }
   }
 
@@ -39,20 +39,6 @@
             .addEventListener('click', (e) => addBear(e));
 
     pausedView = document.getElementById('paused-view');
-    gameOverView = document.getElementById('game-over');
-  }
-
-  function addClass(element, klass) {
-    var classes = element.className.match(/(^| ).+?($| )/g);
-    classes = classes.map(s => s.trim());
-    if (classes.includes(klass)) return;
-    element.className += ' ' + klass;
-  }
-
-  function removeClass(element, klass) {
-    var classes = element.className.match(/(^| ).+?($| )/g);
-    classes = classes.map(s => s.trim());
-    element.className = classes.filter((k) => k !== klass).join(' ');
   }
 
   module.exports = {
