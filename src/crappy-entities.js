@@ -39,7 +39,7 @@
 
   function update(timestamp, delta) {
     if (!eating) {
-      if (Math.random() < config.basePartyGoerProbability) {
+      if (party.rollGoer()) {
         introducePartygoer();
       }
 
