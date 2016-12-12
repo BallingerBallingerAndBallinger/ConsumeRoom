@@ -6,7 +6,7 @@
     var goerBuilders = [
       () => { return dude1Builder.initialize(renderer, movementHandler); },
       () => { return girl1Builder.initialize(renderer, movementHandler); }
-    ];
+   ];
 
     var selection = Math.floor(Math.random() * goerBuilders.length);
     var goer = goerBuilders[selection]();

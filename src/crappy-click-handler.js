@@ -1,7 +1,11 @@
 (() => {
   var registered = [];
+  var initialized = false;
 
   function initialize(canvasElement) {
+    registered = [];
+    if (initialized) return;
+    initialized = true;
     canvasElement.addEventListener('click', (e) => registered.forEach(h => h(e)));
   }
 

@@ -19,9 +19,6 @@
   var timeout;
 
   function initialize(canvasElement) {
-    if (timeout) clearTimeout(timeout);
-    eating = false;
-
     renderer.initialize(canvasElement);
     renderer.audio('sound');
 
@@ -74,6 +71,8 @@
 
   function gameOver() {
     renderer.stopAudio('sound');
+    if (timeout) clearTimeout(timeout);
+    eating = false;
   }
 
   function consumeAll() {
@@ -82,10 +81,10 @@
     renderer.stopAudio('sound');
     renderer.audio('eat');
 
-    var originalCount = entities.length;
     var people = entities.filter(e => {
       return e.isPerson ? true : false;
     });
+    var originalCount = people.length;
 
     people.forEach(p => p.setGoal(0.5, 0.5, () => {
       if (p.eaten) {
@@ -97,7 +96,7 @@
 
     timeout = setTimeout(() => {
       entities = _.difference(entities, people);
-      gameState.bankHappiness(originalCount - entities.length);
+      gameState.bankHappiness(originalCount);
       renderer.audio('sound');
       eating = false;
       timeout = undefined;

@@ -33,6 +33,7 @@
     stopped = false;
 
     var canvasElement = document.getElementById('canvas');
+
     gameState.initialize();
     entities.initialize(canvasElement);
     stats.initialize();

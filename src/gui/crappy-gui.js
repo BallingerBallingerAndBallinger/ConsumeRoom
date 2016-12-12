@@ -31,6 +31,7 @@
   function initialize(ents) {
     entities = ents;
 
+    if (pausedView) return;
     document.getElementById('consume-all-button')
             .addEventListener('click', (e) => consumeAll(e));
     document.getElementById('pause-game-button')

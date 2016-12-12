@@ -79,6 +79,7 @@
 	    stopped = false;
 	
 	    var canvasElement = document.getElementById('canvas');
+	
 	    gameState.initialize();
 	    entities.initialize(canvasElement);
 	    stats.initialize();
@@ -164,9 +165,6 @@
 	  var timeout;
 	
 	  function initialize(canvasElement) {
-	    if (timeout) clearTimeout(timeout);
-	    eating = false;
-	
 	    renderer.initialize(canvasElement);
 	    renderer.audio('sound');
 	
@@ -219,6 +217,8 @@
 	
 	  function gameOver() {
 	    renderer.stopAudio('sound');
+	    if (timeout) clearTimeout(timeout);
+	    eating = false;
 	  }
 	
 	  function consumeAll() {
@@ -227,10 +227,10 @@
 	    renderer.stopAudio('sound');
 	    renderer.audio('eat');
 	
-	    var originalCount = entities.length;
 	    var people = entities.filter(e => {
 	      return e.isPerson ? true : false;
 	    });
+	    var originalCount = people.length;
 	
 	    people.forEach(p => p.setGoal(0.5, 0.5, () => {
 	      if (p.eaten) {
@@ -242,7 +242,7 @@
 	
 	    timeout = setTimeout(() => {
 	      entities = _.difference(entities, people);
-	      gameState.bankHappiness(originalCount - entities.length);
+	      gameState.bankHappiness(originalCount);
 	      renderer.audio('sound');
 	      eating = false;
 	      timeout = undefined;
@@ -17741,7 +17741,7 @@
 	    var goerBuilders = [
 	      () => { return dude1Builder.initialize(renderer, movementHandler); },
 	      () => { return girl1Builder.initialize(renderer, movementHandler); }
-	    ];
+	   ];
 	
 	    var selection = Math.floor(Math.random() * goerBuilders.length);
 	    var goer = goerBuilders[selection]();
@@ -18431,8 +18431,12 @@
 
 	(() => {
 	  var registered = [];
+	  var initialized = false;
 	
 	  function initialize(canvasElement) {
+	    registered = [];
+	    if (initialized) return;
+	    initialized = true;
 	    canvasElement.addEventListener('click', (e) => registered.forEach(h => h(e)));
 	  }
 	
@@ -18558,6 +18562,7 @@
 	  function initialize(ents) {
 	    entities = ents;
 	
+	    if (pausedView) return;
 	    document.getElementById('consume-all-button')
 	            .addEventListener('click', (e) => consumeAll(e));
 	    document.getElementById('pause-game-button')
