@@ -61,6 +61,7 @@ stats {
   color: white;
   background-color: rgba(0,0,0,1);
 
+  left: 0;
 }
 
 .paused-view {
