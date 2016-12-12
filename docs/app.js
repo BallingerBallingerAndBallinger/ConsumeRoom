@@ -248,7 +248,7 @@
 	    });
 	    var originalCount = people.length;
 	
-	    people.forEach(p => p.setGoal(0.5, 0.5, () => {
+	    people.forEach(p => p.setGoal(0.6, 0.55, () => {
 	      if (p.eaten) {
 	        p.eaten();
 	      } else {
@@ -17812,7 +17812,6 @@
 	
 	      var self = { name: 'floor-closed', x: 0, y: -1 };
 	      var eating = false;
-	      var chew = false;
 	
 	      var room = Object.assign({}, entity);
 	      room.update = update;
@@ -17823,17 +17822,12 @@
 	      return room;
 	
 	      function update(timestamp, delta) {
-	        if (eating) {
-	          if (Math.random() < 0.35) {
-	            chew = !chew;
-	          }
-	        }
 	        render.image(self.x, 200, 'room-base', 1000, '');
 	
-	        if (eating && chew) {
-	          render.image(self.x, 500, 'floor-open', 1000, 500);
+	        if (eating) {
+	          render.image(325, 600, 'floor-open', 350, '');
 	        } else {
-	          render.image(self.x, 500, 'floor-closed', 1000, 500);
+	          render.image(325, 600, 'floor-closed', 350, '');
 	        }
 	
 	        door.update(timestamp, delta);
@@ -18746,7 +18740,11 @@
 	      },
 	      { name: 'buy-bloon',
 	        description: 'The bloons aren\'t even really for the humans, are they?',
-	        action: () => { win(); entities.addBloon(); },
+	        action: () => {
+	          win();
+	          entities.addBloon();
+	          setWin(() => {}); // You can't win again this game =P
+	        },
 	        price: configuration.bloon.price
 	      }];
 	

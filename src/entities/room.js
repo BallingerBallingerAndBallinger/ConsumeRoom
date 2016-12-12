@@ -10,7 +10,6 @@
 
       var self = { name: 'floor-closed', x: 0, y: -1 };
       var eating = false;
-      var chew = false;
 
       var room = Object.assign({}, entity);
       room.update = update;
@@ -21,17 +20,12 @@
       return room;
 
       function update(timestamp, delta) {
-        if (eating) {
-          if (Math.random() < 0.35) {
-            chew = !chew;
-          }
-        }
         render.image(self.x, 200, 'room-base', 1000, '');
 
-        if (eating && chew) {
-          render.image(self.x, 500, 'floor-open', 1000, 500);
+        if (eating) {
+          render.image(325, 600, 'floor-open', 350, '');
         } else {
-          render.image(self.x, 500, 'floor-closed', 1000, 500);
+          render.image(325, 600, 'floor-closed', 350, '');
         }
 
         door.update(timestamp, delta);
