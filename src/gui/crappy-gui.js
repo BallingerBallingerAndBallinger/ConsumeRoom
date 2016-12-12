@@ -65,7 +65,11 @@
       },
       { name: 'buy-bloon',
         description: 'The bloons aren\'t even really for the humans, are they?',
-        action: () => { win(); entities.addBloon(); },
+        action: () => {
+          win();
+          entities.addBloon();
+          setWin(() => {}); // You can't win again this game =P
+        },
         price: configuration.bloon.price
       }];
 
