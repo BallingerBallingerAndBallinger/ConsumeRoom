@@ -5,8 +5,7 @@
   var doorBuilder = require('./entities/door.js');
   var windowBuilder = require('./entities/window.js');
   var bearBuilder = require('./entities/items/bear.js');
-  var dude1Builder = require('./entities/goers/dude1.js');
-  var girl1Builder = require('./entities/goers/girl1.js');
+  var party = require('./crappy-party.js');
   var config = require('./configuration.js');
   var renderer = require('./rendering.js');
   var gameState = require('./crappy-state.js');
@@ -101,13 +100,7 @@
   }
 
   function introducePartygoer() {
-    var goerBuilders = [
-      () => { return dude1Builder.initialize(renderer, movementHandler); },
-      () => { return girl1Builder.initialize(renderer, movementHandler); }
-    ];
-
-    var selection = Math.floor(Math.random() * goerBuilders.length);
-    var goer = goerBuilders[selection]();
+    var goer = party.getPartyGoer(renderer, movementHandler);
 
     goer.setX(0.9);
     goer.setY(0);

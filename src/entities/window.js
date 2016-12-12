@@ -1,6 +1,6 @@
 (() => {
   var entityBase = require('../crappy-entity.js');
-  var partyGoer = require('./goers/girl1.js');
+  var party = require('../crappy-party.js');
 
   function initialize(renderer, movementHandler) {
     var constructor = () => {
@@ -10,7 +10,7 @@
 
       var pacers = [];
       for (var i = 0; i < 30; i++) {
-        var pacer = partyGoer.initialize(renderer, { check: () => true });
+        var pacer = party.getPartyGoer(renderer, { check: () => true });
 
         pacer.setX(Math.random());
         pacer.setY(-0.03);
