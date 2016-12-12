@@ -18643,7 +18643,7 @@
 	
 	    shopItems = [
 	      { name: 'buy-plant',
-	        description: 'Back when YOU were human, you remember vaugly enjoying house plants.',
+	        description: 'Back when YOU were human, you remember vaguely enjoying house plants.',
 	        action: entities.addPlant,
 	        price: 5
 	      },
