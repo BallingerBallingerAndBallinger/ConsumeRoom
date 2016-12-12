@@ -1,5 +1,6 @@
 (() => {
   var entityBase = require('../../crappy-entity.js');
+  var configuration = require('../../configuration.js');
 
   var velocity = 0.00001;
 
@@ -19,7 +20,7 @@
       var travel = 0;
 
       bloon.update = update;
-      bloon.getHappiness = () => 100;
+      bloon.getHappiness = () => configuration.bloon.happiness;
       bloon.isEnticement = true;
       return bloon;
 

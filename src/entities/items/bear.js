@@ -1,5 +1,6 @@
 (() => {
   var entityBase = require('../../crappy-entity.js');
+  var configuration = require('../../configuration.js');
 
   function initialize(renderer, movementHandler) {
     var constructor = () => {
@@ -18,13 +19,8 @@
       var isSquishing;
 
       bear.update = update;
-      bear.getX = getX;
-      bear.getY = getY;
-      bear.getZ = getZ;
-      bear.setX = setX;
-      bear.setY = setY;
       bear.handleClick = handleClick;
-      bear.getHappiness = () => 33;
+      bear.getHappiness = () => configuration.bear.happiness;
       bear.isEnticement = true;
       return bear;
 
@@ -61,27 +57,7 @@
           isSquishing = false;
         }
 
-        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
-      }
-
-      function getX() {
-        return self.x;
-      }
-
-      function getY() {
-        return self.y;
-      }
-
-      function getZ() {
-        return self.z;
-      }
-
-      function setX(newX) {
-        self.x = newX;
-      }
-
-      function setY(newY) {
-        self.y = newY;
+        render.image(entity.getRenderX(), entity.getRenderY() + squished, self.name, entity.getRenderHeight(), entity.getRenderHeight() - squished);
       }
     };
 

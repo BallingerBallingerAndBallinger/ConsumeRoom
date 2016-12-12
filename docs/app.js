@@ -53,7 +53,7 @@
 	  var gui = __webpack_require__(22);
 	  var views = __webpack_require__(24);
 	  var gameState = __webpack_require__(17);
-	  var config = __webpack_require__(16);
+	  var config = __webpack_require__(6);
 	
 	  var paused = false;
 	  var stopped = true;
@@ -149,14 +149,15 @@
 	  var _ = __webpack_require__(2);
 	  // Builders
 	  var bloonBuilder = __webpack_require__(4);
-	  var discoBuilder = __webpack_require__(6);
-	  var bearBuilder = __webpack_require__(7);
-	  var plantBuilder = __webpack_require__(8);
-	  var roomBuilder = __webpack_require__(9);
-	  var windowBuilder = __webpack_require__(11);
+	  var discoBuilder = __webpack_require__(7);
+	  var bearBuilder = __webpack_require__(8);
+	  var plantBuilder = __webpack_require__(9);
+	  var roomBuilder = __webpack_require__(10);
+	  var doorBuilder = __webpack_require__(11);
+	  var windowBuilder = __webpack_require__(12);
 	  //
-	  var party = __webpack_require__(12);
-	  var config = __webpack_require__(16);
+	  var party = __webpack_require__(13);
+	  var config = __webpack_require__(6);
 	  var renderer = __webpack_require__(18);
 	  var gameState = __webpack_require__(17);
 	  var click = __webpack_require__(19);
@@ -337,7 +338,7 @@
 	  var undefined;
 	
 	  /** Used as the semantic version number. */
-	  var VERSION = '4.17.2';
+	  var VERSION = '4.17.0';
 	
 	  /** Used as the size to enable large array optimizations. */
 	  var LARGE_ARRAY_SIZE = 200;
@@ -3381,7 +3382,7 @@
 	     * @returns {*} Returns the resolved value.
 	     */
 	    function baseGet(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = 0,
 	          length = path.length;
@@ -3567,9 +3568,12 @@
 	     * @returns {*} Returns the result of the invoked method.
 	     */
 	    function baseInvoke(object, path, args) {
-	      path = castPath(path, object);
-	      object = parent(object, path);
-	      var func = object == null ? object : object[toKey(last(path))];
+	      if (!isKey(path, object)) {
+	        path = castPath(path);
+	        object = parent(object, path);
+	        path = last(path);
+	      }
+	      var func = object == null ? object : object[toKey(path)];
 	      return func == null ? undefined : apply(func, object, args);
 	    }
 	
@@ -4130,7 +4134,7 @@
 	            value = baseGet(object, path);
 	
 	        if (predicate(value, path)) {
-	          baseSet(result, castPath(path, object), value);
+	          baseSet(result, path, value);
 	        }
 	      }
 	      return result;
@@ -4206,8 +4210,17 @@
 	          var previous = index;
 	          if (isIndex(index)) {
 	            splice.call(array, index, 1);
-	          } else {
-	            baseUnset(array, index);
+	          }
+	          else if (!isKey(index, array)) {
+	            var path = castPath(index),
+	                object = parent(array, path);
+	
+	            if (object != null) {
+	              delete object[toKey(last(path))];
+	            }
+	          }
+	          else {
+	            delete array[toKey(index)];
 	          }
 	        }
 	      }
@@ -4328,7 +4341,7 @@
 	      if (!isObject(object)) {
 	        return object;
 	      }
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -4669,9 +4682,11 @@
 	     * @returns {boolean} Returns `true` if the property is deleted, else `false`.
 	     */
 	    function baseUnset(object, path) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	      object = parent(object, path);
-	      return object == null || delete object[toKey(last(path))];
+	
+	      var key = toKey(last(path));
+	      return !(object != null && hasOwnProperty.call(object, key)) || delete object[key];
 	    }
 	
 	    /**
@@ -4811,14 +4826,10 @@
 	     *
 	     * @private
 	     * @param {*} value The value to inspect.
-	     * @param {Object} [object] The object to query keys on.
 	     * @returns {Array} Returns the cast property path array.
 	     */
-	    function castPath(value, object) {
-	      if (isArray(value)) {
-	        return value;
-	      }
-	      return isKey(value, object) ? [value] : stringToPath(toString(value));
+	    function castPath(value) {
+	      return isArray(value) ? value : stringToPath(value);
 	    }
 	
 	    /**
@@ -6443,7 +6454,7 @@
 	     * @returns {boolean} Returns `true` if `path` exists, else `false`.
 	     */
 	    function hasPath(object, path, hasFunc) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length,
@@ -6920,7 +6931,7 @@
 	     * @returns {*} Returns the parent value.
 	     */
 	    function parent(object, path) {
-	      return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
+	      return path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
 	    }
 	
 	    /**
@@ -7060,6 +7071,8 @@
 	     * @returns {Array} Returns the property path array.
 	     */
 	    var stringToPath = memoizeCapped(function(string) {
+	      string = toString(string);
+	
 	      var result = [];
 	      if (reLeadingDot.test(string)) {
 	        result.push('');
@@ -9794,10 +9807,12 @@
 	    var invokeMap = baseRest(function(collection, path, args) {
 	      var index = -1,
 	          isFunc = typeof path == 'function',
+	          isProp = isKey(path),
 	          result = isArrayLike(collection) ? Array(collection.length) : [];
 	
 	      baseEach(collection, function(value) {
-	        result[++index] = isFunc ? apply(path, value, args) : baseInvoke(value, path, args);
+	        var func = isFunc ? path : ((isProp && value != null) ? value[path] : undefined);
+	        result[++index] = func ? apply(func, value, args) : baseInvoke(value, path, args);
 	      });
 	      return result;
 	    });
@@ -11165,10 +11180,14 @@
 	      start = start === undefined ? 0 : nativeMax(toInteger(start), 0);
 	      return baseRest(function(args) {
 	        var array = args[start],
+	            lastIndex = args.length - 1,
 	            otherArgs = castSlice(args, 0, start);
 	
 	        if (array) {
 	          arrayPush(otherArgs, array);
+	        }
+	        if (start != lastIndex) {
+	          arrayPush(otherArgs, castSlice(args, start + 1));
 	        }
 	        return apply(func, this, otherArgs);
 	      });
@@ -13784,16 +13803,9 @@
 	      if (object == null) {
 	        return result;
 	      }
-	      var isDeep = false;
-	      paths = arrayMap(paths, function(path) {
-	        path = castPath(path, object);
-	        isDeep || (isDeep = path.length > 1);
-	        return path;
-	      });
 	      copyObject(object, getAllKeysIn(object), result);
-	      if (isDeep) {
-	        result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
-	      }
+	      result = baseClone(result, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG);
+	
 	      var length = paths.length;
 	      while (length--) {
 	        baseUnset(result, paths[length]);
@@ -13843,7 +13855,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    var pick = flatRest(function(object, paths) {
-	      return object == null ? {} : basePick(object, paths);
+	      return object == null ? {} : basePick(object, arrayMap(paths, toKey));
 	    });
 	
 	    /**
@@ -13865,16 +13877,7 @@
 	     * // => { 'a': 1, 'c': 3 }
 	     */
 	    function pickBy(object, predicate) {
-	      if (object == null) {
-	        return {};
-	      }
-	      var props = arrayMap(getAllKeysIn(object), function(prop) {
-	        return [prop];
-	      });
-	      predicate = getIteratee(predicate);
-	      return basePickBy(object, props, function(value, path) {
-	        return predicate(value, path[0]);
-	      });
+	      return object == null ? {} : basePickBy(object, getAllKeysIn(object), getIteratee(predicate));
 	    }
 	
 	    /**
@@ -13907,15 +13910,15 @@
 	     * // => 'default'
 	     */
 	    function result(object, path, defaultValue) {
-	      path = castPath(path, object);
+	      path = isKey(path, object) ? [path] : castPath(path);
 	
 	      var index = -1,
 	          length = path.length;
 	
 	      // Ensure the loop is entered when path is empty.
 	      if (!length) {
-	        length = 1;
 	        object = undefined;
+	        length = 1;
 	      }
 	      while (++index < length) {
 	        var value = object == null ? undefined : object[toKey(path[index])];
@@ -16425,7 +16428,7 @@
 	      if (isArray(value)) {
 	        return arrayMap(value, toKey);
 	      }
-	      return isSymbol(value) ? [value] : copyArray(stringToPath(toString(value)));
+	      return isSymbol(value) ? [value] : copyArray(stringToPath(value));
 	    }
 	
 	    /**
@@ -17413,6 +17416,7 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  var velocity = 0.00001;
 	
@@ -17432,7 +17436,7 @@
 	      var travel = 0;
 	
 	      bloon.update = update;
-	      bloon.getHappiness = () => 100;
+	      bloon.getHappiness = () => configuration.bloon.happiness;
 	      bloon.isEnticement = true;
 	      return bloon;
 	
@@ -17555,10 +17559,45 @@
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  title: 'Consume Room',
+	  frameMs: 50,
+	  eatSoundTime: 11500,
+	  baseHungerProbability: 0.005,
+	  basePartyGoerProbability: 0.03,
+	  basePartyGoerLeavesProbability: 0.03,
+	  irresistableEnticingness: 10000,
+	  packedHouse: 400,
+	  leaveAttempts: 15,
+	  entryDistance: 0.5,
+	  plant: {
+	    happiness: 5,
+	    price: 5
+	  },
+	  bear: {
+	    happiness: 15,
+	    price: 10
+	  },
+	  disco: {
+	    happiness: 50,
+	    price: 25
+	  },
+	  bloon: {
+	    happiness: 200,
+	    price: 100
+	  }
+	};
+
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17577,7 +17616,7 @@
 	
 	      var disco = Object.assign({}, entity);
 	      disco.update = update;
-	      disco.getHappiness = () => 100;
+	      disco.getHappiness = () => configuration.disco.happiness;
 	      disco.isEnticement = true;
 	      return disco;
 	
@@ -17608,11 +17647,12 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17631,13 +17671,8 @@
 	      var isSquishing;
 	
 	      bear.update = update;
-	      bear.getX = getX;
-	      bear.getY = getY;
-	      bear.getZ = getZ;
-	      bear.setX = setX;
-	      bear.setY = setY;
 	      bear.handleClick = handleClick;
-	      bear.getHappiness = () => 33;
+	      bear.getHappiness = () => configuration.bear.happiness;
 	      bear.isEnticement = true;
 	      return bear;
 	
@@ -17674,27 +17709,7 @@
 	          isSquishing = false;
 	        }
 	
-	        render.image(entity.getRenderX(renderer), entity.getRenderY(renderer) + squished, self.name, entity.getRenderHeight(renderer), entity.getRenderHeight(renderer) - squished);
-	      }
-	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function getZ() {
-	        return self.z;
-	      }
-	
-	      function setX(newX) {
-	        self.x = newX;
-	      }
-	
-	      function setY(newY) {
-	        self.y = newY;
+	        render.image(entity.getRenderX(), entity.getRenderY() + squished, self.name, entity.getRenderHeight(), entity.getRenderHeight() - squished);
 	      }
 	    };
 	
@@ -17708,11 +17723,12 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
+	  var configuration = __webpack_require__(6);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17728,7 +17744,7 @@
 	
 	      plant.update = update;
 	      plant.handleClick = handleClick;
-	      plant.getHappiness = () => 33;
+	      plant.getHappiness = () => configuration.plant.happiness;
 	      plant.isEnticement = true;
 	      return plant;
 	
@@ -17758,17 +17774,15 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var doorBuilder = __webpack_require__(10);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
 	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var door = doorBuilder.initialize(renderer);
 	      var render = renderer;
 	
 	      var self = { name: 'floor-closed', x: 0, y: -1 };
@@ -17796,8 +17810,6 @@
 	        } else {
 	          render.image(self.x, 500, 'floor-closed', 1000, 500);
 	        }
-	
-	        door.update(timestamp, delta);
 	      }
 	
 	      function getX() {
@@ -17814,63 +17826,6 @@
 	
 	      function setEating(newEating) {
 	        eating = newEating;
-	        door.setClosed(newEating);
-	      }
-	    };
-	
-	    return constructor();
-	  }
-	
-	  module.exports = {
-	    initialize: initialize
-	  };
-	})();
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(() => {
-	  var entityBase = __webpack_require__(5);
-	
-	  function initialize(renderer, movementHandler) {
-	    var constructor = () => {
-	      var entity = entityBase.initialize(renderer, movementHandler);
-	      var render = renderer;
-	      var closed = false;
-	      var self = { name: door, y: -1 };
-	
-	      var door = Object.assign({}, entity);
-	      door.update = update;
-	      door.getX = getX;
-	      door.getY = getY;
-	      door.getZ = getZ;
-	      door.setClosed = setClosed;
-	      return door;
-	
-	      function setClosed(newClosed) {
-	        closed = newClosed;
-	      }
-	
-	      function update(timestamp, delta) {
-	        if (closed) {
-	          render.image(630, 353, 'closed-door', 80, 148);
-	        } else {
-	          render.image(710, 350, 'open-door', 55, '');
-	        }
-	      }
-	
-	      function getX() {
-	        return self.x;
-	      }
-	
-	      function getY() {
-	        return self.y;
-	      }
-	
-	      function getZ() {
-	        return self.z;
 	      }
 	    };
 	
@@ -17889,7 +17844,53 @@
 
 	(() => {
 	  var entityBase = __webpack_require__(5);
-	  var party = __webpack_require__(12);
+	
+	  function initialize(renderer, movementHandler) {
+	    var constructor = () => {
+	      var entity = entityBase.initialize(renderer, movementHandler);
+	      var render = renderer;
+	      var self = { name: door, y: -1 };
+	
+	      var door = Object.assign({}, entity);
+	      door.update = update;
+	      door.getX = getX;
+	      door.getY = getY;
+	      door.getZ = getZ;
+	      return door;
+	
+	      function update(timestamp, delta) {
+	        render.image(830, 300, 'door', 55, 400);
+	      }
+	
+	      function getX() {
+	        return self.x;
+	      }
+	
+	      function getY() {
+	        return self.y;
+	      }
+	
+	      function getZ() {
+	        return self.z;
+	      }
+	    };
+	
+	    return constructor();
+	  }
+	
+	  module.exports = {
+	    initialize: initialize
+	  };
+	})();
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(() => {
+	  var entityBase = __webpack_require__(5);
+	  var party = __webpack_require__(13);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -17956,13 +17957,13 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var dude1Builder = __webpack_require__(13);
-	  var girl1Builder = __webpack_require__(15);
-	  var config = __webpack_require__(16);
+	  var dude1Builder = __webpack_require__(14);
+	  var girl1Builder = __webpack_require__(16);
+	  var config = __webpack_require__(6);
 	  var gameState = __webpack_require__(17);
 	
 	  function rollGoer() {
@@ -18012,11 +18013,11 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(14);
+	  var entityBase = __webpack_require__(15);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18045,7 +18046,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
@@ -18165,11 +18166,11 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(() => {
-	  var entityBase = __webpack_require__(14);
+	  var entityBase = __webpack_require__(15);
 	
 	  function initialize(renderer, movementHandler) {
 	    var constructor = () => {
@@ -18203,24 +18204,6 @@
 	    initialize: initialize
 	  };
 	})();
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	  title: 'Consume Room',
-	  frameMs: 50,
-	  eatSoundTime: 11500,
-	  baseHungerProbability: 0.005,
-	  basePartyGoerProbability: 0.03,
-	  basePartyGoerLeavesProbability: 0.03,
-	  irresistableEnticingness: 10000,
-	  packedHouse: 400,
-	  leaveAttempts: 15,
-	  entryDistance: 0.5
-	};
 
 
 /***/ },
@@ -18642,6 +18625,7 @@
 
 	(function() {
 	  var $ = __webpack_require__(23);
+	  var configuration = __webpack_require__(6);
 	  var pause = () => { console.log('No pause function registered'); };
 	
 	  var entities;
@@ -18651,7 +18635,7 @@
 	  var pausedView;
 	  var selectedItem;
 	  var shopItems;
-	  var shopShown = false;;
+	  var shopShown = false;
 	
 	  function consumeAll() {
 	    entities.consumeAll();
@@ -18687,22 +18671,22 @@
 	      { name: 'buy-plant',
 	        description: 'Back when YOU were human, you remember vaguely enjoying house plants.',
 	        action: entities.addPlant,
-	        price: 5
+	        price: configuration.plant.price
 	      },
 	      { name: 'buy-bear',
 	        description: 'Nothing says "This room is totally safe" like a cuddly teddy!',
 	        action: entities.addBear,
-	        price: 10
+	        price: configuration.bear.price
 	      },
 	      { name: 'buy-disco',
 	        description: 'It\'s not a party in your tummy without one of these.',
 	        action: entities.addDisco,
-	        price: 25
+	        price: configuration.disco.price
 	      },
 	      { name: 'buy-bloon',
 	        description: 'The bloons aren\'t even really for the humans, are they?',
 	        action: entities.addBloon,
-	        price: 50
+	        price: configuration.bloon.price
 	      }];
 	
 	    if (pausedView) return;
@@ -18734,6 +18718,7 @@
 	
 	    shopItems.forEach((item) => {
 	      item.element = document.getElementById(item.name);
+	      item.element.getElementsByClassName('cost')[0].innerHTML = item.price + ' happiness';
 	      item.element.addEventListener('mouseover', (e) => { enticementDesc.innerHTML = item.description; });
 	      item.element.addEventListener('mouseout', (e) => { enticementDesc.innerHTML = selectedItem.description; });
 	      item.element.addEventListener('click', (e) => {

@@ -1,5 +1,6 @@
 (() => {
   var entityBase = require('../../crappy-entity.js');
+  var configuration = require('../../configuration.js');
 
   function initialize(renderer, movementHandler) {
     var constructor = () => {
@@ -18,7 +19,7 @@
 
       var disco = Object.assign({}, entity);
       disco.update = update;
-      disco.getHappiness = () => 100;
+      disco.getHappiness = () => configuration.disco.happiness;
       disco.isEnticement = true;
       return disco;
 
